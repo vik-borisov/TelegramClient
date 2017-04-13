@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-402498398)]
-    public class TLSavedGifsNotModified : TLAbsSavedGifs
+    [TlObject(-402498398)]
+    public class TlSavedGifsNotModified : TlAbsSavedGifs
     {
         public override int Constructor => -402498398;
 

@@ -7,15 +7,15 @@ namespace TelegramClient.Core.Network
     public class MtProtoPlainSender
     {
         private readonly TcpTransport _transport;
-        private long lastMessageId;
-        private readonly Random random;
-        private int sequence = 0;
-        private int timeOffset;
+        private long _lastMessageId;
+        private readonly Random _random;
+        private int _sequence = 0;
+        private int _timeOffset;
 
         public MtProtoPlainSender(TcpTransport transport)
         {
             _transport = transport;
-            random = new Random();
+            _random = new Random();
         }
 
         public async Task Send(byte[] data)
@@ -56,15 +56,15 @@ namespace TelegramClient.Core.Network
         private long GetNewMessageId()
         {
             var time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds);
-            var newMessageId = ((time / 1000 + timeOffset) << 32) |
+            var newMessageId = ((time / 1000 + _timeOffset) << 32) |
                                ((time % 1000) << 22) |
-                               (random.Next(524288) << 2); // 2^19
+                               (_random.Next(524288) << 2); // 2^19
             // [ unix timestamp : 32 bit] [ milliseconds : 10 bit ] [ buffer space : 1 bit ] [ random : 19 bit ] [ msg_id type : 2 bit ] = [ msg_id : 64 bit ]
 
-            if (lastMessageId >= newMessageId)
-                newMessageId = lastMessageId + 4;
+            if (_lastMessageId >= newMessageId)
+                newMessageId = _lastMessageId + 4;
 
-            lastMessageId = newMessageId;
+            _lastMessageId = newMessageId;
             return newMessageId;
         }
     }

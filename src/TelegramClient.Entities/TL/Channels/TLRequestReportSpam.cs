@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Channels
 {
-    [TLObject(-32999408)]
-    public class TLRequestReportSpam : TLMethod
+    [TlObject(-32999408)]
+    public class TlRequestReportSpam : TlMethod
     {
         public override int Constructor => -32999408;
 
-        public TLAbsInputChannel channel { get; set; }
-        public TLAbsInputUser user_id { get; set; }
-        public TLVector<int> id { get; set; }
+        public TlAbsInputChannel Channel { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public TlVector<int> Id { get; set; }
         public bool Response { get; set; }
 
 
@@ -19,20 +19,20 @@ namespace TelegramClient.Entities.TL.Channels
 
         public override void DeserializeBody(BinaryReader br)
         {
-            channel = (TLAbsInputChannel) ObjectUtils.DeserializeObject(br);
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
-            id = ObjectUtils.DeserializeVector<int>(br);
+            Channel = (TlAbsInputChannel) ObjectUtils.DeserializeObject(br);
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Id = ObjectUtils.DeserializeVector<int>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(channel, bw);
-            ObjectUtils.SerializeObject(user_id, bw);
-            ObjectUtils.SerializeObject(id, bw);
+            ObjectUtils.SerializeObject(Channel, bw);
+            ObjectUtils.SerializeObject(UserId, bw);
+            ObjectUtils.SerializeObject(Id, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

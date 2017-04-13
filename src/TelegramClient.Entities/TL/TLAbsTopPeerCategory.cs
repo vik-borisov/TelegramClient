@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsTopPeerCategory : TLObject
+    public abstract class TlAbsTopPeerCategory : TlObject
     {
     }
 }

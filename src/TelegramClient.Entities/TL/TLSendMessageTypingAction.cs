@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(381645902)]
-    public class TLSendMessageTypingAction : TLAbsSendMessageAction
+    [TlObject(381645902)]
+    public class TlSendMessageTypingAction : TlAbsSendMessageAction
     {
         public override int Constructor => 381645902;
 

@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsInputPhoto : TLObject
+    public abstract class TlAbsInputPhoto : TlObject
     {
     }
 }

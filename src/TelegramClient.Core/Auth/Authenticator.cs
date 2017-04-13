@@ -5,15 +5,15 @@ namespace TelegramClient.Core.Auth
 {
     public static class Authenticator
     {
-        public static async Task<Step3_Response> DoAuthentication(TcpTransport transport)
+        public static async Task<Step3Response> DoAuthentication(TcpTransport transport)
         {
             var sender = new MtProtoPlainSender(transport);
-            var step1 = new Step1_PQRequest();
+            var step1 = new Step1PqRequest();
 
             await sender.Send(step1.ToBytes());
             var step1Response = step1.FromBytes(await sender.Receive());
 
-            var step2 = new Step2_DHExchange();
+            var step2 = new Step2DhExchange();
             await sender.Send(step2.ToBytes(
                 step1Response.Nonce,
                 step1Response.ServerNonce,
@@ -22,7 +22,7 @@ namespace TelegramClient.Core.Auth
 
             var step2Response = step2.FromBytes(await sender.Receive());
 
-            var step3 = new Step3_CompleteDHExchange();
+            var step3 = new Step3CompleteDhExchange();
             await sender.Send(step3.ToBytes(
                 step2Response.Nonce,
                 step2Response.ServerNonce,

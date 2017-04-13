@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1657903163)]
-    public class TLUpdateContactLink : TLAbsUpdate
+    [TlObject(-1657903163)]
+    public class TlUpdateContactLink : TlAbsUpdate
     {
         public override int Constructor => -1657903163;
 
-        public int user_id { get; set; }
-        public TLAbsContactLink my_link { get; set; }
-        public TLAbsContactLink foreign_link { get; set; }
+        public int UserId { get; set; }
+        public TlAbsContactLink MyLink { get; set; }
+        public TlAbsContactLink ForeignLink { get; set; }
 
 
         public void ComputeFlags()
@@ -18,17 +18,17 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            user_id = br.ReadInt32();
-            my_link = (TLAbsContactLink) ObjectUtils.DeserializeObject(br);
-            foreign_link = (TLAbsContactLink) ObjectUtils.DeserializeObject(br);
+            UserId = br.ReadInt32();
+            MyLink = (TlAbsContactLink) ObjectUtils.DeserializeObject(br);
+            ForeignLink = (TlAbsContactLink) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(user_id);
-            ObjectUtils.SerializeObject(my_link, bw);
-            ObjectUtils.SerializeObject(foreign_link, bw);
+            bw.Write(UserId);
+            ObjectUtils.SerializeObject(MyLink, bw);
+            ObjectUtils.SerializeObject(ForeignLink, bw);
         }
     }
 }

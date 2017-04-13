@@ -2,145 +2,145 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-897446185)]
-    public class TLWebPage : TLAbsWebPage
+    [TlObject(-897446185)]
+    public class TlWebPage : TlAbsWebPage
     {
         public override int Constructor => -897446185;
 
-        public int flags { get; set; }
-        public long id { get; set; }
-        public string url { get; set; }
-        public string display_url { get; set; }
-        public string type { get; set; }
-        public string site_name { get; set; }
-        public string title { get; set; }
-        public string description { get; set; }
-        public TLAbsPhoto photo { get; set; }
-        public string embed_url { get; set; }
-        public string embed_type { get; set; }
-        public int? embed_width { get; set; }
-        public int? embed_height { get; set; }
-        public int? duration { get; set; }
-        public string author { get; set; }
-        public TLAbsDocument document { get; set; }
+        public int Flags { get; set; }
+        public long Id { get; set; }
+        public string Url { get; set; }
+        public string DisplayUrl { get; set; }
+        public string Type { get; set; }
+        public string SiteName { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public TlAbsPhoto Photo { get; set; }
+        public string EmbedUrl { get; set; }
+        public string EmbedType { get; set; }
+        public int? EmbedWidth { get; set; }
+        public int? EmbedHeight { get; set; }
+        public int? Duration { get; set; }
+        public string Author { get; set; }
+        public TlAbsDocument Document { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = type != null ? flags | 1 : flags & ~1;
-            flags = site_name != null ? flags | 2 : flags & ~2;
-            flags = title != null ? flags | 4 : flags & ~4;
-            flags = description != null ? flags | 8 : flags & ~8;
-            flags = photo != null ? flags | 16 : flags & ~16;
-            flags = embed_url != null ? flags | 32 : flags & ~32;
-            flags = embed_type != null ? flags | 32 : flags & ~32;
-            flags = embed_width != null ? flags | 64 : flags & ~64;
-            flags = embed_height != null ? flags | 64 : flags & ~64;
-            flags = duration != null ? flags | 128 : flags & ~128;
-            flags = author != null ? flags | 256 : flags & ~256;
-            flags = document != null ? flags | 512 : flags & ~512;
+            Flags = 0;
+            Flags = Type != null ? Flags | 1 : Flags & ~1;
+            Flags = SiteName != null ? Flags | 2 : Flags & ~2;
+            Flags = Title != null ? Flags | 4 : Flags & ~4;
+            Flags = Description != null ? Flags | 8 : Flags & ~8;
+            Flags = Photo != null ? Flags | 16 : Flags & ~16;
+            Flags = EmbedUrl != null ? Flags | 32 : Flags & ~32;
+            Flags = EmbedType != null ? Flags | 32 : Flags & ~32;
+            Flags = EmbedWidth != null ? Flags | 64 : Flags & ~64;
+            Flags = EmbedHeight != null ? Flags | 64 : Flags & ~64;
+            Flags = Duration != null ? Flags | 128 : Flags & ~128;
+            Flags = Author != null ? Flags | 256 : Flags & ~256;
+            Flags = Document != null ? Flags | 512 : Flags & ~512;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            id = br.ReadInt64();
-            url = StringUtil.Deserialize(br);
-            display_url = StringUtil.Deserialize(br);
-            if ((flags & 1) != 0)
-                type = StringUtil.Deserialize(br);
+            Flags = br.ReadInt32();
+            Id = br.ReadInt64();
+            Url = StringUtil.Deserialize(br);
+            DisplayUrl = StringUtil.Deserialize(br);
+            if ((Flags & 1) != 0)
+                Type = StringUtil.Deserialize(br);
             else
-                type = null;
+                Type = null;
 
-            if ((flags & 2) != 0)
-                site_name = StringUtil.Deserialize(br);
+            if ((Flags & 2) != 0)
+                SiteName = StringUtil.Deserialize(br);
             else
-                site_name = null;
+                SiteName = null;
 
-            if ((flags & 4) != 0)
-                title = StringUtil.Deserialize(br);
+            if ((Flags & 4) != 0)
+                Title = StringUtil.Deserialize(br);
             else
-                title = null;
+                Title = null;
 
-            if ((flags & 8) != 0)
-                description = StringUtil.Deserialize(br);
+            if ((Flags & 8) != 0)
+                Description = StringUtil.Deserialize(br);
             else
-                description = null;
+                Description = null;
 
-            if ((flags & 16) != 0)
-                photo = (TLAbsPhoto) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 16) != 0)
+                Photo = (TlAbsPhoto) ObjectUtils.DeserializeObject(br);
             else
-                photo = null;
+                Photo = null;
 
-            if ((flags & 32) != 0)
-                embed_url = StringUtil.Deserialize(br);
+            if ((Flags & 32) != 0)
+                EmbedUrl = StringUtil.Deserialize(br);
             else
-                embed_url = null;
+                EmbedUrl = null;
 
-            if ((flags & 32) != 0)
-                embed_type = StringUtil.Deserialize(br);
+            if ((Flags & 32) != 0)
+                EmbedType = StringUtil.Deserialize(br);
             else
-                embed_type = null;
+                EmbedType = null;
 
-            if ((flags & 64) != 0)
-                embed_width = br.ReadInt32();
+            if ((Flags & 64) != 0)
+                EmbedWidth = br.ReadInt32();
             else
-                embed_width = null;
+                EmbedWidth = null;
 
-            if ((flags & 64) != 0)
-                embed_height = br.ReadInt32();
+            if ((Flags & 64) != 0)
+                EmbedHeight = br.ReadInt32();
             else
-                embed_height = null;
+                EmbedHeight = null;
 
-            if ((flags & 128) != 0)
-                duration = br.ReadInt32();
+            if ((Flags & 128) != 0)
+                Duration = br.ReadInt32();
             else
-                duration = null;
+                Duration = null;
 
-            if ((flags & 256) != 0)
-                author = StringUtil.Deserialize(br);
+            if ((Flags & 256) != 0)
+                Author = StringUtil.Deserialize(br);
             else
-                author = null;
+                Author = null;
 
-            if ((flags & 512) != 0)
-                document = (TLAbsDocument) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 512) != 0)
+                Document = (TlAbsDocument) ObjectUtils.DeserializeObject(br);
             else
-                document = null;
+                Document = null;
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
-            bw.Write(id);
-            StringUtil.Serialize(url, bw);
-            StringUtil.Serialize(display_url, bw);
-            if ((flags & 1) != 0)
-                StringUtil.Serialize(type, bw);
-            if ((flags & 2) != 0)
-                StringUtil.Serialize(site_name, bw);
-            if ((flags & 4) != 0)
-                StringUtil.Serialize(title, bw);
-            if ((flags & 8) != 0)
-                StringUtil.Serialize(description, bw);
-            if ((flags & 16) != 0)
-                ObjectUtils.SerializeObject(photo, bw);
-            if ((flags & 32) != 0)
-                StringUtil.Serialize(embed_url, bw);
-            if ((flags & 32) != 0)
-                StringUtil.Serialize(embed_type, bw);
-            if ((flags & 64) != 0)
-                bw.Write(embed_width.Value);
-            if ((flags & 64) != 0)
-                bw.Write(embed_height.Value);
-            if ((flags & 128) != 0)
-                bw.Write(duration.Value);
-            if ((flags & 256) != 0)
-                StringUtil.Serialize(author, bw);
-            if ((flags & 512) != 0)
-                ObjectUtils.SerializeObject(document, bw);
+            bw.Write(Flags);
+            bw.Write(Id);
+            StringUtil.Serialize(Url, bw);
+            StringUtil.Serialize(DisplayUrl, bw);
+            if ((Flags & 1) != 0)
+                StringUtil.Serialize(Type, bw);
+            if ((Flags & 2) != 0)
+                StringUtil.Serialize(SiteName, bw);
+            if ((Flags & 4) != 0)
+                StringUtil.Serialize(Title, bw);
+            if ((Flags & 8) != 0)
+                StringUtil.Serialize(Description, bw);
+            if ((Flags & 16) != 0)
+                ObjectUtils.SerializeObject(Photo, bw);
+            if ((Flags & 32) != 0)
+                StringUtil.Serialize(EmbedUrl, bw);
+            if ((Flags & 32) != 0)
+                StringUtil.Serialize(EmbedType, bw);
+            if ((Flags & 64) != 0)
+                bw.Write(EmbedWidth.Value);
+            if ((Flags & 64) != 0)
+                bw.Write(EmbedHeight.Value);
+            if ((Flags & 128) != 0)
+                bw.Write(Duration.Value);
+            if ((Flags & 256) != 0)
+                StringUtil.Serialize(Author, bw);
+            if ((Flags & 512) != 0)
+                ObjectUtils.SerializeObject(Document, bw);
         }
     }
 }

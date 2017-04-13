@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1776756363)]
-    public class TLChannelRoleModerator : TLAbsChannelParticipantRole
+    [TlObject(-1776756363)]
+    public class TlChannelRoleModerator : TlAbsChannelParticipantRole
     {
         public override int Constructor => -1776756363;
 

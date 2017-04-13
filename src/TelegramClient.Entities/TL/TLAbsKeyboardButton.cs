@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsKeyboardButton : TLObject
+    public abstract class TlAbsKeyboardButton : TlObject
     {
     }
 }

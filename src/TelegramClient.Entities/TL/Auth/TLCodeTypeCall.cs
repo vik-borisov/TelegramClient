@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Auth
 {
-    [TLObject(1948046307)]
-    public class TLCodeTypeCall : TLAbsCodeType
+    [TlObject(1948046307)]
+    public class TlCodeTypeCall : TlAbsCodeType
     {
         public override int Constructor => 1948046307;
 

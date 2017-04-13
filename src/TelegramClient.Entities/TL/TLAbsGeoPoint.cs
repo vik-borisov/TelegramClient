@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsGeoPoint : TLObject
+    public abstract class TlAbsGeoPoint : TlObject
     {
     }
 }

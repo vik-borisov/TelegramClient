@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Auth
 {
-    [TLObject(1398007207)]
-    public class TLSentCodeTypeCall : TLAbsSentCodeType
+    [TlObject(1398007207)]
+    public class TlSentCodeTypeCall : TlAbsSentCodeType
     {
         public override int Constructor => 1398007207;
 
-        public int length { get; set; }
+        public int Length { get; set; }
 
 
         public void ComputeFlags()
@@ -16,13 +16,13 @@ namespace TelegramClient.Entities.TL.Auth
 
         public override void DeserializeBody(BinaryReader br)
         {
-            length = br.ReadInt32();
+            Length = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(length);
+            bw.Write(Length);
         }
     }
 }

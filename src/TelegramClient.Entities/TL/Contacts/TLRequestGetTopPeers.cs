@@ -2,61 +2,61 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Contacts
 {
-    [TLObject(-728224331)]
-    public class TLRequestGetTopPeers : TLMethod
+    [TlObject(-728224331)]
+    public class TlRequestGetTopPeers : TlMethod
     {
         public override int Constructor => -728224331;
 
-        public int flags { get; set; }
-        public bool correspondents { get; set; }
-        public bool bots_pm { get; set; }
-        public bool bots_inline { get; set; }
-        public bool groups { get; set; }
-        public bool channels { get; set; }
-        public int offset { get; set; }
-        public int limit { get; set; }
-        public int hash { get; set; }
-        public TLAbsTopPeers Response { get; set; }
+        public int Flags { get; set; }
+        public bool Correspondents { get; set; }
+        public bool BotsPm { get; set; }
+        public bool BotsInline { get; set; }
+        public bool Groups { get; set; }
+        public bool Channels { get; set; }
+        public int Offset { get; set; }
+        public int Limit { get; set; }
+        public int Hash { get; set; }
+        public TlAbsTopPeers Response { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = correspondents ? flags | 1 : flags & ~1;
-            flags = bots_pm ? flags | 2 : flags & ~2;
-            flags = bots_inline ? flags | 4 : flags & ~4;
-            flags = groups ? flags | 1024 : flags & ~1024;
-            flags = channels ? flags | 32768 : flags & ~32768;
+            Flags = 0;
+            Flags = Correspondents ? Flags | 1 : Flags & ~1;
+            Flags = BotsPm ? Flags | 2 : Flags & ~2;
+            Flags = BotsInline ? Flags | 4 : Flags & ~4;
+            Flags = Groups ? Flags | 1024 : Flags & ~1024;
+            Flags = Channels ? Flags | 32768 : Flags & ~32768;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            correspondents = (flags & 1) != 0;
-            bots_pm = (flags & 2) != 0;
-            bots_inline = (flags & 4) != 0;
-            groups = (flags & 1024) != 0;
-            channels = (flags & 32768) != 0;
-            offset = br.ReadInt32();
-            limit = br.ReadInt32();
-            hash = br.ReadInt32();
+            Flags = br.ReadInt32();
+            Correspondents = (Flags & 1) != 0;
+            BotsPm = (Flags & 2) != 0;
+            BotsInline = (Flags & 4) != 0;
+            Groups = (Flags & 1024) != 0;
+            Channels = (Flags & 32768) != 0;
+            Offset = br.ReadInt32();
+            Limit = br.ReadInt32();
+            Hash = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
 
-            bw.Write(offset);
-            bw.Write(limit);
-            bw.Write(hash);
+            bw.Write(Offset);
+            bw.Write(Limit);
+            bw.Write(Hash);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsTopPeers) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsTopPeers) ObjectUtils.DeserializeObject(br);
         }
     }
 }

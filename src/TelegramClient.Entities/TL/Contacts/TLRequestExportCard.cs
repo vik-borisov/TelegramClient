@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Contacts
 {
-    [TLObject(-2065352905)]
-    public class TLRequestExportCard : TLMethod
+    [TlObject(-2065352905)]
+    public class TlRequestExportCard : TlMethod
     {
         public override int Constructor => -2065352905;
 
-        public TLVector<int> Response { get; set; }
+        public TlVector<int> Response { get; set; }
 
 
         public void ComputeFlags()
@@ -23,7 +23,7 @@ namespace TelegramClient.Entities.TL.Contacts
             bw.Write(Constructor);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = ObjectUtils.DeserializeVector<int>(br);
         }

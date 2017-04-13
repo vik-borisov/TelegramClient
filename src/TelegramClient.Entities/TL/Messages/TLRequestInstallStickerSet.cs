@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-946871200)]
-    public class TLRequestInstallStickerSet : TLMethod
+    [TlObject(-946871200)]
+    public class TlRequestInstallStickerSet : TlMethod
     {
         public override int Constructor => -946871200;
 
-        public TLAbsInputStickerSet stickerset { get; set; }
-        public bool archived { get; set; }
-        public TLAbsStickerSetInstallResult Response { get; set; }
+        public TlAbsInputStickerSet Stickerset { get; set; }
+        public bool Archived { get; set; }
+        public TlAbsStickerSetInstallResult Response { get; set; }
 
 
         public void ComputeFlags()
@@ -18,20 +18,20 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            stickerset = (TLAbsInputStickerSet) ObjectUtils.DeserializeObject(br);
-            archived = BoolUtil.Deserialize(br);
+            Stickerset = (TlAbsInputStickerSet) ObjectUtils.DeserializeObject(br);
+            Archived = BoolUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(stickerset, bw);
-            BoolUtil.Serialize(archived, bw);
+            ObjectUtils.SerializeObject(Stickerset, bw);
+            BoolUtil.Serialize(Archived, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsStickerSetInstallResult) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsStickerSetInstallResult) ObjectUtils.DeserializeObject(br);
         }
     }
 }

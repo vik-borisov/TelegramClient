@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsExportedChatInvite : TLObject
+    public abstract class TlAbsExportedChatInvite : TlObject
     {
     }
 }

@@ -2,15 +2,15 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Upload
 {
-    [TLObject(-475607115)]
-    public class TLRequestGetFile : TLMethod
+    [TlObject(-475607115)]
+    public class TlRequestGetFile : TlMethod
     {
         public override int Constructor => -475607115;
 
-        public TLAbsInputFileLocation location { get; set; }
-        public int offset { get; set; }
-        public int limit { get; set; }
-        public TLFile Response { get; set; }
+        public TlAbsInputFileLocation Location { get; set; }
+        public int Offset { get; set; }
+        public int Limit { get; set; }
+        public TlFile Response { get; set; }
 
 
         public void ComputeFlags()
@@ -19,22 +19,22 @@ namespace TelegramClient.Entities.TL.Upload
 
         public override void DeserializeBody(BinaryReader br)
         {
-            location = (TLAbsInputFileLocation) ObjectUtils.DeserializeObject(br);
-            offset = br.ReadInt32();
-            limit = br.ReadInt32();
+            Location = (TlAbsInputFileLocation) ObjectUtils.DeserializeObject(br);
+            Offset = br.ReadInt32();
+            Limit = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(location, bw);
-            bw.Write(offset);
-            bw.Write(limit);
+            ObjectUtils.SerializeObject(Location, bw);
+            bw.Write(Offset);
+            bw.Write(Limit);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLFile) ObjectUtils.DeserializeObject(br);
+            Response = (TlFile) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -2,66 +2,66 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(319564933)]
-    public class TLRequestEditInlineBotMessage : TLMethod
+    [TlObject(319564933)]
+    public class TlRequestEditInlineBotMessage : TlMethod
     {
         public override int Constructor => 319564933;
 
-        public int flags { get; set; }
-        public bool no_webpage { get; set; }
-        public TLInputBotInlineMessageID id { get; set; }
-        public string message { get; set; }
-        public TLAbsReplyMarkup reply_markup { get; set; }
-        public TLVector<TLAbsMessageEntity> entities { get; set; }
+        public int Flags { get; set; }
+        public bool NoWebpage { get; set; }
+        public TlInputBotInlineMessageId Id { get; set; }
+        public string Message { get; set; }
+        public TlAbsReplyMarkup ReplyMarkup { get; set; }
+        public TlVector<TlAbsMessageEntity> Entities { get; set; }
         public bool Response { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = no_webpage ? flags | 2 : flags & ~2;
-            flags = message != null ? flags | 2048 : flags & ~2048;
-            flags = reply_markup != null ? flags | 4 : flags & ~4;
-            flags = entities != null ? flags | 8 : flags & ~8;
+            Flags = 0;
+            Flags = NoWebpage ? Flags | 2 : Flags & ~2;
+            Flags = Message != null ? Flags | 2048 : Flags & ~2048;
+            Flags = ReplyMarkup != null ? Flags | 4 : Flags & ~4;
+            Flags = Entities != null ? Flags | 8 : Flags & ~8;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            no_webpage = (flags & 2) != 0;
-            id = (TLInputBotInlineMessageID) ObjectUtils.DeserializeObject(br);
-            if ((flags & 2048) != 0)
-                message = StringUtil.Deserialize(br);
+            Flags = br.ReadInt32();
+            NoWebpage = (Flags & 2) != 0;
+            Id = (TlInputBotInlineMessageId) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 2048) != 0)
+                Message = StringUtil.Deserialize(br);
             else
-                message = null;
+                Message = null;
 
-            if ((flags & 4) != 0)
-                reply_markup = (TLAbsReplyMarkup) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 4) != 0)
+                ReplyMarkup = (TlAbsReplyMarkup) ObjectUtils.DeserializeObject(br);
             else
-                reply_markup = null;
+                ReplyMarkup = null;
 
-            if ((flags & 8) != 0)
-                entities = ObjectUtils.DeserializeVector<TLAbsMessageEntity>(br);
+            if ((Flags & 8) != 0)
+                Entities = ObjectUtils.DeserializeVector<TlAbsMessageEntity>(br);
             else
-                entities = null;
+                Entities = null;
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            ObjectUtils.SerializeObject(id, bw);
-            if ((flags & 2048) != 0)
-                StringUtil.Serialize(message, bw);
-            if ((flags & 4) != 0)
-                ObjectUtils.SerializeObject(reply_markup, bw);
-            if ((flags & 8) != 0)
-                ObjectUtils.SerializeObject(entities, bw);
+            ObjectUtils.SerializeObject(Id, bw);
+            if ((Flags & 2048) != 0)
+                StringUtil.Serialize(Message, bw);
+            if ((Flags & 4) != 0)
+                ObjectUtils.SerializeObject(ReplyMarkup, bw);
+            if ((Flags & 8) != 0)
+                ObjectUtils.SerializeObject(Entities, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

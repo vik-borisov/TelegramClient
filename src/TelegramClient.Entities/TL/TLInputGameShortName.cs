@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1020139510)]
-    public class TLInputGameShortName : TLAbsInputGame
+    [TlObject(-1020139510)]
+    public class TlInputGameShortName : TlAbsInputGame
     {
         public override int Constructor => -1020139510;
 
-        public TLAbsInputUser bot_id { get; set; }
-        public string short_name { get; set; }
+        public TlAbsInputUser BotId { get; set; }
+        public string ShortName { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            bot_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
-            short_name = StringUtil.Deserialize(br);
+            BotId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
+            ShortName = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(bot_id, bw);
-            StringUtil.Serialize(short_name, bw);
+            ObjectUtils.SerializeObject(BotId, bw);
+            StringUtil.Serialize(ShortName, bw);
         }
     }
 }

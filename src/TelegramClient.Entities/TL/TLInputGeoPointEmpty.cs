@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-457104426)]
-    public class TLInputGeoPointEmpty : TLAbsInputGeoPoint
+    [TlObject(-457104426)]
+    public class TlInputGeoPointEmpty : TlAbsInputGeoPoint
     {
         public override int Constructor => -457104426;
 

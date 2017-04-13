@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsChannelParticipantRole : TLObject
+    public abstract class TlAbsChannelParticipantRole : TlObject
     {
     }
 }

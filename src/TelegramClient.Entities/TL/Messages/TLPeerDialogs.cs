@@ -3,16 +3,16 @@ using TelegramClient.Entities.TL.Updates;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(863093588)]
-    public class TLPeerDialogs : TLObject
+    [TlObject(863093588)]
+    public class TlPeerDialogs : TlObject
     {
         public override int Constructor => 863093588;
 
-        public TLVector<TLDialog> dialogs { get; set; }
-        public TLVector<TLAbsMessage> messages { get; set; }
-        public TLVector<TLAbsChat> chats { get; set; }
-        public TLVector<TLAbsUser> users { get; set; }
-        public TLState state { get; set; }
+        public TlVector<TlDialog> Dialogs { get; set; }
+        public TlVector<TlAbsMessage> Messages { get; set; }
+        public TlVector<TlAbsChat> Chats { get; set; }
+        public TlVector<TlAbsUser> Users { get; set; }
+        public TlState State { get; set; }
 
 
         public void ComputeFlags()
@@ -21,21 +21,21 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            dialogs = ObjectUtils.DeserializeVector<TLDialog>(br);
-            messages = ObjectUtils.DeserializeVector<TLAbsMessage>(br);
-            chats = ObjectUtils.DeserializeVector<TLAbsChat>(br);
-            users = ObjectUtils.DeserializeVector<TLAbsUser>(br);
-            state = (TLState) ObjectUtils.DeserializeObject(br);
+            Dialogs = ObjectUtils.DeserializeVector<TlDialog>(br);
+            Messages = ObjectUtils.DeserializeVector<TlAbsMessage>(br);
+            Chats = ObjectUtils.DeserializeVector<TlAbsChat>(br);
+            Users = ObjectUtils.DeserializeVector<TlAbsUser>(br);
+            State = (TlState) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(dialogs, bw);
-            ObjectUtils.SerializeObject(messages, bw);
-            ObjectUtils.SerializeObject(chats, bw);
-            ObjectUtils.SerializeObject(users, bw);
-            ObjectUtils.SerializeObject(state, bw);
+            ObjectUtils.SerializeObject(Dialogs, bw);
+            ObjectUtils.SerializeObject(Messages, bw);
+            ObjectUtils.SerializeObject(Chats, bw);
+            ObjectUtils.SerializeObject(Users, bw);
+            ObjectUtils.SerializeObject(State, bw);
         }
     }
 }

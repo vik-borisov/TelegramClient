@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1369215196)]
-    public class TLDisabledFeature : TLObject
+    [TlObject(-1369215196)]
+    public class TlDisabledFeature : TlObject
     {
         public override int Constructor => -1369215196;
 
-        public string feature { get; set; }
-        public string description { get; set; }
+        public string Feature { get; set; }
+        public string Description { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            feature = StringUtil.Deserialize(br);
-            description = StringUtil.Deserialize(br);
+            Feature = StringUtil.Deserialize(br);
+            Description = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(feature, bw);
-            StringUtil.Serialize(description, bw);
+            StringUtil.Serialize(Feature, bw);
+            StringUtil.Serialize(Description, bw);
         }
     }
 }

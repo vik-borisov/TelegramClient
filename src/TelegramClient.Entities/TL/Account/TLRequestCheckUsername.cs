@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(655677548)]
-    public class TLRequestCheckUsername : TLMethod
+    [TlObject(655677548)]
+    public class TlRequestCheckUsername : TlMethod
     {
         public override int Constructor => 655677548;
 
-        public string username { get; set; }
+        public string Username { get; set; }
         public bool Response { get; set; }
 
 
@@ -17,16 +17,16 @@ namespace TelegramClient.Entities.TL.Account
 
         public override void DeserializeBody(BinaryReader br)
         {
-            username = StringUtil.Deserialize(br);
+            Username = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(username, bw);
+            StringUtil.Serialize(Username, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

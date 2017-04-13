@@ -54,16 +54,16 @@ namespace TelegramClient.Core
 
     public class Session
     {
-        private const string defaultConnectionAddress = "149.154.175.100"; //"149.154.167.50";
+        private const string DefaultConnectionAddress = "149.154.175.100"; //"149.154.167.50";
 
-        private const int defaultConnectionPort = 443;
+        private const int DefaultConnectionPort = 443;
 
         private readonly ISessionStore _store;
-        private readonly Random random;
+        private readonly Random _random;
 
         private Session(ISessionStore store)
         {
-            random = new Random();
+            _random = new Random();
             _store = store;
         }
 
@@ -77,7 +77,7 @@ namespace TelegramClient.Core
         public int TimeOffset { get; set; }
         public long LastMessageId { get; set; }
         public int SessionExpires { get; set; }
-        public TLUser TLUser { get; set; }
+        public TlUser TlUser { get; set; }
 
         public byte[] ToBytes()
         {
@@ -89,21 +89,21 @@ namespace TelegramClient.Core
                 writer.Write(Salt);
                 writer.Write(LastMessageId);
                 writer.Write(TimeOffset);
-                Serializers.String.write(writer, ServerAddress);
+                Serializers.String.Write(writer, ServerAddress);
                 writer.Write(Port);
 
-                if (TLUser != null)
+                if (TlUser != null)
                 {
                     writer.Write(1);
                     writer.Write(SessionExpires);
-                    ObjectUtils.SerializeObject(TLUser, writer);
+                    ObjectUtils.SerializeObject(TlUser, writer);
                 }
                 else
                 {
                     writer.Write(0);
                 }
 
-                Serializers.Bytes.write(writer, AuthKey.Data);
+                Serializers.Bytes.Write(writer, AuthKey.Data);
 
                 return stream.ToArray();
             }
@@ -119,19 +119,19 @@ namespace TelegramClient.Core
                 var salt = reader.ReadUInt64();
                 var lastMessageId = reader.ReadInt64();
                 var timeOffset = reader.ReadInt32();
-                var serverAddress = Serializers.String.read(reader);
+                var serverAddress = Serializers.String.Read(reader);
                 var port = reader.ReadInt32();
 
                 var isAuthExsist = reader.ReadInt32() == 1;
                 var sessionExpires = 0;
-                TLUser TLUser = null;
+                TlUser tlUser = null;
                 if (isAuthExsist)
                 {
                     sessionExpires = reader.ReadInt32();
-                    TLUser = (TLUser) ObjectUtils.DeserializeObject(reader);
+                    tlUser = (TlUser) ObjectUtils.DeserializeObject(reader);
                 }
 
-                var authData = Serializers.Bytes.read(reader);
+                var authData = Serializers.Bytes.Read(reader);
 
                 return new Session(store)
                 {
@@ -142,7 +142,7 @@ namespace TelegramClient.Core
                     LastMessageId = lastMessageId,
                     TimeOffset = timeOffset,
                     SessionExpires = sessionExpires,
-                    TLUser = TLUser,
+                    TlUser = tlUser,
                     SessionUserId = sessionUserId,
                     ServerAddress = serverAddress,
                     Port = port
@@ -161,8 +161,8 @@ namespace TelegramClient.Core
             {
                 Id = GenerateRandomUlong(),
                 SessionUserId = sessionUserId,
-                ServerAddress = defaultConnectionAddress,
-                Port = defaultConnectionPort
+                ServerAddress = DefaultConnectionAddress,
+                Port = DefaultConnectionPort
             };
         }
 
@@ -178,7 +178,7 @@ namespace TelegramClient.Core
             var time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds);
             var newMessageId = ((time / 1000 + TimeOffset) << 32) |
                                ((time % 1000) << 22) |
-                               (random.Next(524288) << 2); // 2^19
+                               (_random.Next(524288) << 2); // 2^19
             // [ unix timestamp : 32 bit] [ milliseconds : 10 bit ] [ buffer space : 1 bit ] [ random : 19 bit ] [ msg_id type : 2 bit ] = [ msg_id : 64 bit ]
 
             if (LastMessageId >= newMessageId)

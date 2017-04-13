@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(1436924774)]
-    public class TLRequestReceivedQueue : TLMethod
+    [TlObject(1436924774)]
+    public class TlRequestReceivedQueue : TlMethod
     {
         public override int Constructor => 1436924774;
 
-        public int max_qts { get; set; }
-        public TLVector<long> Response { get; set; }
+        public int MaxQts { get; set; }
+        public TlVector<long> Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,16 +17,16 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            max_qts = br.ReadInt32();
+            MaxQts = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(max_qts);
+            bw.Write(MaxQts);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = ObjectUtils.DeserializeVector<long>(br);
         }

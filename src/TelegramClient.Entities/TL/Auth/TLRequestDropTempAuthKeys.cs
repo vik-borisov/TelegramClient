@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Auth
 {
-    [TLObject(-1907842680)]
-    public class TLRequestDropTempAuthKeys : TLMethod
+    [TlObject(-1907842680)]
+    public class TlRequestDropTempAuthKeys : TlMethod
     {
         public override int Constructor => -1907842680;
 
-        public TLVector<long> except_auth_keys { get; set; }
+        public TlVector<long> ExceptAuthKeys { get; set; }
         public bool Response { get; set; }
 
 
@@ -17,16 +17,16 @@ namespace TelegramClient.Entities.TL.Auth
 
         public override void DeserializeBody(BinaryReader br)
         {
-            except_auth_keys = ObjectUtils.DeserializeVector<long>(br);
+            ExceptAuthKeys = ObjectUtils.DeserializeVector<long>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(except_auth_keys, bw);
+            ObjectUtils.SerializeObject(ExceptAuthKeys, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

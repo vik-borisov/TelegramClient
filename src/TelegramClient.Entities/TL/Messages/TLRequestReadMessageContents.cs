@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(916930423)]
-    public class TLRequestReadMessageContents : TLMethod
+    [TlObject(916930423)]
+    public class TlRequestReadMessageContents : TlMethod
     {
         public override int Constructor => 916930423;
 
-        public TLVector<int> id { get; set; }
-        public TLAffectedMessages Response { get; set; }
+        public TlVector<int> Id { get; set; }
+        public TlAffectedMessages Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,18 +17,18 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = ObjectUtils.DeserializeVector<int>(br);
+            Id = ObjectUtils.DeserializeVector<int>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(id, bw);
+            ObjectUtils.SerializeObject(Id, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAffectedMessages) ObjectUtils.DeserializeObject(br);
+            Response = (TlAffectedMessages) ObjectUtils.DeserializeObject(br);
         }
     }
 }

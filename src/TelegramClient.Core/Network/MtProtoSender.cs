@@ -20,7 +20,7 @@ namespace TelegramClient.Core.Network
 
 		private TcpTransport _transport;
 
-		public List<ulong> needConfirmation = new List<ulong>();
+		public List<ulong> NeedConfirmation = new List<ulong>();
 
 		public MtProtoSender(TcpTransport transport, Session session)
 		{
@@ -38,18 +38,18 @@ namespace TelegramClient.Core.Network
 			return confirmed ? _session.Sequence++ * 2 + 1 : _session.Sequence * 2;
 		}
 
-		public async Task Send(TLMethod request)
+		public async Task Send(TlMethod request)
 		{
 			// TODO: refactor
-			if (needConfirmation.Any())
+			if (NeedConfirmation.Any())
 			{
-				var ackRequest = new AckRequest(needConfirmation);
+				var ackRequest = new AckRequest(NeedConfirmation);
 				using (var memory = new MemoryStream())
 				using (var writer = new BinaryWriter(memory))
 				{
 					ackRequest.SerializeBody(writer);
 					await Send(memory.ToArray(), ackRequest);
-					needConfirmation.Clear();
+					NeedConfirmation.Clear();
 				}
 			}
 
@@ -64,13 +64,13 @@ namespace TelegramClient.Core.Network
 			_session.Save();
 		}
 
-		public async Task Send(byte[] packet, TLMethod request)
+		public async Task Send(byte[] packet, TlMethod request)
 		{
 			request.MessageId = _session.GetNewMessageId();
 
 			byte[] msgKey;
 			byte[] ciphertext;
-			using (var plaintextPacket = makeMemory(8 + 8 + 8 + 4 + 4 + packet.Length))
+			using (var plaintextPacket = MakeMemory(8 + 8 + 8 + 4 + 4 + packet.Length))
 			{
 				using (var plaintextWriter = new BinaryWriter(plaintextPacket))
 				{
@@ -83,11 +83,11 @@ namespace TelegramClient.Core.Network
 
 				    plaintextPacket.TryGetBuffer(out var buffer);
                     msgKey = Helpers.CalcMsgKey(buffer.Array);
-					ciphertext = AES.EncryptAES(Helpers.CalcKey(_session.AuthKey.Data, msgKey, true), buffer.Array);
+					ciphertext = AES.EncryptAes(Helpers.CalcKey(_session.AuthKey.Data, msgKey, true), buffer.Array);
 				}
 			}
 
-			using (var ciphertextPacket = makeMemory(8 + 16 + ciphertext.Length))
+			using (var ciphertextPacket = MakeMemory(8 + 16 + ciphertext.Length))
 			{
 				using (var writer = new BinaryWriter(ciphertextPacket))
 				{
@@ -116,7 +116,7 @@ namespace TelegramClient.Core.Network
 				var msgKey = inputReader.ReadBytes(16); // TODO: check msg_key correctness
 				var keyData = Helpers.CalcKey(_session.AuthKey.Data, msgKey, false);
 
-				var plaintext = AES.DecryptAES(keyData,
+				var plaintext = AES.DecryptAes(keyData,
 					inputReader.ReadBytes((int) (inputStream.Length - inputStream.Position)));
 
 				using (var plaintextStream = new MemoryStream(plaintext))
@@ -133,7 +133,7 @@ namespace TelegramClient.Core.Network
 			return new Tuple<byte[], ulong, int>(message, remoteMessageId, remoteSequence);
 		}
 
-		public async Task<byte[]> Receive(TLMethod request)
+		public async Task<byte[]> Receive(TlMethod request)
 		{
 			while (!request.ConfirmReceived)
 			{
@@ -142,7 +142,7 @@ namespace TelegramClient.Core.Network
 				using (var messageStream = new MemoryStream(result.Item1, false))
 				using (var messageReader = new BinaryReader(messageStream))
 				{
-					processMessage(result.Item2, result.Item3, messageReader, request);
+					ProcessMessage(result.Item2, result.Item3, messageReader, request);
 				}
 			}
 
@@ -162,14 +162,14 @@ namespace TelegramClient.Core.Network
 			await Receive(pingRequest);
 		}
 
-		private bool processMessage(ulong messageId, int sequence, BinaryReader messageReader, TLMethod request)
+		private bool ProcessMessage(ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
 			// TODO: check salt
 			// TODO: check sessionid
 			// TODO: check seqno
 
 			//logger.debug("processMessage: msg_id {0}, sequence {1}, data {2}", BitConverter.ToString(((MemoryStream)messageReader.BaseStream).GetBuffer(), (int) messageReader.BaseStream.Position, (int) (messageReader.BaseStream.Length - messageReader.BaseStream.Position)).Replace("-","").ToLower());
-			needConfirmation.Add(messageId);
+			NeedConfirmation.Add(messageId);
 
 			var code = messageReader.ReadUInt32();
 			messageReader.BaseStream.Position -= 4;
@@ -239,20 +239,20 @@ namespace TelegramClient.Core.Network
 			*/
 		}
 
-	    private bool HandleGzipPacked(ulong messageId, int sequence, BinaryReader messageReader, TLMethod request)
+	    private bool HandleGzipPacked(ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 	    {
 	        var code = messageReader.ReadUInt32();
-	        using (var stream = new MemoryStream(Serializers.Bytes.read(messageReader)))
+	        using (var stream = new MemoryStream(Serializers.Bytes.Read(messageReader)))
 	        using (var zipStream = new GZipStream(stream, CompressionMode.Decompress))
 	        using (var compressedReader = new BinaryReader(zipStream))
 	        {
-	            processMessage(messageId, sequence, compressedReader, request);
+	            ProcessMessage(messageId, sequence, compressedReader, request);
 	        }
 
 	        return true;
 	    }
 
-	    private bool HandleRpcResult(ulong messageId, int sequence, BinaryReader messageReader, TLMethod request)
+	    private bool HandleRpcResult(ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
 			var code = messageReader.ReadUInt32();
 			var requestId = messageReader.ReadUInt64();
@@ -281,7 +281,7 @@ namespace TelegramClient.Core.Network
 			{
 				// rpc_error
 				var errorCode = messageReader.ReadInt32();
-				var errorMessage = Serializers.String.read(messageReader);
+				var errorMessage = Serializers.String.Read(messageReader);
 
 				if (errorMessage.StartsWith("FLOOD_WAIT_"))
 				{
@@ -319,7 +319,7 @@ namespace TelegramClient.Core.Network
 			    try
 			    {
 			        // gzip_packed
-			        var packedData = Serializers.Bytes.read(messageReader);
+			        var packedData = Serializers.Bytes.Read(messageReader);
 			        using (var ms = new MemoryStream())
 			        {
 			            using (var packedStream = new MemoryStream(packedData, false))
@@ -330,7 +330,7 @@ namespace TelegramClient.Core.Network
 			            }
 			            using (var compressedReader = new BinaryReader(ms))
 			            {
-			                request.deserializeResponse(compressedReader);
+			                request.DeserializeResponse(compressedReader);
 			            }
 			        }
 			    }
@@ -341,7 +341,7 @@ namespace TelegramClient.Core.Network
 			else
 			{
 				messageReader.BaseStream.Position -= 4;
-				request.deserializeResponse(messageReader);
+				request.DeserializeResponse(messageReader);
 			}
 
 			return false;
@@ -413,7 +413,7 @@ namespace TelegramClient.Core.Network
 			return true;
 		}
 
-		private bool HandleBadServerSalt(ulong messageId, int sequence, BinaryReader messageReader, TLMethod request)
+		private bool HandleBadServerSalt(ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
 			var code = messageReader.ReadUInt32();
 			var badMsgId = messageReader.ReadUInt64();
@@ -474,7 +474,7 @@ namespace TelegramClient.Core.Network
 			return true;
 		}
 
-		private bool HandlePong(ulong messageId, int sequence, BinaryReader messageReader, TLMethod request)
+		private bool HandlePong(ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
 			var code = messageReader.ReadUInt32();
 			var msgId = messageReader.ReadUInt64();
@@ -490,7 +490,7 @@ namespace TelegramClient.Core.Network
 			return false;
 		}
 
-		private bool HandleContainer(ulong messageId, int sequence, BinaryReader messageReader, TLMethod request)
+		private bool HandleContainer(ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
 			var code = messageReader.ReadUInt32();
 			var size = messageReader.ReadInt32();
@@ -502,7 +502,7 @@ namespace TelegramClient.Core.Network
 				var beginPosition = messageReader.BaseStream.Position;
 				try
 				{
-					if (!processMessage(innerMessageId, sequence, messageReader, request))
+					if (!ProcessMessage(innerMessageId, sequence, messageReader, request))
 						messageReader.BaseStream.Position = beginPosition + innerLength;
 				}
 				catch (Exception e)
@@ -515,7 +515,7 @@ namespace TelegramClient.Core.Network
 			return false;
 		}
 
-		private MemoryStream makeMemory(int len)
+		private MemoryStream MakeMemory(int len)
 		{
 			return new MemoryStream(new byte[len], 0, len, true, true);
 		}
@@ -536,15 +536,15 @@ namespace TelegramClient.Core.Network
 
 	internal abstract class DataCenterMigrationException : Exception
 	{
-		private const string REPORT_MESSAGE =
+		private const string ReportMessage =
 			" See: https://github.com/sochix/TLSharp#i-get-a-xxxmigrationexception-or-a-migrate_x-error";
 
-		protected DataCenterMigrationException(string msg, int dc) : base(msg + REPORT_MESSAGE)
+		protected DataCenterMigrationException(string msg, int dc) : base(msg + ReportMessage)
 		{
-			DC = dc;
+			Dc = dc;
 		}
 
-		internal int DC { get; }
+		internal int Dc { get; }
 	}
 
 	internal class PhoneMigrationException : DataCenterMigrationException

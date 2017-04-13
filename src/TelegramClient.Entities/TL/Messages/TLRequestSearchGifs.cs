@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1080395925)]
-    public class TLRequestSearchGifs : TLMethod
+    [TlObject(-1080395925)]
+    public class TlRequestSearchGifs : TlMethod
     {
         public override int Constructor => -1080395925;
 
-        public string q { get; set; }
-        public int offset { get; set; }
-        public TLFoundGifs Response { get; set; }
+        public string Q { get; set; }
+        public int Offset { get; set; }
+        public TlFoundGifs Response { get; set; }
 
 
         public void ComputeFlags()
@@ -18,20 +18,20 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            q = StringUtil.Deserialize(br);
-            offset = br.ReadInt32();
+            Q = StringUtil.Deserialize(br);
+            Offset = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(q, bw);
-            bw.Write(offset);
+            StringUtil.Serialize(Q, bw);
+            bw.Write(Offset);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLFoundGifs) ObjectUtils.DeserializeObject(br);
+            Response = (TlFoundGifs) ObjectUtils.DeserializeObject(br);
         }
     }
 }

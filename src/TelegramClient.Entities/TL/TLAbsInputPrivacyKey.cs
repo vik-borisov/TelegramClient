@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsInputPrivacyKey : TLObject
+    public abstract class TlAbsInputPrivacyKey : TlObject
     {
     }
 }

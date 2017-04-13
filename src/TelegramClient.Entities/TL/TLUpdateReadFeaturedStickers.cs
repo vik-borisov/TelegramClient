@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1461528386)]
-    public class TLUpdateReadFeaturedStickers : TLAbsUpdate
+    [TlObject(1461528386)]
+    public class TlUpdateReadFeaturedStickers : TlAbsUpdate
     {
         public override int Constructor => 1461528386;
 

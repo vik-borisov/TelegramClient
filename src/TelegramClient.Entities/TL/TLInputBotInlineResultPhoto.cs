@@ -2,15 +2,15 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1462213465)]
-    public class TLInputBotInlineResultPhoto : TLAbsInputBotInlineResult
+    [TlObject(-1462213465)]
+    public class TlInputBotInlineResultPhoto : TlAbsInputBotInlineResult
     {
         public override int Constructor => -1462213465;
 
-        public string id { get; set; }
-        public string type { get; set; }
-        public TLAbsInputPhoto photo { get; set; }
-        public TLAbsInputBotInlineMessage send_message { get; set; }
+        public string Id { get; set; }
+        public string Type { get; set; }
+        public TlAbsInputPhoto Photo { get; set; }
+        public TlAbsInputBotInlineMessage SendMessage { get; set; }
 
 
         public void ComputeFlags()
@@ -19,19 +19,19 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = StringUtil.Deserialize(br);
-            type = StringUtil.Deserialize(br);
-            photo = (TLAbsInputPhoto) ObjectUtils.DeserializeObject(br);
-            send_message = (TLAbsInputBotInlineMessage) ObjectUtils.DeserializeObject(br);
+            Id = StringUtil.Deserialize(br);
+            Type = StringUtil.Deserialize(br);
+            Photo = (TlAbsInputPhoto) ObjectUtils.DeserializeObject(br);
+            SendMessage = (TlAbsInputBotInlineMessage) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(id, bw);
-            StringUtil.Serialize(type, bw);
-            ObjectUtils.SerializeObject(photo, bw);
-            ObjectUtils.SerializeObject(send_message, bw);
+            StringUtil.Serialize(Id, bw);
+            StringUtil.Serialize(Type, bw);
+            ObjectUtils.SerializeObject(Photo, bw);
+            ObjectUtils.SerializeObject(SendMessage, bw);
         }
     }
 }

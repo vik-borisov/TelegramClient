@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL.Auth
 {
-    public abstract class TLAbsCodeType : TLObject
+    public abstract class TlAbsCodeType : TlObject
     {
     }
 }

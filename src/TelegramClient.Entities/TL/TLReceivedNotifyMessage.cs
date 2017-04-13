@@ -2,32 +2,32 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1551583367)]
-    public class TLReceivedNotifyMessage : TLObject
+    [TlObject(-1551583367)]
+    public class TlReceivedNotifyMessage : TlObject
     {
         public override int Constructor => -1551583367;
 
-        public int id { get; set; }
-        public int flags { get; set; }
+        public int Id { get; set; }
+        public int Flags { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
+            Flags = 0;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = br.ReadInt32();
-            flags = br.ReadInt32();
+            Id = br.ReadInt32();
+            Flags = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
-            bw.Write(id);
+            bw.Write(Flags);
+            bw.Write(Id);
         }
     }
 }

@@ -3,14 +3,14 @@ using TelegramClient.Entities.TL.Messages;
 
 namespace TelegramClient.Entities.TL.Channels
 {
-    [TLObject(-787622117)]
-    public class TLRequestDeleteUserHistory : TLMethod
+    [TlObject(-787622117)]
+    public class TlRequestDeleteUserHistory : TlMethod
     {
         public override int Constructor => -787622117;
 
-        public TLAbsInputChannel channel { get; set; }
-        public TLAbsInputUser user_id { get; set; }
-        public TLAffectedHistory Response { get; set; }
+        public TlAbsInputChannel Channel { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public TlAffectedHistory Response { get; set; }
 
 
         public void ComputeFlags()
@@ -19,20 +19,20 @@ namespace TelegramClient.Entities.TL.Channels
 
         public override void DeserializeBody(BinaryReader br)
         {
-            channel = (TLAbsInputChannel) ObjectUtils.DeserializeObject(br);
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Channel = (TlAbsInputChannel) ObjectUtils.DeserializeObject(br);
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(channel, bw);
-            ObjectUtils.SerializeObject(user_id, bw);
+            ObjectUtils.SerializeObject(Channel, bw);
+            ObjectUtils.SerializeObject(UserId, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAffectedHistory) ObjectUtils.DeserializeObject(br);
+            Response = (TlAffectedHistory) ObjectUtils.DeserializeObject(br);
         }
     }
 }

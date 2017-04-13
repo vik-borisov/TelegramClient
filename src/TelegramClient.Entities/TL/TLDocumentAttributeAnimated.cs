@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(297109817)]
-    public class TLDocumentAttributeAnimated : TLAbsDocumentAttribute
+    [TlObject(297109817)]
+    public class TlDocumentAttributeAnimated : TlAbsDocumentAttribute
     {
         public override int Constructor => 297109817;
 

@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(-906486552)]
-    public class TLRequestSetPrivacy : TLMethod
+    [TlObject(-906486552)]
+    public class TlRequestSetPrivacy : TlMethod
     {
         public override int Constructor => -906486552;
 
-        public TLAbsInputPrivacyKey key { get; set; }
-        public TLVector<TLAbsInputPrivacyRule> rules { get; set; }
-        public TLPrivacyRules Response { get; set; }
+        public TlAbsInputPrivacyKey Key { get; set; }
+        public TlVector<TlAbsInputPrivacyRule> Rules { get; set; }
+        public TlPrivacyRules Response { get; set; }
 
 
         public void ComputeFlags()
@@ -18,20 +18,20 @@ namespace TelegramClient.Entities.TL.Account
 
         public override void DeserializeBody(BinaryReader br)
         {
-            key = (TLAbsInputPrivacyKey) ObjectUtils.DeserializeObject(br);
-            rules = ObjectUtils.DeserializeVector<TLAbsInputPrivacyRule>(br);
+            Key = (TlAbsInputPrivacyKey) ObjectUtils.DeserializeObject(br);
+            Rules = ObjectUtils.DeserializeVector<TlAbsInputPrivacyRule>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(key, bw);
-            ObjectUtils.SerializeObject(rules, bw);
+            ObjectUtils.SerializeObject(Key, bw);
+            ObjectUtils.SerializeObject(Rules, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLPrivacyRules) ObjectUtils.DeserializeObject(br);
+            Response = (TlPrivacyRules) ObjectUtils.DeserializeObject(br);
         }
     }
 }

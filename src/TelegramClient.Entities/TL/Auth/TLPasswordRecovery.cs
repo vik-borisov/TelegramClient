@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Auth
 {
-    [TLObject(326715557)]
-    public class TLPasswordRecovery : TLObject
+    [TlObject(326715557)]
+    public class TlPasswordRecovery : TlObject
     {
         public override int Constructor => 326715557;
 
-        public string email_pattern { get; set; }
+        public string EmailPattern { get; set; }
 
 
         public void ComputeFlags()
@@ -16,13 +16,13 @@ namespace TelegramClient.Entities.TL.Auth
 
         public override void DeserializeBody(BinaryReader br)
         {
-            email_pattern = StringUtil.Deserialize(br);
+            EmailPattern = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(email_pattern, bw);
+            StringUtil.Serialize(EmailPattern, bw);
         }
     }
 }

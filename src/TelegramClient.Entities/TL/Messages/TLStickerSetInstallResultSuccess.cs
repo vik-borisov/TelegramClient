@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(946083368)]
-    public class TLStickerSetInstallResultSuccess : TLAbsStickerSetInstallResult
+    [TlObject(946083368)]
+    public class TlStickerSetInstallResultSuccess : TlAbsStickerSetInstallResult
     {
         public override int Constructor => 946083368;
 

@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(846868683)]
-    public class TLRequestSaveGif : TLMethod
+    [TlObject(846868683)]
+    public class TlRequestSaveGif : TlMethod
     {
         public override int Constructor => 846868683;
 
-        public TLAbsInputDocument id { get; set; }
-        public bool unsave { get; set; }
+        public TlAbsInputDocument Id { get; set; }
+        public bool Unsave { get; set; }
         public bool Response { get; set; }
 
 
@@ -18,18 +18,18 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = (TLAbsInputDocument) ObjectUtils.DeserializeObject(br);
-            unsave = BoolUtil.Deserialize(br);
+            Id = (TlAbsInputDocument) ObjectUtils.DeserializeObject(br);
+            Unsave = BoolUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(id, bw);
-            BoolUtil.Serialize(unsave, bw);
+            ObjectUtils.SerializeObject(Id, bw);
+            BoolUtil.Serialize(Unsave, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

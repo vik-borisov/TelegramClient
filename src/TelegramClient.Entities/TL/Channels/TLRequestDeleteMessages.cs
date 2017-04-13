@@ -3,14 +3,14 @@ using TelegramClient.Entities.TL.Messages;
 
 namespace TelegramClient.Entities.TL.Channels
 {
-    [TLObject(-2067661490)]
-    public class TLRequestDeleteMessages : TLMethod
+    [TlObject(-2067661490)]
+    public class TlRequestDeleteMessages : TlMethod
     {
         public override int Constructor => -2067661490;
 
-        public TLAbsInputChannel channel { get; set; }
-        public TLVector<int> id { get; set; }
-        public TLAffectedMessages Response { get; set; }
+        public TlAbsInputChannel Channel { get; set; }
+        public TlVector<int> Id { get; set; }
+        public TlAffectedMessages Response { get; set; }
 
 
         public void ComputeFlags()
@@ -19,20 +19,20 @@ namespace TelegramClient.Entities.TL.Channels
 
         public override void DeserializeBody(BinaryReader br)
         {
-            channel = (TLAbsInputChannel) ObjectUtils.DeserializeObject(br);
-            id = ObjectUtils.DeserializeVector<int>(br);
+            Channel = (TlAbsInputChannel) ObjectUtils.DeserializeObject(br);
+            Id = ObjectUtils.DeserializeVector<int>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(channel, bw);
-            ObjectUtils.SerializeObject(id, bw);
+            ObjectUtils.SerializeObject(Channel, bw);
+            ObjectUtils.SerializeObject(Id, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAffectedMessages) ObjectUtils.DeserializeObject(br);
+            Response = (TlAffectedMessages) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1460572005)]
-    public class TLRequestHideReportSpam : TLMethod
+    [TlObject(-1460572005)]
+    public class TlRequestHideReportSpam : TlMethod
     {
         public override int Constructor => -1460572005;
 
-        public TLAbsInputPeer peer { get; set; }
+        public TlAbsInputPeer Peer { get; set; }
         public bool Response { get; set; }
 
 
@@ -17,16 +17,16 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            peer = (TLAbsInputPeer) ObjectUtils.DeserializeObject(br);
+            Peer = (TlAbsInputPeer) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(peer, bw);
+            ObjectUtils.SerializeObject(Peer, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

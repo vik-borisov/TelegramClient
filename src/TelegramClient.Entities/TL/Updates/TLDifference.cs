@@ -2,17 +2,17 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Updates
 {
-    [TLObject(16030880)]
-    public class TLDifference : TLAbsDifference
+    [TlObject(16030880)]
+    public class TlDifference : TlAbsDifference
     {
         public override int Constructor => 16030880;
 
-        public TLVector<TLAbsMessage> new_messages { get; set; }
-        public TLVector<TLAbsEncryptedMessage> new_encrypted_messages { get; set; }
-        public TLVector<TLAbsUpdate> other_updates { get; set; }
-        public TLVector<TLAbsChat> chats { get; set; }
-        public TLVector<TLAbsUser> users { get; set; }
-        public TLState state { get; set; }
+        public TlVector<TlAbsMessage> NewMessages { get; set; }
+        public TlVector<TlAbsEncryptedMessage> NewEncryptedMessages { get; set; }
+        public TlVector<TlAbsUpdate> OtherUpdates { get; set; }
+        public TlVector<TlAbsChat> Chats { get; set; }
+        public TlVector<TlAbsUser> Users { get; set; }
+        public TlState State { get; set; }
 
 
         public void ComputeFlags()
@@ -21,23 +21,23 @@ namespace TelegramClient.Entities.TL.Updates
 
         public override void DeserializeBody(BinaryReader br)
         {
-            new_messages = ObjectUtils.DeserializeVector<TLAbsMessage>(br);
-            new_encrypted_messages = ObjectUtils.DeserializeVector<TLAbsEncryptedMessage>(br);
-            other_updates = ObjectUtils.DeserializeVector<TLAbsUpdate>(br);
-            chats = ObjectUtils.DeserializeVector<TLAbsChat>(br);
-            users = ObjectUtils.DeserializeVector<TLAbsUser>(br);
-            state = (TLState) ObjectUtils.DeserializeObject(br);
+            NewMessages = ObjectUtils.DeserializeVector<TlAbsMessage>(br);
+            NewEncryptedMessages = ObjectUtils.DeserializeVector<TlAbsEncryptedMessage>(br);
+            OtherUpdates = ObjectUtils.DeserializeVector<TlAbsUpdate>(br);
+            Chats = ObjectUtils.DeserializeVector<TlAbsChat>(br);
+            Users = ObjectUtils.DeserializeVector<TlAbsUser>(br);
+            State = (TlState) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(new_messages, bw);
-            ObjectUtils.SerializeObject(new_encrypted_messages, bw);
-            ObjectUtils.SerializeObject(other_updates, bw);
-            ObjectUtils.SerializeObject(chats, bw);
-            ObjectUtils.SerializeObject(users, bw);
-            ObjectUtils.SerializeObject(state, bw);
+            ObjectUtils.SerializeObject(NewMessages, bw);
+            ObjectUtils.SerializeObject(NewEncryptedMessages, bw);
+            ObjectUtils.SerializeObject(OtherUpdates, bw);
+            ObjectUtils.SerializeObject(Chats, bw);
+            ObjectUtils.SerializeObject(Users, bw);
+            ObjectUtils.SerializeObject(State, bw);
         }
     }
 }

@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(-1068696894)]
-    public class TLRequestGetWallPapers : TLMethod
+    [TlObject(-1068696894)]
+    public class TlRequestGetWallPapers : TlMethod
     {
         public override int Constructor => -1068696894;
 
-        public TLVector<TLAbsWallPaper> Response { get; set; }
+        public TlVector<TlAbsWallPaper> Response { get; set; }
 
 
         public void ComputeFlags()
@@ -23,9 +23,9 @@ namespace TelegramClient.Entities.TL.Account
             bw.Write(Constructor);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = ObjectUtils.DeserializeVector<TLAbsWallPaper>(br);
+            Response = ObjectUtils.DeserializeVector<TlAbsWallPaper>(br);
         }
     }
 }

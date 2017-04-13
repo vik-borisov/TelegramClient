@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1194283041)]
-    public class TLAccountDaysTTL : TLObject
+    [TlObject(-1194283041)]
+    public class TlAccountDaysTtl : TlObject
     {
         public override int Constructor => -1194283041;
 
-        public int days { get; set; }
+        public int Days { get; set; }
 
 
         public void ComputeFlags()
@@ -16,13 +16,13 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            days = br.ReadInt32();
+            Days = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(days);
+            bw.Write(Days);
         }
     }
 }

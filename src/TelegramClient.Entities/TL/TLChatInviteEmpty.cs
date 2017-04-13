@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1776236393)]
-    public class TLChatInviteEmpty : TLAbsExportedChatInvite
+    [TlObject(1776236393)]
+    public class TlChatInviteEmpty : TlAbsExportedChatInvite
     {
         public override int Constructor => 1776236393;
 

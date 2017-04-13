@@ -3,9 +3,9 @@ using System.IO;
 
 namespace TelegramClient.Entities
 {
-    public abstract class TLMethod : TLObject
+    public abstract class TlMethod : TlObject
     {
-        public abstract void deserializeResponse(BinaryReader stream);
+        public abstract void DeserializeResponse(BinaryReader stream);
 
         #region MTPROTO
 

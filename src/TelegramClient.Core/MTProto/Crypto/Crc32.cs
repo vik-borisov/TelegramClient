@@ -6,36 +6,36 @@ namespace TelegramClient.Core.MTProto.Crypto
     {
         public const uint DefaultPolynomial = 0xedb88320u;
         public const uint DefaultSeed = 0xffffffffu;
-        private static uint[] defaultTable;
+        private static uint[] _defaultTable;
 
-        private uint hash;
-        private readonly uint seed;
-        private readonly uint[] table;
+        private uint _hash;
+        private readonly uint _seed;
+        private readonly uint[] _table;
 
         public Crc32()
         {
-            table = InitializeTable(DefaultPolynomial);
-            seed = DefaultSeed;
-            hash = seed;
+            _table = InitializeTable(DefaultPolynomial);
+            _seed = DefaultSeed;
+            _hash = _seed;
         }
 
         public Crc32(uint polynomial, uint seed)
         {
-            table = InitializeTable(polynomial);
-            this.seed = seed;
-            hash = seed;
+            _table = InitializeTable(polynomial);
+            this._seed = seed;
+            _hash = seed;
         }
 
         public override int HashSize => 32;
 
         public override void Initialize()
         {
-            hash = seed;
+            _hash = _seed;
         }
 
         protected override void HashCore(byte[] buffer, int start, int length)
         {
-            hash = CalculateHash(table, hash, buffer, start, length);
+            _hash = CalculateHash(_table, _hash, buffer, start, length);
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace TelegramClient.Core.MTProto.Crypto
         /// <returns></returns>
         protected override byte[] HashFinal()
         {
-            var hashBuffer = UInt32ToBigEndianBytes(~hash);
+            var hashBuffer = UInt32ToBigEndianBytes(~_hash);
             return hashBuffer;
         }
 
@@ -65,8 +65,8 @@ namespace TelegramClient.Core.MTProto.Crypto
 
         private static uint[] InitializeTable(uint polynomial)
         {
-            if (polynomial == DefaultPolynomial && defaultTable != null)
-                return defaultTable;
+            if (polynomial == DefaultPolynomial && _defaultTable != null)
+                return _defaultTable;
 
             var createTable = new uint[256];
             for (var i = 0; i < 256; i++)
@@ -81,7 +81,7 @@ namespace TelegramClient.Core.MTProto.Crypto
             }
 
             if (polynomial == DefaultPolynomial)
-                defaultTable = createTable;
+                _defaultTable = createTable;
 
             return createTable;
         }

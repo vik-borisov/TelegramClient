@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-395967805)]
-    public class TLAllStickersNotModified : TLAbsAllStickers
+    [TlObject(-395967805)]
+    public class TlAllStickersNotModified : TlAbsAllStickers
     {
         public override int Constructor => -395967805;
 

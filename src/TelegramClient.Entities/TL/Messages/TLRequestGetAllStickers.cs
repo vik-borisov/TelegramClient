@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(479598769)]
-    public class TLRequestGetAllStickers : TLMethod
+    [TlObject(479598769)]
+    public class TlRequestGetAllStickers : TlMethod
     {
         public override int Constructor => 479598769;
 
-        public int hash { get; set; }
-        public TLAbsAllStickers Response { get; set; }
+        public int Hash { get; set; }
+        public TlAbsAllStickers Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,18 +17,18 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            hash = br.ReadInt32();
+            Hash = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(hash);
+            bw.Write(Hash);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsAllStickers) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsAllStickers) ObjectUtils.DeserializeObject(br);
         }
     }
 }

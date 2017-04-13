@@ -2,19 +2,19 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1347868602)]
-    public class TLRequestGetHistory : TLMethod
+    [TlObject(-1347868602)]
+    public class TlRequestGetHistory : TlMethod
     {
         public override int Constructor => -1347868602;
 
-        public TLAbsInputPeer peer { get; set; }
-        public int offset_id { get; set; }
-        public int offset_date { get; set; }
-        public int add_offset { get; set; }
-        public int limit { get; set; }
-        public int max_id { get; set; }
-        public int min_id { get; set; }
-        public TLAbsMessages Response { get; set; }
+        public TlAbsInputPeer Peer { get; set; }
+        public int OffsetId { get; set; }
+        public int OffsetDate { get; set; }
+        public int AddOffset { get; set; }
+        public int Limit { get; set; }
+        public int MaxId { get; set; }
+        public int MinId { get; set; }
+        public TlAbsMessages Response { get; set; }
 
 
         public void ComputeFlags()
@@ -23,30 +23,30 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            peer = (TLAbsInputPeer) ObjectUtils.DeserializeObject(br);
-            offset_id = br.ReadInt32();
-            offset_date = br.ReadInt32();
-            add_offset = br.ReadInt32();
-            limit = br.ReadInt32();
-            max_id = br.ReadInt32();
-            min_id = br.ReadInt32();
+            Peer = (TlAbsInputPeer) ObjectUtils.DeserializeObject(br);
+            OffsetId = br.ReadInt32();
+            OffsetDate = br.ReadInt32();
+            AddOffset = br.ReadInt32();
+            Limit = br.ReadInt32();
+            MaxId = br.ReadInt32();
+            MinId = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(peer, bw);
-            bw.Write(offset_id);
-            bw.Write(offset_date);
-            bw.Write(add_offset);
-            bw.Write(limit);
-            bw.Write(max_id);
-            bw.Write(min_id);
+            ObjectUtils.SerializeObject(Peer, bw);
+            bw.Write(OffsetId);
+            bw.Write(OffsetDate);
+            bw.Write(AddOffset);
+            bw.Write(Limit);
+            bw.Write(MaxId);
+            bw.Write(MinId);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsMessages) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsMessages) ObjectUtils.DeserializeObject(br);
         }
     }
 }

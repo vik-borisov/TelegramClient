@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(-92517498)]
-    public class TLRequestUpdatePasswordSettings : TLMethod
+    [TlObject(-92517498)]
+    public class TlRequestUpdatePasswordSettings : TlMethod
     {
         public override int Constructor => -92517498;
 
-        public byte[] current_password_hash { get; set; }
-        public TLPasswordInputSettings new_settings { get; set; }
+        public byte[] CurrentPasswordHash { get; set; }
+        public TlPasswordInputSettings NewSettings { get; set; }
         public bool Response { get; set; }
 
 
@@ -18,18 +18,18 @@ namespace TelegramClient.Entities.TL.Account
 
         public override void DeserializeBody(BinaryReader br)
         {
-            current_password_hash = BytesUtil.Deserialize(br);
-            new_settings = (TLPasswordInputSettings) ObjectUtils.DeserializeObject(br);
+            CurrentPasswordHash = BytesUtil.Deserialize(br);
+            NewSettings = (TlPasswordInputSettings) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            BytesUtil.Serialize(current_password_hash, bw);
-            ObjectUtils.SerializeObject(new_settings, bw);
+            BytesUtil.Serialize(CurrentPasswordHash, bw);
+            ObjectUtils.SerializeObject(NewSettings, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Contacts
 {
-    [TLObject(471043349)]
-    public class TLBlocked : TLAbsBlocked
+    [TlObject(471043349)]
+    public class TlBlocked : TlAbsBlocked
     {
         public override int Constructor => 471043349;
 
-        public TLVector<TLContactBlocked> blocked { get; set; }
-        public TLVector<TLAbsUser> users { get; set; }
+        public TlVector<TlContactBlocked> Blocked { get; set; }
+        public TlVector<TlAbsUser> Users { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL.Contacts
 
         public override void DeserializeBody(BinaryReader br)
         {
-            blocked = ObjectUtils.DeserializeVector<TLContactBlocked>(br);
-            users = ObjectUtils.DeserializeVector<TLAbsUser>(br);
+            Blocked = ObjectUtils.DeserializeVector<TlContactBlocked>(br);
+            Users = ObjectUtils.DeserializeVector<TlAbsUser>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(blocked, bw);
-            ObjectUtils.SerializeObject(users, bw);
+            ObjectUtils.SerializeObject(Blocked, bw);
+            ObjectUtils.SerializeObject(Users, bw);
         }
     }
 }

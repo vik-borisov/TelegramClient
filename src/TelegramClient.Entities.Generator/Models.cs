@@ -4,35 +4,35 @@ namespace TelegramClient.Entities.Generator
 {
     internal class Method
     {
-        public int id { get; set; }
+        public int Id { get; set; }
         public string method { get; set; }
 
         [Newtonsoft.Json.JsonProperty("params")]
         public List<Param> Params { get; set; }
 
-        public string type { get; set; }
+        public string Type { get; set; }
     }
 
     internal class Param
     {
-        public string name { get; set; }
-        public string type { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
     }
 
     internal class Constructor
     {
-        public int id { get; set; }
-        public string predicate { get; set; }
+        public int Id { get; set; }
+        public string Predicate { get; set; }
 
         [Newtonsoft.Json.JsonProperty("params")]
         public List<Param> Params { get; set; }
 
-        public string type { get; set; }
+        public string Type { get; set; }
     }
 
     internal class Schema
     {
-        public List<Constructor> constructors { get; set; }
-        public List<Method> methods { get; set; }
+        public List<Constructor> Constructors { get; set; }
+        public List<Method> Methods { get; set; }
     }
 }

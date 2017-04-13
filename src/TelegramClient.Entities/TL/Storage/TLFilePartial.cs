@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Storage
 {
-    [TLObject(1086091090)]
-    public class TLFilePartial : TLAbsFileType
+    [TlObject(1086091090)]
+    public class TlFilePartial : TlAbsFileType
     {
         public override int Constructor => 1086091090;
 

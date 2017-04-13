@@ -5,18 +5,18 @@ using System.Security.Cryptography;
 
 namespace TelegramClient.Core.MTProto.Crypto
 {
-    internal class RSAServerKey
+    internal class RsaServerKey
     {
-        private readonly BigInteger e;
+        private readonly BigInteger _e;
 
-        private string fingerprint;
-        private readonly BigInteger m;
+        private string _fingerprint;
+        private readonly BigInteger _m;
 
-        public RSAServerKey(string fingerprint, BigInteger m, BigInteger e)
+        public RsaServerKey(string fingerprint, BigInteger m, BigInteger e)
         {
-            this.fingerprint = fingerprint;
-            this.m = m;
-            this.e = e;
+            this._fingerprint = fingerprint;
+            this._m = m;
+            this._e = e;
         }
 
         public byte[] Encrypt(byte[] data, int offset, int length)
@@ -38,7 +38,7 @@ namespace TelegramClient.Core.MTProto.Crypto
                     buffer.Write(padding, 0, padding.Length);
                 }
 
-                var ciphertext = new BigInteger(1, buffer.ToArray()).ModPow(e, m).ToByteArrayUnsigned();
+                var ciphertext = new BigInteger(1, buffer.ToArray()).ModPow(_e, _m).ToByteArrayUnsigned();
 
                 if (ciphertext.Length == 256)
                 {
@@ -56,13 +56,13 @@ namespace TelegramClient.Core.MTProto.Crypto
         }
     }
 
-    public class RSA
+    public class Rsa
     {
-        private static readonly Dictionary<string, RSAServerKey> serverKeys = new Dictionary<string, RSAServerKey>
+        private static readonly Dictionary<string, RsaServerKey> ServerKeys = new Dictionary<string, RsaServerKey>
         {
             {
                 "216be86c022bb4c3",
-                new RSAServerKey("216be86c022bb4c3",
+                new RsaServerKey("216be86c022bb4c3",
                     new BigInteger(
                         "00C150023E2F70DB7985DED064759CFECF0AF328E69A41DAF4D6F01B538135A6F91F8F8B2A0EC9BA9720CE352EFCF6C5680FFC424BD634864902DE0B4BD6D49F4E580230E3AE97D95C8B19442B3C0A10D8F5633FECEDD6926A7F6DAB0DDB7D457F9EA81B8465FCD6FFFEED114011DF91C059CAEDAF97625F6C96ECC74725556934EF781D866B34F011FCE4D835A090196E9A5F0E4449AF7EB697DDB9076494CA5F81104A305B6DD27665722C46B60E5DF680FB16B210607EF217652E60236C255F6A28315F4083A96791D7214BF64C1DF4FD0DB1944FB26A2A57031B32EEE64AD15A8BA68885CDE74A5BFC920F6ABF59BA5C75506373E7130F9042DA922179251F",
                         16), new BigInteger("010001", 16))
@@ -72,10 +72,10 @@ namespace TelegramClient.Core.MTProto.Crypto
         public static byte[] Encrypt(string fingerprint, byte[] data, int offset, int length)
         {
             var fingerprintLower = fingerprint.ToLower();
-            if (!serverKeys.ContainsKey(fingerprintLower))
+            if (!ServerKeys.ContainsKey(fingerprintLower))
                 return null;
 
-            var key = serverKeys[fingerprintLower];
+            var key = ServerKeys[fingerprintLower];
 
             return key.Encrypt(data, offset, length);
         }

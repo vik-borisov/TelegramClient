@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Auth
 {
-    [TLObject(-1616179942)]
-    public class TLRequestResetAuthorizations : TLMethod
+    [TlObject(-1616179942)]
+    public class TlRequestResetAuthorizations : TlMethod
     {
         public override int Constructor => -1616179942;
 
@@ -23,7 +23,7 @@ namespace TelegramClient.Entities.TL.Auth
             bw.Write(Constructor);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

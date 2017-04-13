@@ -6,10 +6,10 @@ using System.Reflection;
 
 namespace TelegramClient.Entities
 {
-    [TLObject(481674261)]
-    public class TLVector<T> : TLObject
+    [TlObject(481674261)]
+    public class TlVector<T> : TlObject
     {
-        public List<T> lists = new List<T>();
+        public List<T> Lists = new List<T>();
 
         public override int Constructor => 481674261;
 
@@ -19,36 +19,36 @@ namespace TelegramClient.Entities
             for (var i = 0; i < count; i++)
                 if (typeof(T) == typeof(int))
                 {
-                    lists.Add((T) Convert.ChangeType(br.ReadInt32(), typeof(T)));
+                    Lists.Add((T) Convert.ChangeType(br.ReadInt32(), typeof(T)));
                 }
                 else if (typeof(T) == typeof(long))
                 {
-                    lists.Add((T) Convert.ChangeType(br.ReadInt64(), typeof(T)));
+                    Lists.Add((T) Convert.ChangeType(br.ReadInt64(), typeof(T)));
                 }
                 else if (typeof(T) == typeof(string))
                 {
-                    lists.Add((T) Convert.ChangeType(StringUtil.Deserialize(br), typeof(T)));
+                    Lists.Add((T) Convert.ChangeType(StringUtil.Deserialize(br), typeof(T)));
                 }
                 else if (typeof(T) == typeof(double))
                 {
-                    lists.Add((T) Convert.ChangeType(br.ReadDouble(), typeof(T)));
+                    Lists.Add((T) Convert.ChangeType(br.ReadDouble(), typeof(T)));
                 }
-                else if (typeof(T).GetTypeInfo().BaseType == typeof(TLObject))
+                else if (typeof(T).GetTypeInfo().BaseType == typeof(TlObject))
                 {
                     var constructor = br.ReadInt32();
-                    var type = TLContext.GetType(constructor);
+                    var type = TlContext.GetType(constructor);
                     var obj = Activator.CreateInstance(type);
                     type.GetMethod("DeserializeBody").Invoke(obj, new object[] {br});
-                    lists.Add((T) Convert.ChangeType(obj, type));
+                    Lists.Add((T) Convert.ChangeType(obj, type));
                 }
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(lists.Count());
+            bw.Write(Lists.Count());
 
-            foreach (var item in lists)
+            foreach (var item in Lists)
                 if (typeof(T) == typeof(int))
                 {
                     var res = (int) Convert.ChangeType(item, typeof(int));
@@ -70,9 +70,9 @@ namespace TelegramClient.Entities
                     var res = (double) Convert.ChangeType(item, typeof(double));
                     bw.Write(res);
                 }
-                else if (typeof(T).GetTypeInfo().BaseType == typeof(TLObject))
+                else if (typeof(T).GetTypeInfo().BaseType == typeof(TlObject))
                 {
-                    var res = (TLObject) (object) item;
+                    var res = (TlObject) (object) item;
                     res.SerializeBody(bw);
                 }
         }

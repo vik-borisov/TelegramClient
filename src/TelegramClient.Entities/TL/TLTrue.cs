@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1072550713)]
-    public class TLTrue : TLObject
+    [TlObject(1072550713)]
+    public class TlTrue : TlObject
     {
         public override int Constructor => 1072550713;
 

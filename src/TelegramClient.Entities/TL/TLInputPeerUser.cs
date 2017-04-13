@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(2072935910)]
-    public class TLInputPeerUser : TLAbsInputPeer
+    [TlObject(2072935910)]
+    public class TlInputPeerUser : TlAbsInputPeer
     {
         public override int Constructor => 2072935910;
 
-        public int user_id { get; set; }
-        public long access_hash { get; set; }
+        public int UserId { get; set; }
+        public long AccessHash { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            user_id = br.ReadInt32();
-            access_hash = br.ReadInt64();
+            UserId = br.ReadInt32();
+            AccessHash = br.ReadInt64();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(user_id);
-            bw.Write(access_hash);
+            bw.Write(UserId);
+            bw.Write(AccessHash);
         }
     }
 }

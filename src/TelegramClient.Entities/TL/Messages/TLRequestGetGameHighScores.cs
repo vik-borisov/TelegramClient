@@ -2,15 +2,15 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-400399203)]
-    public class TLRequestGetGameHighScores : TLMethod
+    [TlObject(-400399203)]
+    public class TlRequestGetGameHighScores : TlMethod
     {
         public override int Constructor => -400399203;
 
-        public TLAbsInputPeer peer { get; set; }
-        public int id { get; set; }
-        public TLAbsInputUser user_id { get; set; }
-        public TLHighScores Response { get; set; }
+        public TlAbsInputPeer Peer { get; set; }
+        public int Id { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public TlHighScores Response { get; set; }
 
 
         public void ComputeFlags()
@@ -19,22 +19,22 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            peer = (TLAbsInputPeer) ObjectUtils.DeserializeObject(br);
-            id = br.ReadInt32();
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Peer = (TlAbsInputPeer) ObjectUtils.DeserializeObject(br);
+            Id = br.ReadInt32();
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(peer, bw);
-            bw.Write(id);
-            ObjectUtils.SerializeObject(user_id, bw);
+            ObjectUtils.SerializeObject(Peer, bw);
+            bw.Write(Id);
+            ObjectUtils.SerializeObject(UserId, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLHighScores) ObjectUtils.DeserializeObject(br);
+            Response = (TlHighScores) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -6,7 +6,7 @@ using TelegramClient.Core.MTProto.Crypto;
 
 namespace TelegramClient.Core.Auth
 {
-    public class Step2_Response
+    public class Step2Response
     {
         public byte[] Nonce { get; set; }
         public byte[] ServerNonce { get; set; }
@@ -14,18 +14,18 @@ namespace TelegramClient.Core.Auth
         public byte[] EncryptedAnswer { get; set; }
     }
 
-    public class Step2_DHExchange
+    public class Step2DhExchange
     {
-        public byte[] newNonce;
+        public byte[] NewNonce;
 
-        public Step2_DHExchange()
+        public Step2DhExchange()
         {
-            newNonce = new byte[32];
+            NewNonce = new byte[32];
         }
 
         public byte[] ToBytes(byte[] nonce, byte[] serverNonce, List<byte[]> fingerprints, BigInteger pq)
         {
-            new Random().NextBytes(newNonce);
+            new Random().NextBytes(NewNonce);
 
             var pqPair = Factorizator.Factorize(pq);
 
@@ -36,19 +36,19 @@ namespace TelegramClient.Core.Auth
                 using (var pqInnerDataWriter = new BinaryWriter(pqInnerData))
                 {
                     pqInnerDataWriter.Write(0x83c95aec); // pq_inner_data
-                    Serializers.Bytes.write(pqInnerDataWriter, pq.ToByteArrayUnsigned());
-                    Serializers.Bytes.write(pqInnerDataWriter, pqPair.Min.ToByteArrayUnsigned());
-                    Serializers.Bytes.write(pqInnerDataWriter, pqPair.Max.ToByteArrayUnsigned());
+                    Serializers.Bytes.Write(pqInnerDataWriter, pq.ToByteArrayUnsigned());
+                    Serializers.Bytes.Write(pqInnerDataWriter, pqPair.Min.ToByteArrayUnsigned());
+                    Serializers.Bytes.Write(pqInnerDataWriter, pqPair.Max.ToByteArrayUnsigned());
                     pqInnerDataWriter.Write(nonce);
                     pqInnerDataWriter.Write(serverNonce);
-                    pqInnerDataWriter.Write(newNonce);
+                    pqInnerDataWriter.Write(NewNonce);
 
                     byte[] ciphertext = null;
                     byte[] targetFingerprint = null;
                     foreach (var fingerprint in fingerprints)
                     {
                         pqInnerData.TryGetBuffer(out var buffer);
-                        ciphertext = RSA.Encrypt(BitConverter.ToString(fingerprint).Replace("-", string.Empty), buffer.Array, 0, (int) pqInnerData.Position);
+                        ciphertext = Rsa.Encrypt(BitConverter.ToString(fingerprint).Replace("-", string.Empty), buffer.Array, 0, (int) pqInnerData.Position);
                         if (ciphertext != null)
                         {
                             targetFingerprint = fingerprint;
@@ -61,19 +61,19 @@ namespace TelegramClient.Core.Auth
                             string.Format("not found valid key for fingerprints: {0}",
                                 string.Join(", ", fingerprints)));
 
-                    using (var reqDHParams = new MemoryStream(1024))
+                    using (var reqDhParams = new MemoryStream(1024))
                     {
-                        using (var reqDHParamsWriter = new BinaryWriter(reqDHParams))
+                        using (var reqDhParamsWriter = new BinaryWriter(reqDhParams))
                         {
-                            reqDHParamsWriter.Write(0xd712e4be); // req_dh_params
-                            reqDHParamsWriter.Write(nonce);
-                            reqDHParamsWriter.Write(serverNonce);
-                            Serializers.Bytes.write(reqDHParamsWriter, pqPair.Min.ToByteArrayUnsigned());
-                            Serializers.Bytes.write(reqDHParamsWriter, pqPair.Max.ToByteArrayUnsigned());
-                            reqDHParamsWriter.Write(targetFingerprint);
-                            Serializers.Bytes.write(reqDHParamsWriter, ciphertext);
+                            reqDhParamsWriter.Write(0xd712e4be); // req_dh_params
+                            reqDhParamsWriter.Write(nonce);
+                            reqDhParamsWriter.Write(serverNonce);
+                            Serializers.Bytes.Write(reqDhParamsWriter, pqPair.Min.ToByteArrayUnsigned());
+                            Serializers.Bytes.Write(reqDhParamsWriter, pqPair.Max.ToByteArrayUnsigned());
+                            reqDhParamsWriter.Write(targetFingerprint);
+                            Serializers.Bytes.Write(reqDhParamsWriter, ciphertext);
 
-                            reqDhParamsBytes = reqDHParams.ToArray();
+                            reqDhParamsBytes = reqDhParams.ToArray();
                         }
                     }
                 }
@@ -81,7 +81,7 @@ namespace TelegramClient.Core.Auth
             }
         }
 
-        public Step2_Response FromBytes(byte[] response)
+        public Step2Response FromBytes(byte[] response)
         {
             byte[] encryptedAnswer;
 
@@ -120,14 +120,14 @@ namespace TelegramClient.Core.Auth
 					}
 					*/
 
-                    encryptedAnswer = Serializers.Bytes.read(responseReader);
+                    encryptedAnswer = Serializers.Bytes.Read(responseReader);
 
-                    return new Step2_Response
+                    return new Step2Response
                     {
                         EncryptedAnswer = encryptedAnswer,
                         ServerNonce = serverNonceFromServer,
                         Nonce = nonceFromServer,
-                        NewNonce = newNonce
+                        NewNonce = NewNonce
                     };
                 }
             }

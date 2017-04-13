@@ -3,17 +3,17 @@ using System.IO;
 
 namespace TelegramClient.Entities
 {
-    public class TLObjectAttribute : Attribute
+    public class TlObjectAttribute : Attribute
     {
-        public TLObjectAttribute(int Constructor)
+        public TlObjectAttribute(int constructor)
         {
-            this.Constructor = Constructor;
+            this.Constructor = constructor;
         }
 
         public int Constructor { get; }
     }
 
-    public abstract class TLObject
+    public abstract class TlObject
     {
         public abstract int Constructor { get; }
         public abstract void SerializeBody(BinaryWriter bw);

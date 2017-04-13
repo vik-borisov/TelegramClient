@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(1707432768)]
-    public class TLRequestUnregisterDevice : TLMethod
+    [TlObject(1707432768)]
+    public class TlRequestUnregisterDevice : TlMethod
     {
         public override int Constructor => 1707432768;
 
-        public int token_type { get; set; }
-        public string token { get; set; }
+        public int TokenType { get; set; }
+        public string Token { get; set; }
         public bool Response { get; set; }
 
 
@@ -18,18 +18,18 @@ namespace TelegramClient.Entities.TL.Account
 
         public override void DeserializeBody(BinaryReader br)
         {
-            token_type = br.ReadInt32();
-            token = StringUtil.Deserialize(br);
+            TokenType = br.ReadInt32();
+            Token = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(token_type);
-            StringUtil.Serialize(token, bw);
+            bw.Write(TokenType);
+            StringUtil.Serialize(Token, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

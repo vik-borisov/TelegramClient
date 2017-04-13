@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Contacts
 {
-    [TLObject(301470424)]
-    public class TLRequestSearch : TLMethod
+    [TlObject(301470424)]
+    public class TlRequestSearch : TlMethod
     {
         public override int Constructor => 301470424;
 
-        public string q { get; set; }
-        public int limit { get; set; }
-        public TLFound Response { get; set; }
+        public string Q { get; set; }
+        public int Limit { get; set; }
+        public TlFound Response { get; set; }
 
 
         public void ComputeFlags()
@@ -18,20 +18,20 @@ namespace TelegramClient.Entities.TL.Contacts
 
         public override void DeserializeBody(BinaryReader br)
         {
-            q = StringUtil.Deserialize(br);
-            limit = br.ReadInt32();
+            Q = StringUtil.Deserialize(br);
+            Limit = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(q, bw);
-            bw.Write(limit);
+            StringUtil.Serialize(Q, bw);
+            bw.Write(Limit);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLFound) ObjectUtils.DeserializeObject(br);
+            Response = (TlFound) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace TelegramClient.Core.Utils
     {
         private static string GetFileHash(byte[] data)
         {
-            string md5_checksum;
+            string md5Checksum;
             using (var md5 = MD5.Create())
             {
                 var hash = md5.ComputeHash(data);
@@ -22,13 +22,13 @@ namespace TelegramClient.Core.Utils
                 foreach (var t in hash)
                     hashResult.Append(t.ToString("x2"));
 
-                md5_checksum = hashResult.ToString();
+                md5Checksum = hashResult.ToString();
             }
 
-            return md5_checksum;
+            return md5Checksum;
         }
 
-        public static async Task<TLAbsInputFile> UploadFile(this TClient client, string name,
+        public static async Task<TlAbsInputFile> UploadFile(this Client client, string name,
             StreamReader reader)
         {
             const long tenMb = 10 * 1024 * 1024;
@@ -74,50 +74,50 @@ namespace TelegramClient.Core.Utils
             return fileParts;
         }
 
-        private static async Task<TLAbsInputFile> UploadFile(string name, StreamReader reader,
-            TClient client, bool isBigFileUpload)
+        private static async Task<TlAbsInputFile> UploadFile(string name, StreamReader reader,
+            Client client, bool isBigFileUpload)
         {
             var file = GetFile(reader);
             var fileParts = GetFileParts(file);
 
             var partNumber = 0;
             var partsCount = fileParts.Count;
-            var file_id = BitConverter.ToInt64(Helpers.GenerateRandomBytes(8), 0);
+            var fileId = BitConverter.ToInt64(Helpers.GenerateRandomBytes(8), 0);
             while (fileParts.Count != 0)
             {
                 var part = fileParts.Dequeue();
 
                 if (isBigFileUpload)
-                    await client.SendRequestAsync<bool>(new TLRequestSaveBigFilePart
+                    await client.SendRequestAsync<bool>(new TlRequestSaveBigFilePart
                     {
-                        file_id = file_id,
-                        file_part = partNumber,
-                        bytes = part,
-                        file_total_parts = partsCount
+                        FileId = fileId,
+                        FilePart = partNumber,
+                        Bytes = part,
+                        FileTotalParts = partsCount
                     });
                 else
-                    await client.SendRequestAsync<bool>(new TLRequestSaveFilePart
+                    await client.SendRequestAsync<bool>(new TlRequestSaveFilePart
                     {
-                        file_id = file_id,
-                        file_part = partNumber,
-                        bytes = part
+                        FileId = fileId,
+                        FilePart = partNumber,
+                        Bytes = part
                     });
                 partNumber++;
             }
 
             if (isBigFileUpload)
-                return new TLInputFileBig
+                return new TlInputFileBig
                 {
-                    id = file_id,
-                    name = name,
-                    parts = partsCount
+                    Id = fileId,
+                    Name = name,
+                    Parts = partsCount
                 };
-            return new TLInputFile
+            return new TlInputFile
             {
-                id = file_id,
-                name = name,
-                parts = partsCount,
-                md5_checksum = GetFileHash(file)
+                Id = fileId,
+                Name = name,
+                Parts = partsCount,
+                Md5Checksum = GetFileHash(file)
             };
         }
     }

@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(-545786948)]
-    public class TLRequestResetAuthorization : TLMethod
+    [TlObject(-545786948)]
+    public class TlRequestResetAuthorization : TlMethod
     {
         public override int Constructor => -545786948;
 
-        public long hash { get; set; }
+        public long Hash { get; set; }
         public bool Response { get; set; }
 
 
@@ -17,16 +17,16 @@ namespace TelegramClient.Entities.TL.Account
 
         public override void DeserializeBody(BinaryReader br)
         {
-            hash = br.ReadInt64();
+            Hash = br.ReadInt64();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(hash);
+            bw.Write(Hash);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Contacts
 {
-    [TLObject(1340184318)]
-    public class TLRequestImportCard : TLMethod
+    [TlObject(1340184318)]
+    public class TlRequestImportCard : TlMethod
     {
         public override int Constructor => 1340184318;
 
-        public TLVector<int> export_card { get; set; }
-        public TLAbsUser Response { get; set; }
+        public TlVector<int> ExportCard { get; set; }
+        public TlAbsUser Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,18 +17,18 @@ namespace TelegramClient.Entities.TL.Contacts
 
         public override void DeserializeBody(BinaryReader br)
         {
-            export_card = ObjectUtils.DeserializeVector<int>(br);
+            ExportCard = ObjectUtils.DeserializeVector<int>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(export_card, bw);
+            ObjectUtils.SerializeObject(ExportCard, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsUser) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsUser) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1061556205)]
-    public class TLChatParticipants : TLAbsChatParticipants
+    [TlObject(1061556205)]
+    public class TlChatParticipants : TlAbsChatParticipants
     {
         public override int Constructor => 1061556205;
 
-        public int chat_id { get; set; }
-        public TLVector<TLAbsChatParticipant> participants { get; set; }
-        public int version { get; set; }
+        public int ChatId { get; set; }
+        public TlVector<TlAbsChatParticipant> Participants { get; set; }
+        public int Version { get; set; }
 
 
         public void ComputeFlags()
@@ -18,17 +18,17 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            chat_id = br.ReadInt32();
-            participants = ObjectUtils.DeserializeVector<TLAbsChatParticipant>(br);
-            version = br.ReadInt32();
+            ChatId = br.ReadInt32();
+            Participants = ObjectUtils.DeserializeVector<TlAbsChatParticipant>(br);
+            Version = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(chat_id);
-            ObjectUtils.SerializeObject(participants, bw);
-            bw.Write(version);
+            bw.Write(ChatId);
+            ObjectUtils.SerializeObject(Participants, bw);
+            bw.Write(Version);
         }
     }
 }

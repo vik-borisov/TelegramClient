@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1240849242)]
-    public class TLStickerSet : TLObject
+    [TlObject(-1240849242)]
+    public class TlStickerSet : TlObject
     {
         public override int Constructor => -1240849242;
 
-        public TLStickerSet set { get; set; }
-        public TLVector<TLStickerPack> packs { get; set; }
-        public TLVector<TLAbsDocument> documents { get; set; }
+        public TlStickerSet Set { get; set; }
+        public TlVector<TlStickerPack> Packs { get; set; }
+        public TlVector<TlAbsDocument> Documents { get; set; }
 
 
         public void ComputeFlags()
@@ -18,17 +18,17 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            set = (TLStickerSet) ObjectUtils.DeserializeObject(br);
-            packs = ObjectUtils.DeserializeVector<TLStickerPack>(br);
-            documents = ObjectUtils.DeserializeVector<TLAbsDocument>(br);
+            Set = (TlStickerSet) ObjectUtils.DeserializeObject(br);
+            Packs = ObjectUtils.DeserializeVector<TlStickerPack>(br);
+            Documents = ObjectUtils.DeserializeVector<TlAbsDocument>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(set, bw);
-            ObjectUtils.SerializeObject(packs, bw);
-            ObjectUtils.SerializeObject(documents, bw);
+            ObjectUtils.SerializeObject(Set, bw);
+            ObjectUtils.SerializeObject(Packs, bw);
+            ObjectUtils.SerializeObject(Documents, bw);
         }
     }
 }

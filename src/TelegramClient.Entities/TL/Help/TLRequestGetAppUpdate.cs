@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Help
 {
-    [TLObject(-1372724842)]
-    public class TLRequestGetAppUpdate : TLMethod
+    [TlObject(-1372724842)]
+    public class TlRequestGetAppUpdate : TlMethod
     {
         public override int Constructor => -1372724842;
 
-        public TLAbsAppUpdate Response { get; set; }
+        public TlAbsAppUpdate Response { get; set; }
 
 
         public void ComputeFlags()
@@ -23,9 +23,9 @@ namespace TelegramClient.Entities.TL.Help
             bw.Write(Constructor);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsAppUpdate) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsAppUpdate) ObjectUtils.DeserializeObject(br);
         }
     }
 }

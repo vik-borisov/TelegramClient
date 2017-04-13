@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsMessageMedia : TLObject
+    public abstract class TlAbsMessageMedia : TlObject
     {
     }
 }

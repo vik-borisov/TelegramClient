@@ -41,12 +41,12 @@ namespace TelegramClient.Core.Utils
     ///   archive files.
     /// </remarks>
 
-    public class CRC32
+    public class Crc32
     {
         /// <summary>
         ///   Indicates the total number of bytes applied to the CRC.
         /// </summary>
-        public long TotalBytesRead => _TotalBytesRead;
+        public long TotalBytesRead => _totalBytesRead;
 
         /// <summary>
         /// Indicates the current CRC for all blocks slurped in.
@@ -77,19 +77,19 @@ namespace TelegramClient.Core.Utils
 
             unchecked
             {
-                byte[] buffer = new byte[BUFFER_SIZE];
-                int readSize = BUFFER_SIZE;
+                byte[] buffer = new byte[BufferSize];
+                int readSize = BufferSize;
 
-                _TotalBytesRead = 0;
+                _totalBytesRead = 0;
                 int count = input.Read(buffer, 0, readSize);
                 output?.Write(buffer, 0, count);
-                _TotalBytesRead += count;
+                _totalBytesRead += count;
                 while (count > 0)
                 {
                     SlurpBlock(buffer, 0, count);
                     count = input.Read(buffer, 0, readSize);
                     output?.Write(buffer, 0, count);
-                    _TotalBytesRead += count;
+                    _totalBytesRead += count;
                 }
 
                 return (int)(~_register);
@@ -101,17 +101,17 @@ namespace TelegramClient.Core.Utils
         ///   Get the CRC32 for the given (word,byte) combo.  This is a
         ///   computation defined by PKzip for PKZIP 2.0 (weak) encryption.
         /// </summary>
-        /// <param name="W">The word to start with.</param>
-        /// <param name="B">The byte to combine it with.</param>
+        /// <param name="w">The word to start with.</param>
+        /// <param name="b">The byte to combine it with.</param>
         /// <returns>The CRC-ized result.</returns>
-        public int ComputeCrc32(int W, byte B)
+        public int ComputeCrc32(int w, byte b)
         {
-            return _InternalComputeCrc32((uint)W, B);
+            return _InternalComputeCrc32((uint)w, b);
         }
 
-        internal int _InternalComputeCrc32(uint W, byte B)
+        internal int _InternalComputeCrc32(uint w, byte b)
         {
-            return (int)(crc32Table[(W ^ B) & 0xFF] ^ (W >> 8));
+            return (int)(_crc32Table[(w ^ b) & 0xFF] ^ (w >> 8));
         }
 
 
@@ -132,18 +132,18 @@ namespace TelegramClient.Core.Utils
             {
                 int x = offset + i;
                 byte b = block[x];
-                if (this.reverseBits)
+                if (this._reverseBits)
                 {
                     uint temp = (_register >> 24) ^ b;
-                    _register = (_register << 8) ^ crc32Table[temp];
+                    _register = (_register << 8) ^ _crc32Table[temp];
                 }
                 else
                 {
                     uint temp = (_register & 0x000000FF) ^ b;
-                    _register = (_register >> 8) ^ crc32Table[temp];
+                    _register = (_register >> 8) ^ _crc32Table[temp];
                 }
             }
-            _TotalBytesRead += count;
+            _totalBytesRead += count;
         }
 
 
@@ -151,17 +151,17 @@ namespace TelegramClient.Core.Utils
         ///   Process one byte in the CRC.
         /// </summary>
         /// <param name = "b">the byte to include into the CRC .  </param>
-        public void UpdateCRC(byte b)
+        public void UpdateCrc(byte b)
         {
-            if (this.reverseBits)
+            if (this._reverseBits)
             {
                 uint temp = (_register >> 24) ^ b;
-                _register = (_register << 8) ^ crc32Table[temp];
+                _register = (_register << 8) ^ _crc32Table[temp];
             }
             else
             {
                 uint temp = (_register & 0x000000FF) ^ b;
-                _register = (_register >> 8) ^ crc32Table[temp];
+                _register = (_register >> 8) ^ _crc32Table[temp];
             }
         }
 
@@ -179,21 +179,21 @@ namespace TelegramClient.Core.Utils
         /// </remarks>
         /// <param name = "b">the byte to include into the CRC.  </param>
         /// <param name = "n">the number of times that byte should be repeated. </param>
-        public void UpdateCRC(byte b, int n)
+        public void UpdateCrc(byte b, int n)
         {
             while (n-- > 0)
             {
-                if (this.reverseBits)
+                if (this._reverseBits)
                 {
                     uint temp = (_register >> 24) ^ b;
-                    _register = (_register << 8) ^ crc32Table[(temp >= 0)
+                    _register = (_register << 8) ^ _crc32Table[(temp >= 0)
                                     ? temp
                                     : (temp + 256)];
                 }
                 else
                 {
                     uint temp = (_register & 0x000000FF) ^ b;
-                    _register = (_register >> 8) ^ crc32Table[(temp >= 0)
+                    _register = (_register >> 8) ^ _crc32Table[(temp >= 0)
                                     ? temp
                                     : (temp + 256)];
 
@@ -232,7 +232,7 @@ namespace TelegramClient.Core.Utils
 
         private void GenerateLookupTable()
         {
-            crc32Table = new uint[256];
+            _crc32Table = new uint[256];
             unchecked
             {
                 uint dwCrc;
@@ -244,20 +244,20 @@ namespace TelegramClient.Core.Utils
                     {
                         if ((dwCrc & 1) == 1)
                         {
-                            dwCrc = (dwCrc >> 1) ^ dwPolynomial;
+                            dwCrc = (dwCrc >> 1) ^ _dwPolynomial;
                         }
                         else
                         {
                             dwCrc >>= 1;
                         }
                     }
-                    if (reverseBits)
+                    if (_reverseBits)
                     {
-                        crc32Table[ReverseBits(i)] = ReverseBits(dwCrc);
+                        _crc32Table[ReverseBits(i)] = ReverseBits(dwCrc);
                     }
                     else
                     {
-                        crc32Table[i] = dwCrc;
+                        _crc32Table[i] = dwCrc;
                     }
                     i++;
                 } while (i != 0);
@@ -326,7 +326,7 @@ namespace TelegramClient.Core.Utils
             uint crc2 = (uint)crc;
 
             // put operator for one zero bit in odd
-            odd[0] = this.dwPolynomial;  // the CRC-32 polynomial
+            odd[0] = this._dwPolynomial;  // the CRC-32 polynomial
             uint row = 1;
             for (int i = 1; i < 32; i++)
             {
@@ -378,7 +378,7 @@ namespace TelegramClient.Core.Utils
         ///   Create an instance of the CRC32 class using the default settings: no
         ///   bit reversal, and a polynomial of 0xEDB88320.
         /// </summary>
-        public CRC32() : this(false)
+        public Crc32() : this(false)
         {
         }
 
@@ -398,7 +398,7 @@ namespace TelegramClient.Core.Utils
         ///     those, you should pass false.
         ///   </para>
         /// </remarks>
-        public CRC32(bool reverseBits) :
+        public Crc32(bool reverseBits) :
             this(unchecked((int)0xEDB88320), reverseBits)
         {
         }
@@ -429,10 +429,10 @@ namespace TelegramClient.Core.Utils
         ///     <c>reverseBits</c> parameter.
         ///   </para>
         /// </remarks>
-        public CRC32(int polynomial, bool reverseBits)
+        public Crc32(int polynomial, bool reverseBits)
         {
-            this.reverseBits = reverseBits;
-            this.dwPolynomial = (uint)polynomial;
+            this._reverseBits = reverseBits;
+            this._dwPolynomial = (uint)polynomial;
             this.GenerateLookupTable();
         }
 
@@ -451,11 +451,11 @@ namespace TelegramClient.Core.Utils
         }
 
         // private member vars
-        private uint dwPolynomial;
-        private long _TotalBytesRead;
-        private bool reverseBits;
-        private uint[] crc32Table;
-        private const int BUFFER_SIZE = 8192;
+        private uint _dwPolynomial;
+        private long _totalBytesRead;
+        private bool _reverseBits;
+        private uint[] _crc32Table;
+        private const int BufferSize = 8192;
         private uint _register = 0xFFFFFFFFU;
     }
 
@@ -483,8 +483,8 @@ namespace TelegramClient.Core.Utils
     {
         private static readonly long UnsetLengthLimit = -99;
 
-        internal System.IO.Stream _innerStream;
-        private CRC32 _Crc32;
+        internal System.IO.Stream InnerStream;
+        private Crc32 _crc32;
         private long _lengthLimit = -99;
         private bool _leaveOpen;
 
@@ -584,7 +584,7 @@ namespace TelegramClient.Core.Utils
         /// open upon close of the <c>CrcCalculatorStream</c>; false otherwise.</param>
         /// <param name="crc32">the CRC32 instance to use to calculate the CRC32</param>
         public CrcCalculatorStream(System.IO.Stream stream, long length, bool leaveOpen,
-            CRC32 crc32)
+            Crc32 crc32)
             : this(leaveOpen, length, stream, crc32)
         {
             if (length < 0)
@@ -598,11 +598,11 @@ namespace TelegramClient.Core.Utils
         // explicit param, otherwise we don't validate, because it could be our special
         // value.
         private CrcCalculatorStream
-            (bool leaveOpen, long length, System.IO.Stream stream, CRC32 crc32)
+            (bool leaveOpen, long length, System.IO.Stream stream, Crc32 crc32)
             : base()
         {
-            _innerStream = stream;
-            _Crc32 = crc32 ?? new CRC32();
+            InnerStream = stream;
+            _crc32 = crc32 ?? new Crc32();
             _lengthLimit = length;
             _leaveOpen = leaveOpen;
         }
@@ -616,7 +616,7 @@ namespace TelegramClient.Core.Utils
         ///   This is either the total number of bytes read, or the total number of
         ///   bytes written, depending on the direction of this stream.
         /// </remarks>
-        public long TotalBytesSlurped => _Crc32.TotalBytesRead;
+        public long TotalBytesSlurped => _crc32.TotalBytesRead;
 
         /// <summary>
         ///   Provides the current CRC for all blocks slurped in.
@@ -628,7 +628,7 @@ namespace TelegramClient.Core.Utils
         ///     get an accurate CRC for the entire stream.
         ///   </para>
         /// </remarks>
-        public int Crc => _Crc32.Crc32Result;
+        public int Crc => _crc32.Crc32Result;
 
         /// <summary>
         ///   Indicates whether the underlying stream will be left open when the
@@ -666,12 +666,12 @@ namespace TelegramClient.Core.Utils
 
             if (_lengthLimit != CrcCalculatorStream.UnsetLengthLimit)
             {
-                if (_Crc32.TotalBytesRead >= _lengthLimit) return 0; // EOF
-                long bytesRemaining = _lengthLimit - _Crc32.TotalBytesRead;
+                if (_crc32.TotalBytesRead >= _lengthLimit) return 0; // EOF
+                long bytesRemaining = _lengthLimit - _crc32.TotalBytesRead;
                 if (bytesRemaining < count) bytesToRead = (int)bytesRemaining;
             }
-            int n = _innerStream.Read(buffer, offset, bytesToRead);
-            if (n > 0) _Crc32.SlurpBlock(buffer, offset, n);
+            int n = InnerStream.Read(buffer, offset, bytesToRead);
+            if (n > 0) _crc32.SlurpBlock(buffer, offset, n);
             return n;
         }
 
@@ -683,14 +683,14 @@ namespace TelegramClient.Core.Utils
         /// <param name="count">the number of bytes to write</param>
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if (count > 0) _Crc32.SlurpBlock(buffer, offset, count);
-            _innerStream.Write(buffer, offset, count);
+            if (count > 0) _crc32.SlurpBlock(buffer, offset, count);
+            InnerStream.Write(buffer, offset, count);
         }
 
         /// <summary>
         /// Indicates whether the stream supports reading.
         /// </summary>
-        public override bool CanRead => _innerStream.CanRead;
+        public override bool CanRead => InnerStream.CanRead;
 
         /// <summary>
         ///   Indicates whether the stream supports seeking.
@@ -705,14 +705,14 @@ namespace TelegramClient.Core.Utils
         /// <summary>
         /// Indicates whether the stream supports writing.
         /// </summary>
-        public override bool CanWrite => _innerStream.CanWrite;
+        public override bool CanWrite => InnerStream.CanWrite;
 
         /// <summary>
         /// Flush the stream.
         /// </summary>
         public override void Flush()
         {
-            _innerStream.Flush();
+            InnerStream.Flush();
         }
 
         /// <summary>
@@ -723,7 +723,7 @@ namespace TelegramClient.Core.Utils
             get
             {
                 if (_lengthLimit == CrcCalculatorStream.UnsetLengthLimit)
-                    return _innerStream.Length;
+                    return InnerStream.Length;
                 else return _lengthLimit;
             }
         }
@@ -735,7 +735,7 @@ namespace TelegramClient.Core.Utils
         /// </summary>
         public override long Position
         {
-            get => _Crc32.TotalBytesRead;
+            get => _crc32.TotalBytesRead;
             set => throw new NotSupportedException();
         }
 
@@ -764,7 +764,7 @@ namespace TelegramClient.Core.Utils
 
         void IDisposable.Dispose()
         {
-            _innerStream.Dispose();
+            InnerStream.Dispose();
         }
     }
 

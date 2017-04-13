@@ -18,7 +18,7 @@ namespace TelegramClient.Entities
 
     public class BytesUtil
     {
-        private static byte[] read(BinaryReader binaryReader)
+        private static byte[] Read(BinaryReader binaryReader)
         {
             var firstByte = binaryReader.ReadByte();
             int len, padding;
@@ -43,7 +43,7 @@ namespace TelegramClient.Entities
             return data;
         }
 
-        private static BinaryWriter write(BinaryWriter binaryWriter, byte[] data)
+        private static BinaryWriter Write(BinaryWriter binaryWriter, byte[] data)
         {
             int padding;
             if (data.Length < 254)
@@ -77,12 +77,12 @@ namespace TelegramClient.Entities
 
         public static byte[] Deserialize(BinaryReader reader)
         {
-            return read(reader);
+            return Read(reader);
         }
 
         public static void Serialize(byte[] src, BinaryWriter writer)
         {
-            write(writer, src);
+            Write(writer, src);
         }
     }
 
@@ -104,19 +104,19 @@ namespace TelegramClient.Entities
     {
         public static bool Deserialize(BinaryReader reader)
         {
-            var FalseCNumber = -1132882121;
-            var TrueCNumber = -1720552011;
+            var falseCNumber = -1132882121;
+            var trueCNumber = -1720552011;
             var readed = reader.ReadInt32();
-            if (readed == FalseCNumber) return false;
-            if (readed == TrueCNumber) return true;
+            if (readed == falseCNumber) return false;
+            if (readed == trueCNumber) return true;
             throw new InvalidDataException(string.Format("Invalid Boolean Data : {0}", readed));
         }
 
         public static void Serialize(bool src, BinaryWriter writer)
         {
-            var FalseCNumber = -1132882121;
-            var TrueCNumber = -1720552011;
-            writer.Write(src ? TrueCNumber : FalseCNumber);
+            var falseCNumber = -1132882121;
+            var trueCNumber = -1720552011;
+            writer.Write(src ? trueCNumber : falseCNumber);
         }
     }
 

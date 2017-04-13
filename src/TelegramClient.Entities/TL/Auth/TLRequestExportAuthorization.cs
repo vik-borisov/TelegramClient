@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Auth
 {
-    [TLObject(-440401971)]
-    public class TLRequestExportAuthorization : TLMethod
+    [TlObject(-440401971)]
+    public class TlRequestExportAuthorization : TlMethod
     {
         public override int Constructor => -440401971;
 
-        public int dc_id { get; set; }
-        public TLExportedAuthorization Response { get; set; }
+        public int DcId { get; set; }
+        public TlExportedAuthorization Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,18 +17,18 @@ namespace TelegramClient.Entities.TL.Auth
 
         public override void DeserializeBody(BinaryReader br)
         {
-            dc_id = br.ReadInt32();
+            DcId = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(dc_id);
+            bw.Write(DcId);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLExportedAuthorization) ObjectUtils.DeserializeObject(br);
+            Response = (TlExportedAuthorization) ObjectUtils.DeserializeObject(br);
         }
     }
 }

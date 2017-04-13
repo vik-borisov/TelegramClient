@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(-623130288)]
-    public class TLRequestGetPrivacy : TLMethod
+    [TlObject(-623130288)]
+    public class TlRequestGetPrivacy : TlMethod
     {
         public override int Constructor => -623130288;
 
-        public TLAbsInputPrivacyKey key { get; set; }
-        public TLPrivacyRules Response { get; set; }
+        public TlAbsInputPrivacyKey Key { get; set; }
+        public TlPrivacyRules Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,18 +17,18 @@ namespace TelegramClient.Entities.TL.Account
 
         public override void DeserializeBody(BinaryReader br)
         {
-            key = (TLAbsInputPrivacyKey) ObjectUtils.DeserializeObject(br);
+            Key = (TlAbsInputPrivacyKey) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(key, bw);
+            ObjectUtils.SerializeObject(Key, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLPrivacyRules) ObjectUtils.DeserializeObject(br);
+            Response = (TlPrivacyRules) ObjectUtils.DeserializeObject(br);
         }
     }
 }

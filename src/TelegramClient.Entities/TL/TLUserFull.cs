@@ -3,68 +3,68 @@ using TelegramClient.Entities.TL.Contacts;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1496513539)]
-    public class TLUserFull : TLObject
+    [TlObject(1496513539)]
+    public class TlUserFull : TlObject
     {
         public override int Constructor => 1496513539;
 
-        public int flags { get; set; }
-        public bool blocked { get; set; }
-        public TLAbsUser user { get; set; }
-        public string about { get; set; }
-        public TLLink link { get; set; }
-        public TLAbsPhoto profile_photo { get; set; }
-        public TLAbsPeerNotifySettings notify_settings { get; set; }
-        public TLBotInfo bot_info { get; set; }
+        public int Flags { get; set; }
+        public bool Blocked { get; set; }
+        public TlAbsUser User { get; set; }
+        public string About { get; set; }
+        public TlLink Link { get; set; }
+        public TlAbsPhoto ProfilePhoto { get; set; }
+        public TlAbsPeerNotifySettings NotifySettings { get; set; }
+        public TlBotInfo BotInfo { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = blocked ? flags | 1 : flags & ~1;
-            flags = about != null ? flags | 2 : flags & ~2;
-            flags = profile_photo != null ? flags | 4 : flags & ~4;
-            flags = bot_info != null ? flags | 8 : flags & ~8;
+            Flags = 0;
+            Flags = Blocked ? Flags | 1 : Flags & ~1;
+            Flags = About != null ? Flags | 2 : Flags & ~2;
+            Flags = ProfilePhoto != null ? Flags | 4 : Flags & ~4;
+            Flags = BotInfo != null ? Flags | 8 : Flags & ~8;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            blocked = (flags & 1) != 0;
-            user = (TLAbsUser) ObjectUtils.DeserializeObject(br);
-            if ((flags & 2) != 0)
-                about = StringUtil.Deserialize(br);
+            Flags = br.ReadInt32();
+            Blocked = (Flags & 1) != 0;
+            User = (TlAbsUser) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 2) != 0)
+                About = StringUtil.Deserialize(br);
             else
-                about = null;
+                About = null;
 
-            link = (TLLink) ObjectUtils.DeserializeObject(br);
-            if ((flags & 4) != 0)
-                profile_photo = (TLAbsPhoto) ObjectUtils.DeserializeObject(br);
+            Link = (TlLink) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 4) != 0)
+                ProfilePhoto = (TlAbsPhoto) ObjectUtils.DeserializeObject(br);
             else
-                profile_photo = null;
+                ProfilePhoto = null;
 
-            notify_settings = (TLAbsPeerNotifySettings) ObjectUtils.DeserializeObject(br);
-            if ((flags & 8) != 0)
-                bot_info = (TLBotInfo) ObjectUtils.DeserializeObject(br);
+            NotifySettings = (TlAbsPeerNotifySettings) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 8) != 0)
+                BotInfo = (TlBotInfo) ObjectUtils.DeserializeObject(br);
             else
-                bot_info = null;
+                BotInfo = null;
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            ObjectUtils.SerializeObject(user, bw);
-            if ((flags & 2) != 0)
-                StringUtil.Serialize(about, bw);
-            ObjectUtils.SerializeObject(link, bw);
-            if ((flags & 4) != 0)
-                ObjectUtils.SerializeObject(profile_photo, bw);
-            ObjectUtils.SerializeObject(notify_settings, bw);
-            if ((flags & 8) != 0)
-                ObjectUtils.SerializeObject(bot_info, bw);
+            ObjectUtils.SerializeObject(User, bw);
+            if ((Flags & 2) != 0)
+                StringUtil.Serialize(About, bw);
+            ObjectUtils.SerializeObject(Link, bw);
+            if ((Flags & 4) != 0)
+                ObjectUtils.SerializeObject(ProfilePhoto, bw);
+            ObjectUtils.SerializeObject(NotifySettings, bw);
+            if ((Flags & 8) != 0)
+                ObjectUtils.SerializeObject(BotInfo, bw);
         }
     }
 }

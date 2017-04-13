@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1137792208)]
-    public class TLPrivacyKeyStatusTimestamp : TLAbsPrivacyKey
+    [TlObject(-1137792208)]
+    public class TlPrivacyKeyStatusTimestamp : TlAbsPrivacyKey
     {
         public override int Constructor => -1137792208;
 

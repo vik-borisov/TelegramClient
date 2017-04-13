@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsInputPeerNotifyEvents : TLObject
+    public abstract class TlAbsInputPeerNotifyEvents : TlObject
     {
     }
 }

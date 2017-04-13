@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1444503762)]
-    public class TLRequestEditChatAdmin : TLMethod
+    [TlObject(-1444503762)]
+    public class TlRequestEditChatAdmin : TlMethod
     {
         public override int Constructor => -1444503762;
 
-        public int chat_id { get; set; }
-        public TLAbsInputUser user_id { get; set; }
-        public bool is_admin { get; set; }
+        public int ChatId { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public bool IsAdmin { get; set; }
         public bool Response { get; set; }
 
 
@@ -19,20 +19,20 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            chat_id = br.ReadInt32();
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
-            is_admin = BoolUtil.Deserialize(br);
+            ChatId = br.ReadInt32();
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
+            IsAdmin = BoolUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(chat_id);
-            ObjectUtils.SerializeObject(user_id, bw);
-            BoolUtil.Serialize(is_admin, bw);
+            bw.Write(ChatId);
+            ObjectUtils.SerializeObject(UserId, bw);
+            BoolUtil.Serialize(IsAdmin, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

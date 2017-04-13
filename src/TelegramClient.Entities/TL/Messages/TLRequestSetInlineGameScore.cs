@@ -2,46 +2,46 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(363700068)]
-    public class TLRequestSetInlineGameScore : TLMethod
+    [TlObject(363700068)]
+    public class TlRequestSetInlineGameScore : TlMethod
     {
         public override int Constructor => 363700068;
 
-        public int flags { get; set; }
-        public bool edit_message { get; set; }
-        public TLInputBotInlineMessageID id { get; set; }
-        public TLAbsInputUser user_id { get; set; }
-        public int score { get; set; }
+        public int Flags { get; set; }
+        public bool EditMessage { get; set; }
+        public TlInputBotInlineMessageId Id { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public int Score { get; set; }
         public bool Response { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = edit_message ? flags | 1 : flags & ~1;
+            Flags = 0;
+            Flags = EditMessage ? Flags | 1 : Flags & ~1;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            edit_message = (flags & 1) != 0;
-            id = (TLInputBotInlineMessageID) ObjectUtils.DeserializeObject(br);
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
-            score = br.ReadInt32();
+            Flags = br.ReadInt32();
+            EditMessage = (Flags & 1) != 0;
+            Id = (TlInputBotInlineMessageId) ObjectUtils.DeserializeObject(br);
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Score = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            ObjectUtils.SerializeObject(id, bw);
-            ObjectUtils.SerializeObject(user_id, bw);
-            bw.Write(score);
+            ObjectUtils.SerializeObject(Id, bw);
+            ObjectUtils.SerializeObject(UserId, bw);
+            bw.Write(Score);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

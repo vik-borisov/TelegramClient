@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL.Messages
 {
-    public abstract class TLAbsStickerSetInstallResult : TLObject
+    public abstract class TlAbsStickerSetInstallResult : TlObject
     {
     }
 }

@@ -2,17 +2,17 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1918567619)]
-    public class TLUpdatesCombined : TLAbsUpdates
+    [TlObject(1918567619)]
+    public class TlUpdatesCombined : TlAbsUpdates
     {
         public override int Constructor => 1918567619;
 
-        public TLVector<TLAbsUpdate> updates { get; set; }
-        public TLVector<TLAbsUser> users { get; set; }
-        public TLVector<TLAbsChat> chats { get; set; }
-        public int date { get; set; }
-        public int seq_start { get; set; }
-        public int seq { get; set; }
+        public TlVector<TlAbsUpdate> Updates { get; set; }
+        public TlVector<TlAbsUser> Users { get; set; }
+        public TlVector<TlAbsChat> Chats { get; set; }
+        public int Date { get; set; }
+        public int SeqStart { get; set; }
+        public int Seq { get; set; }
 
 
         public void ComputeFlags()
@@ -21,23 +21,23 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            updates = ObjectUtils.DeserializeVector<TLAbsUpdate>(br);
-            users = ObjectUtils.DeserializeVector<TLAbsUser>(br);
-            chats = ObjectUtils.DeserializeVector<TLAbsChat>(br);
-            date = br.ReadInt32();
-            seq_start = br.ReadInt32();
-            seq = br.ReadInt32();
+            Updates = ObjectUtils.DeserializeVector<TlAbsUpdate>(br);
+            Users = ObjectUtils.DeserializeVector<TlAbsUser>(br);
+            Chats = ObjectUtils.DeserializeVector<TlAbsChat>(br);
+            Date = br.ReadInt32();
+            SeqStart = br.ReadInt32();
+            Seq = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(updates, bw);
-            ObjectUtils.SerializeObject(users, bw);
-            ObjectUtils.SerializeObject(chats, bw);
-            bw.Write(date);
-            bw.Write(seq_start);
-            bw.Write(seq);
+            ObjectUtils.SerializeObject(Updates, bw);
+            ObjectUtils.SerializeObject(Users, bw);
+            ObjectUtils.SerializeObject(Chats, bw);
+            bw.Write(Date);
+            bw.Write(SeqStart);
+            bw.Write(Seq);
         }
     }
 }

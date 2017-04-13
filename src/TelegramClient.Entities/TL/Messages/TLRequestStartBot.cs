@@ -2,16 +2,16 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-421563528)]
-    public class TLRequestStartBot : TLMethod
+    [TlObject(-421563528)]
+    public class TlRequestStartBot : TlMethod
     {
         public override int Constructor => -421563528;
 
-        public TLAbsInputUser bot { get; set; }
-        public TLAbsInputPeer peer { get; set; }
-        public long random_id { get; set; }
-        public string start_param { get; set; }
-        public TLAbsUpdates Response { get; set; }
+        public TlAbsInputUser Bot { get; set; }
+        public TlAbsInputPeer Peer { get; set; }
+        public long RandomId { get; set; }
+        public string StartParam { get; set; }
+        public TlAbsUpdates Response { get; set; }
 
 
         public void ComputeFlags()
@@ -20,24 +20,24 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            bot = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
-            peer = (TLAbsInputPeer) ObjectUtils.DeserializeObject(br);
-            random_id = br.ReadInt64();
-            start_param = StringUtil.Deserialize(br);
+            Bot = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Peer = (TlAbsInputPeer) ObjectUtils.DeserializeObject(br);
+            RandomId = br.ReadInt64();
+            StartParam = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(bot, bw);
-            ObjectUtils.SerializeObject(peer, bw);
-            bw.Write(random_id);
-            StringUtil.Serialize(start_param, bw);
+            ObjectUtils.SerializeObject(Bot, bw);
+            ObjectUtils.SerializeObject(Peer, bw);
+            bw.Write(RandomId);
+            StringUtil.Serialize(StartParam, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsUpdates) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsUpdates) ObjectUtils.DeserializeObject(br);
         }
     }
 }

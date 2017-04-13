@@ -35,7 +35,7 @@ namespace TelegramClient.Core.Network
                     binaryWriter.Write(Body.Length + 12);
                     binaryWriter.Write(SequneceNumber);
                     binaryWriter.Write(Body);
-                    var crc32 = new CRC32();
+                    var crc32 = new Crc32();
 
                     memoryStream.TryGetBuffer(out var buffer);
                     crc32.SlurpBlock(buffer.Array, 0, 8 + Body.Length);
@@ -72,7 +72,7 @@ namespace TelegramClient.Core.Network
                     var packet = binaryReader.ReadBytes(packetLength - 12);
                     var checksum = binaryReader.ReadInt32();
 
-                    var crc32 = new CRC32();
+                    var crc32 = new Crc32();
                     crc32.SlurpBlock(body, 0, packetLength - 4);
                     var validChecksum = crc32.Crc32Result;
 

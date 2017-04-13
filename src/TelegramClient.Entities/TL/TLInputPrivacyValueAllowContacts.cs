@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(218751099)]
-    public class TLInputPrivacyValueAllowContacts : TLAbsInputPrivacyRule
+    [TlObject(218751099)]
+    public class TlInputPrivacyValueAllowContacts : TlAbsInputPrivacyRule
     {
         public override int Constructor => 218751099;
 

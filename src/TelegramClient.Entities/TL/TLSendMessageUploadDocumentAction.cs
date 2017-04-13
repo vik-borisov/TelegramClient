@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1441998364)]
-    public class TLSendMessageUploadDocumentAction : TLAbsSendMessageAction
+    [TlObject(-1441998364)]
+    public class TlSendMessageUploadDocumentAction : TlAbsSendMessageAction
     {
         public override int Constructor => -1441998364;
 
-        public int progress { get; set; }
+        public int Progress { get; set; }
 
 
         public void ComputeFlags()
@@ -16,13 +16,13 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            progress = br.ReadInt32();
+            Progress = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(progress);
+            bw.Write(Progress);
         }
     }
 }

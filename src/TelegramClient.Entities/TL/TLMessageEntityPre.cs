@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1938967520)]
-    public class TLMessageEntityPre : TLAbsMessageEntity
+    [TlObject(1938967520)]
+    public class TlMessageEntityPre : TlAbsMessageEntity
     {
         public override int Constructor => 1938967520;
 
-        public int offset { get; set; }
-        public int length { get; set; }
-        public string language { get; set; }
+        public int Offset { get; set; }
+        public int Length { get; set; }
+        public string Language { get; set; }
 
 
         public void ComputeFlags()
@@ -18,17 +18,17 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            offset = br.ReadInt32();
-            length = br.ReadInt32();
-            language = StringUtil.Deserialize(br);
+            Offset = br.ReadInt32();
+            Length = br.ReadInt32();
+            Language = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(offset);
-            bw.Write(length);
-            StringUtil.Serialize(language, bw);
+            bw.Write(Offset);
+            bw.Write(Length);
+            StringUtil.Serialize(Language, bw);
         }
     }
 }

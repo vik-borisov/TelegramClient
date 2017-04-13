@@ -2,15 +2,15 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Help
 {
-    [TLObject(-1987579119)]
-    public class TLAppUpdate : TLAbsAppUpdate
+    [TlObject(-1987579119)]
+    public class TlAppUpdate : TlAbsAppUpdate
     {
         public override int Constructor => -1987579119;
 
-        public int id { get; set; }
-        public bool critical { get; set; }
-        public string url { get; set; }
-        public string text { get; set; }
+        public int Id { get; set; }
+        public bool Critical { get; set; }
+        public string Url { get; set; }
+        public string Text { get; set; }
 
 
         public void ComputeFlags()
@@ -19,19 +19,19 @@ namespace TelegramClient.Entities.TL.Help
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = br.ReadInt32();
-            critical = BoolUtil.Deserialize(br);
-            url = StringUtil.Deserialize(br);
-            text = StringUtil.Deserialize(br);
+            Id = br.ReadInt32();
+            Critical = BoolUtil.Deserialize(br);
+            Url = StringUtil.Deserialize(br);
+            Text = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(id);
-            BoolUtil.Serialize(critical, bw);
-            StringUtil.Serialize(url, bw);
-            StringUtil.Serialize(text, bw);
+            bw.Write(Id);
+            BoolUtil.Serialize(Critical, bw);
+            StringUtil.Serialize(Url, bw);
+            StringUtil.Serialize(Text, bw);
         }
     }
 }

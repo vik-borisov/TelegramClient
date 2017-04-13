@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1938715001)]
-    public class TLMessages : TLAbsMessages
+    [TlObject(-1938715001)]
+    public class TlMessages : TlAbsMessages
     {
         public override int Constructor => -1938715001;
 
-        public TLVector<TLAbsMessage> messages { get; set; }
-        public TLVector<TLAbsChat> chats { get; set; }
-        public TLVector<TLAbsUser> users { get; set; }
+        public TlVector<TlAbsMessage> Messages { get; set; }
+        public TlVector<TlAbsChat> Chats { get; set; }
+        public TlVector<TlAbsUser> Users { get; set; }
 
 
         public void ComputeFlags()
@@ -18,17 +18,17 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            messages = ObjectUtils.DeserializeVector<TLAbsMessage>(br);
-            chats = ObjectUtils.DeserializeVector<TLAbsChat>(br);
-            users = ObjectUtils.DeserializeVector<TLAbsUser>(br);
+            Messages = ObjectUtils.DeserializeVector<TlAbsMessage>(br);
+            Chats = ObjectUtils.DeserializeVector<TlAbsChat>(br);
+            Users = ObjectUtils.DeserializeVector<TlAbsUser>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(messages, bw);
-            ObjectUtils.SerializeObject(chats, bw);
-            ObjectUtils.SerializeObject(users, bw);
+            ObjectUtils.SerializeObject(Messages, bw);
+            ObjectUtils.SerializeObject(Chats, bw);
+            ObjectUtils.SerializeObject(Users, bw);
         }
     }
 }

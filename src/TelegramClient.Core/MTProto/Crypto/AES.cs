@@ -4,9 +4,9 @@ using System.Security.Cryptography;
 
 namespace TelegramClient.Core.MTProto.Crypto
 {
-    public class AESKeyData
+    public class AesKeyData
     {
-        public AESKeyData(byte[] key, byte[] iv)
+        public AesKeyData(byte[] key, byte[] iv)
         {
             Key = key;
             Iv = iv;
@@ -48,12 +48,12 @@ namespace TelegramClient.Core.MTProto.Crypto
                     ivBuffer.Write(hash3, 0, hash3.Length);
                     ivBuffer.Write(newNonce, 0, 4);
 
-                    return DecryptIGE(data, keyBuffer.ToArray(), ivBuffer.ToArray());
+                    return DecryptIge(data, keyBuffer.ToArray(), ivBuffer.ToArray());
                 }
             }
         }
 
-        public static AESKeyData GenerateKeyDataFromNonces(byte[] serverNonce, byte[] newNonce)
+        public static AesKeyData GenerateKeyDataFromNonces(byte[] serverNonce, byte[] newNonce)
         {
             using (SHA1 hash = SHA1.Create())
             {
@@ -82,22 +82,22 @@ namespace TelegramClient.Core.MTProto.Crypto
                     ivBuffer.Write(hash3, 0, hash3.Length);
                     ivBuffer.Write(newNonce, 0, 4);
 
-                    return new AESKeyData(keyBuffer.ToArray(), ivBuffer.ToArray());
+                    return new AesKeyData(keyBuffer.ToArray(), ivBuffer.ToArray());
                 }
             }
         }
 
-        public static byte[] DecryptAES(AESKeyData key, byte[] ciphertext)
+        public static byte[] DecryptAes(AesKeyData key, byte[] ciphertext)
         {
-            return DecryptIGE(ciphertext, key.Key, key.Iv);
+            return DecryptIge(ciphertext, key.Key, key.Iv);
         }
 
-        public static byte[] EncryptAES(AESKeyData key, byte[] plaintext)
+        public static byte[] EncryptAes(AesKeyData key, byte[] plaintext)
         {
-            return EncryptIGE(plaintext, key.Key, key.Iv);
+            return EncryptIge(plaintext, key.Key, key.Iv);
         }
 
-        public static byte[] DecryptIGE(byte[] ciphertext, byte[] key, byte[] iv)
+        public static byte[] DecryptIge(byte[] ciphertext, byte[] key, byte[] iv)
         {
             var iv1 = new byte[iv.Length / 2];
             var iv2 = new byte[iv.Length / 2];
@@ -132,7 +132,7 @@ namespace TelegramClient.Core.MTProto.Crypto
             return plaintext;
         }
 
-        public static byte[] EncryptIGE(byte[] originPlaintext, byte[] key, byte[] iv)
+        public static byte[] EncryptIge(byte[] originPlaintext, byte[] key, byte[] iv)
         {
             byte[] plaintext;
             using (var plaintextBuffer = new MemoryStream(originPlaintext.Length + 40))
@@ -189,7 +189,7 @@ namespace TelegramClient.Core.MTProto.Crypto
             return ciphertext;
         }
 
-        public static byte[] XOR(byte[] buffer1, byte[] buffer2)
+        public static byte[] Xor(byte[] buffer1, byte[] buffer2)
         {
             var result = new byte[buffer1.Length];
             for (var i = 0; i < buffer1.Length; i++)
@@ -204,11 +204,11 @@ namespace TelegramClient.Core.MTProto.Crypto
     public class AesEngine
     {
         // The S box
-        private const uint m1 = 0x80808080;
+        private const uint M1 = 0x80808080;
 
-        private const uint m2 = 0x7f7f7f7f;
-        private const uint m3 = 0x0000001b;
-        private const int BLOCK_SIZE = 16;
+        private const uint M2 = 0x7f7f7f7f;
+        private const uint M3 = 0x0000001b;
+        private const int BlockSize = 16;
 
         private static readonly byte[] S =
         {
@@ -284,7 +284,7 @@ namespace TelegramClient.Core.MTProto.Crypto
         };
 
         // vector used in calculating key schedule (powers of x in GF(256))
-        private static readonly byte[] rcon =
+        private static readonly byte[] Rcon =
         {
             0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36, 0x6c, 0xd8, 0xab, 0x4d, 0x9a,
             0x2f, 0x5e, 0xbc, 0x63, 0xc6, 0x97, 0x35, 0x6a, 0xd4, 0xb3, 0x7d, 0xfa, 0xef, 0xc5, 0x91
@@ -403,10 +403,10 @@ namespace TelegramClient.Core.MTProto.Crypto
             0x4257b8d0
         };
 
-        private uint C0, C1, C2, C3;
-        private bool forEncryption;
-        private int ROUNDS;
-        private uint[,] WorkingKey;
+        private uint _c0, _c1, _c2, _c3;
+        private bool _forEncryption;
+        private int _rounds;
+        private uint[,] _workingKey;
 
         public string AlgorithmName => "AES";
 
@@ -422,7 +422,7 @@ namespace TelegramClient.Core.MTProto.Crypto
         private uint FFmulX(
             uint x)
         {
-            return ((x & m2) << 1) ^ (((x & m1) >> 7) * m3);
+            return ((x & M2) << 1) ^ (((x & M1) >> 7) * M3);
         }
 
         /*
@@ -466,14 +466,14 @@ namespace TelegramClient.Core.MTProto.Crypto
             byte[] key,
             bool forEncryption)
         {
-            var KC = key.Length / 4; // key length in words
+            var kc = key.Length / 4; // key length in words
             int t;
 
-            if (KC != 4 && KC != 6 && KC != 8)
+            if (kc != 4 && kc != 6 && kc != 8)
                 throw new ArgumentException("Key length not 128/192/256 bits.");
 
-            ROUNDS = KC + 6; // This is not always true for the generalized Rijndael that allows larger block sizes
-            var W = new uint[ROUNDS + 1, 4]; // 4 words in a block
+            _rounds = kc + 6; // This is not always true for the generalized Rijndael that allows larger block sizes
+            var w = new uint[_rounds + 1, 4]; // 4 words in a block
 
             //
             // copy the key into the round key array
@@ -482,7 +482,7 @@ namespace TelegramClient.Core.MTProto.Crypto
             t = 0;
             for (var i = 0; i < key.Length; t++)
             {
-                W[t >> 2, t & 3] = Pack.LE_To_UInt32(key, i);
+                w[t >> 2, t & 3] = Pack.LE_To_UInt32(key, i);
                 i += 4;
             }
 
@@ -490,40 +490,40 @@ namespace TelegramClient.Core.MTProto.Crypto
             // while not enough round key material calculated
             // calculate new values
             //
-            var k = (ROUNDS + 1) << 2;
-            for (var i = KC; i < k; i++)
+            var k = (_rounds + 1) << 2;
+            for (var i = kc; i < k; i++)
             {
-                var temp = W[(i - 1) >> 2, (i - 1) & 3];
-                if (i % KC == 0)
-                    temp = SubWord(Shift(temp, 8)) ^ rcon[i / KC - 1];
-                else if (KC > 6 && i % KC == 4)
+                var temp = w[(i - 1) >> 2, (i - 1) & 3];
+                if (i % kc == 0)
+                    temp = SubWord(Shift(temp, 8)) ^ Rcon[i / kc - 1];
+                else if (kc > 6 && i % kc == 4)
                     temp = SubWord(temp);
 
-                W[i >> 2, i & 3] = W[(i - KC) >> 2, (i - KC) & 3] ^ temp;
+                w[i >> 2, i & 3] = w[(i - kc) >> 2, (i - kc) & 3] ^ temp;
             }
 
             if (!forEncryption)
-                for (var j = 1; j < ROUNDS; j++)
+                for (var j = 1; j < _rounds; j++)
                 for (var i = 0; i < 4; i++)
-                    W[j, i] = Inv_Mcol(W[j, i]);
+                    w[j, i] = Inv_Mcol(w[j, i]);
 
-            return W;
+            return w;
         }
 
         public void Init(bool forEncryption, byte[] key)
         {
-            WorkingKey = GenerateWorkingKey(key, forEncryption);
-            this.forEncryption = forEncryption;
+            _workingKey = GenerateWorkingKey(key, forEncryption);
+            this._forEncryption = forEncryption;
         }
 
         public int GetBlockSize()
         {
-            return BLOCK_SIZE;
+            return BlockSize;
         }
 
         public int ProcessBlock(byte[] input, int inOff, byte[] output, int outOff)
         {
-            if (WorkingKey == null)
+            if (_workingKey == null)
                 throw new InvalidOperationException("AES engine not initialised");
 
             if (inOff + 32 / 2 > input.Length)
@@ -534,13 +534,13 @@ namespace TelegramClient.Core.MTProto.Crypto
 
             UnPackBlock(input, inOff);
 
-            if (forEncryption)
-                EncryptBlock(WorkingKey);
-            else DecryptBlock(WorkingKey);
+            if (_forEncryption)
+                EncryptBlock(_workingKey);
+            else DecryptBlock(_workingKey);
 
             PackBlock(output, outOff);
 
-            return BLOCK_SIZE;
+            return BlockSize;
         }
 
         public void Reset()
@@ -551,123 +551,123 @@ namespace TelegramClient.Core.MTProto.Crypto
             byte[] bytes,
             int off)
         {
-            C0 = Pack.LE_To_UInt32(bytes, off);
-            C1 = Pack.LE_To_UInt32(bytes, off + 4);
-            C2 = Pack.LE_To_UInt32(bytes, off + 8);
-            C3 = Pack.LE_To_UInt32(bytes, off + 12);
+            _c0 = Pack.LE_To_UInt32(bytes, off);
+            _c1 = Pack.LE_To_UInt32(bytes, off + 4);
+            _c2 = Pack.LE_To_UInt32(bytes, off + 8);
+            _c3 = Pack.LE_To_UInt32(bytes, off + 12);
         }
 
         private void PackBlock(
             byte[] bytes,
             int off)
         {
-            Pack.UInt32_To_LE(C0, bytes, off);
-            Pack.UInt32_To_LE(C1, bytes, off + 4);
-            Pack.UInt32_To_LE(C2, bytes, off + 8);
-            Pack.UInt32_To_LE(C3, bytes, off + 12);
+            Pack.UInt32_To_LE(_c0, bytes, off);
+            Pack.UInt32_To_LE(_c1, bytes, off + 4);
+            Pack.UInt32_To_LE(_c2, bytes, off + 8);
+            Pack.UInt32_To_LE(_c3, bytes, off + 12);
         }
 
         private void EncryptBlock(
-            uint[,] KW)
+            uint[,] kw)
         {
             uint r, r0, r1, r2, r3;
 
-            C0 ^= KW[0, 0];
-            C1 ^= KW[0, 1];
-            C2 ^= KW[0, 2];
-            C3 ^= KW[0, 3];
+            _c0 ^= kw[0, 0];
+            _c1 ^= kw[0, 1];
+            _c2 ^= kw[0, 2];
+            _c3 ^= kw[0, 3];
 
-            for (r = 1; r < ROUNDS - 1;)
+            for (r = 1; r < _rounds - 1;)
             {
-                r0 = T0[C0 & 255] ^ Shift(T0[(C1 >> 8) & 255], 24) ^ Shift(T0[(C2 >> 16) & 255], 16) ^
-                     Shift(T0[(C3 >> 24) & 255], 8) ^ KW[r, 0];
-                r1 = T0[C1 & 255] ^ Shift(T0[(C2 >> 8) & 255], 24) ^ Shift(T0[(C3 >> 16) & 255], 16) ^
-                     Shift(T0[(C0 >> 24) & 255], 8) ^ KW[r, 1];
-                r2 = T0[C2 & 255] ^ Shift(T0[(C3 >> 8) & 255], 24) ^ Shift(T0[(C0 >> 16) & 255], 16) ^
-                     Shift(T0[(C1 >> 24) & 255], 8) ^ KW[r, 2];
-                r3 = T0[C3 & 255] ^ Shift(T0[(C0 >> 8) & 255], 24) ^ Shift(T0[(C1 >> 16) & 255], 16) ^
-                     Shift(T0[(C2 >> 24) & 255], 8) ^ KW[r++, 3];
-                C0 = T0[r0 & 255] ^ Shift(T0[(r1 >> 8) & 255], 24) ^ Shift(T0[(r2 >> 16) & 255], 16) ^
-                     Shift(T0[(r3 >> 24) & 255], 8) ^ KW[r, 0];
-                C1 = T0[r1 & 255] ^ Shift(T0[(r2 >> 8) & 255], 24) ^ Shift(T0[(r3 >> 16) & 255], 16) ^
-                     Shift(T0[(r0 >> 24) & 255], 8) ^ KW[r, 1];
-                C2 = T0[r2 & 255] ^ Shift(T0[(r3 >> 8) & 255], 24) ^ Shift(T0[(r0 >> 16) & 255], 16) ^
-                     Shift(T0[(r1 >> 24) & 255], 8) ^ KW[r, 2];
-                C3 = T0[r3 & 255] ^ Shift(T0[(r0 >> 8) & 255], 24) ^ Shift(T0[(r1 >> 16) & 255], 16) ^
-                     Shift(T0[(r2 >> 24) & 255], 8) ^ KW[r++, 3];
+                r0 = T0[_c0 & 255] ^ Shift(T0[(_c1 >> 8) & 255], 24) ^ Shift(T0[(_c2 >> 16) & 255], 16) ^
+                     Shift(T0[(_c3 >> 24) & 255], 8) ^ kw[r, 0];
+                r1 = T0[_c1 & 255] ^ Shift(T0[(_c2 >> 8) & 255], 24) ^ Shift(T0[(_c3 >> 16) & 255], 16) ^
+                     Shift(T0[(_c0 >> 24) & 255], 8) ^ kw[r, 1];
+                r2 = T0[_c2 & 255] ^ Shift(T0[(_c3 >> 8) & 255], 24) ^ Shift(T0[(_c0 >> 16) & 255], 16) ^
+                     Shift(T0[(_c1 >> 24) & 255], 8) ^ kw[r, 2];
+                r3 = T0[_c3 & 255] ^ Shift(T0[(_c0 >> 8) & 255], 24) ^ Shift(T0[(_c1 >> 16) & 255], 16) ^
+                     Shift(T0[(_c2 >> 24) & 255], 8) ^ kw[r++, 3];
+                _c0 = T0[r0 & 255] ^ Shift(T0[(r1 >> 8) & 255], 24) ^ Shift(T0[(r2 >> 16) & 255], 16) ^
+                     Shift(T0[(r3 >> 24) & 255], 8) ^ kw[r, 0];
+                _c1 = T0[r1 & 255] ^ Shift(T0[(r2 >> 8) & 255], 24) ^ Shift(T0[(r3 >> 16) & 255], 16) ^
+                     Shift(T0[(r0 >> 24) & 255], 8) ^ kw[r, 1];
+                _c2 = T0[r2 & 255] ^ Shift(T0[(r3 >> 8) & 255], 24) ^ Shift(T0[(r0 >> 16) & 255], 16) ^
+                     Shift(T0[(r1 >> 24) & 255], 8) ^ kw[r, 2];
+                _c3 = T0[r3 & 255] ^ Shift(T0[(r0 >> 8) & 255], 24) ^ Shift(T0[(r1 >> 16) & 255], 16) ^
+                     Shift(T0[(r2 >> 24) & 255], 8) ^ kw[r++, 3];
             }
 
-            r0 = T0[C0 & 255] ^ Shift(T0[(C1 >> 8) & 255], 24) ^ Shift(T0[(C2 >> 16) & 255], 16) ^
-                 Shift(T0[(C3 >> 24) & 255], 8) ^ KW[r, 0];
-            r1 = T0[C1 & 255] ^ Shift(T0[(C2 >> 8) & 255], 24) ^ Shift(T0[(C3 >> 16) & 255], 16) ^
-                 Shift(T0[(C0 >> 24) & 255], 8) ^ KW[r, 1];
-            r2 = T0[C2 & 255] ^ Shift(T0[(C3 >> 8) & 255], 24) ^ Shift(T0[(C0 >> 16) & 255], 16) ^
-                 Shift(T0[(C1 >> 24) & 255], 8) ^ KW[r, 2];
-            r3 = T0[C3 & 255] ^ Shift(T0[(C0 >> 8) & 255], 24) ^ Shift(T0[(C1 >> 16) & 255], 16) ^
-                 Shift(T0[(C2 >> 24) & 255], 8) ^ KW[r++, 3];
+            r0 = T0[_c0 & 255] ^ Shift(T0[(_c1 >> 8) & 255], 24) ^ Shift(T0[(_c2 >> 16) & 255], 16) ^
+                 Shift(T0[(_c3 >> 24) & 255], 8) ^ kw[r, 0];
+            r1 = T0[_c1 & 255] ^ Shift(T0[(_c2 >> 8) & 255], 24) ^ Shift(T0[(_c3 >> 16) & 255], 16) ^
+                 Shift(T0[(_c0 >> 24) & 255], 8) ^ kw[r, 1];
+            r2 = T0[_c2 & 255] ^ Shift(T0[(_c3 >> 8) & 255], 24) ^ Shift(T0[(_c0 >> 16) & 255], 16) ^
+                 Shift(T0[(_c1 >> 24) & 255], 8) ^ kw[r, 2];
+            r3 = T0[_c3 & 255] ^ Shift(T0[(_c0 >> 8) & 255], 24) ^ Shift(T0[(_c1 >> 16) & 255], 16) ^
+                 Shift(T0[(_c2 >> 24) & 255], 8) ^ kw[r++, 3];
 
             // the final round's table is a simple function of S so we don't use a whole other four tables for it
 
-            C0 = S[r0 & 255] ^ ((uint) S[(r1 >> 8) & 255] << 8) ^ ((uint) S[(r2 >> 16) & 255] << 16) ^
-                 ((uint) S[(r3 >> 24) & 255] << 24) ^ KW[r, 0];
-            C1 = S[r1 & 255] ^ ((uint) S[(r2 >> 8) & 255] << 8) ^ ((uint) S[(r3 >> 16) & 255] << 16) ^
-                 ((uint) S[(r0 >> 24) & 255] << 24) ^ KW[r, 1];
-            C2 = S[r2 & 255] ^ ((uint) S[(r3 >> 8) & 255] << 8) ^ ((uint) S[(r0 >> 16) & 255] << 16) ^
-                 ((uint) S[(r1 >> 24) & 255] << 24) ^ KW[r, 2];
-            C3 = S[r3 & 255] ^ ((uint) S[(r0 >> 8) & 255] << 8) ^ ((uint) S[(r1 >> 16) & 255] << 16) ^
-                 ((uint) S[(r2 >> 24) & 255] << 24) ^ KW[r, 3];
+            _c0 = S[r0 & 255] ^ ((uint) S[(r1 >> 8) & 255] << 8) ^ ((uint) S[(r2 >> 16) & 255] << 16) ^
+                 ((uint) S[(r3 >> 24) & 255] << 24) ^ kw[r, 0];
+            _c1 = S[r1 & 255] ^ ((uint) S[(r2 >> 8) & 255] << 8) ^ ((uint) S[(r3 >> 16) & 255] << 16) ^
+                 ((uint) S[(r0 >> 24) & 255] << 24) ^ kw[r, 1];
+            _c2 = S[r2 & 255] ^ ((uint) S[(r3 >> 8) & 255] << 8) ^ ((uint) S[(r0 >> 16) & 255] << 16) ^
+                 ((uint) S[(r1 >> 24) & 255] << 24) ^ kw[r, 2];
+            _c3 = S[r3 & 255] ^ ((uint) S[(r0 >> 8) & 255] << 8) ^ ((uint) S[(r1 >> 16) & 255] << 16) ^
+                 ((uint) S[(r2 >> 24) & 255] << 24) ^ kw[r, 3];
         }
 
         private void DecryptBlock(
-            uint[,] KW)
+            uint[,] kw)
         {
             int r;
             uint r0, r1, r2, r3;
 
-            C0 ^= KW[ROUNDS, 0];
-            C1 ^= KW[ROUNDS, 1];
-            C2 ^= KW[ROUNDS, 2];
-            C3 ^= KW[ROUNDS, 3];
+            _c0 ^= kw[_rounds, 0];
+            _c1 ^= kw[_rounds, 1];
+            _c2 ^= kw[_rounds, 2];
+            _c3 ^= kw[_rounds, 3];
 
-            for (r = ROUNDS - 1; r > 1;)
+            for (r = _rounds - 1; r > 1;)
             {
-                r0 = Tinv0[C0 & 255] ^ Shift(Tinv0[(C3 >> 8) & 255], 24) ^ Shift(Tinv0[(C2 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(C1 >> 24) & 255], 8) ^ KW[r, 0];
-                r1 = Tinv0[C1 & 255] ^ Shift(Tinv0[(C0 >> 8) & 255], 24) ^ Shift(Tinv0[(C3 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(C2 >> 24) & 255], 8) ^ KW[r, 1];
-                r2 = Tinv0[C2 & 255] ^ Shift(Tinv0[(C1 >> 8) & 255], 24) ^ Shift(Tinv0[(C0 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(C3 >> 24) & 255], 8) ^ KW[r, 2];
-                r3 = Tinv0[C3 & 255] ^ Shift(Tinv0[(C2 >> 8) & 255], 24) ^ Shift(Tinv0[(C1 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(C0 >> 24) & 255], 8) ^ KW[r--, 3];
-                C0 = Tinv0[r0 & 255] ^ Shift(Tinv0[(r3 >> 8) & 255], 24) ^ Shift(Tinv0[(r2 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(r1 >> 24) & 255], 8) ^ KW[r, 0];
-                C1 = Tinv0[r1 & 255] ^ Shift(Tinv0[(r0 >> 8) & 255], 24) ^ Shift(Tinv0[(r3 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(r2 >> 24) & 255], 8) ^ KW[r, 1];
-                C2 = Tinv0[r2 & 255] ^ Shift(Tinv0[(r1 >> 8) & 255], 24) ^ Shift(Tinv0[(r0 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(r3 >> 24) & 255], 8) ^ KW[r, 2];
-                C3 = Tinv0[r3 & 255] ^ Shift(Tinv0[(r2 >> 8) & 255], 24) ^ Shift(Tinv0[(r1 >> 16) & 255], 16) ^
-                     Shift(Tinv0[(r0 >> 24) & 255], 8) ^ KW[r--, 3];
+                r0 = Tinv0[_c0 & 255] ^ Shift(Tinv0[(_c3 >> 8) & 255], 24) ^ Shift(Tinv0[(_c2 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(_c1 >> 24) & 255], 8) ^ kw[r, 0];
+                r1 = Tinv0[_c1 & 255] ^ Shift(Tinv0[(_c0 >> 8) & 255], 24) ^ Shift(Tinv0[(_c3 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(_c2 >> 24) & 255], 8) ^ kw[r, 1];
+                r2 = Tinv0[_c2 & 255] ^ Shift(Tinv0[(_c1 >> 8) & 255], 24) ^ Shift(Tinv0[(_c0 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(_c3 >> 24) & 255], 8) ^ kw[r, 2];
+                r3 = Tinv0[_c3 & 255] ^ Shift(Tinv0[(_c2 >> 8) & 255], 24) ^ Shift(Tinv0[(_c1 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(_c0 >> 24) & 255], 8) ^ kw[r--, 3];
+                _c0 = Tinv0[r0 & 255] ^ Shift(Tinv0[(r3 >> 8) & 255], 24) ^ Shift(Tinv0[(r2 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(r1 >> 24) & 255], 8) ^ kw[r, 0];
+                _c1 = Tinv0[r1 & 255] ^ Shift(Tinv0[(r0 >> 8) & 255], 24) ^ Shift(Tinv0[(r3 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(r2 >> 24) & 255], 8) ^ kw[r, 1];
+                _c2 = Tinv0[r2 & 255] ^ Shift(Tinv0[(r1 >> 8) & 255], 24) ^ Shift(Tinv0[(r0 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(r3 >> 24) & 255], 8) ^ kw[r, 2];
+                _c3 = Tinv0[r3 & 255] ^ Shift(Tinv0[(r2 >> 8) & 255], 24) ^ Shift(Tinv0[(r1 >> 16) & 255], 16) ^
+                     Shift(Tinv0[(r0 >> 24) & 255], 8) ^ kw[r--, 3];
             }
 
-            r0 = Tinv0[C0 & 255] ^ Shift(Tinv0[(C3 >> 8) & 255], 24) ^ Shift(Tinv0[(C2 >> 16) & 255], 16) ^
-                 Shift(Tinv0[(C1 >> 24) & 255], 8) ^ KW[r, 0];
-            r1 = Tinv0[C1 & 255] ^ Shift(Tinv0[(C0 >> 8) & 255], 24) ^ Shift(Tinv0[(C3 >> 16) & 255], 16) ^
-                 Shift(Tinv0[(C2 >> 24) & 255], 8) ^ KW[r, 1];
-            r2 = Tinv0[C2 & 255] ^ Shift(Tinv0[(C1 >> 8) & 255], 24) ^ Shift(Tinv0[(C0 >> 16) & 255], 16) ^
-                 Shift(Tinv0[(C3 >> 24) & 255], 8) ^ KW[r, 2];
-            r3 = Tinv0[C3 & 255] ^ Shift(Tinv0[(C2 >> 8) & 255], 24) ^ Shift(Tinv0[(C1 >> 16) & 255], 16) ^
-                 Shift(Tinv0[(C0 >> 24) & 255], 8) ^ KW[r, 3];
+            r0 = Tinv0[_c0 & 255] ^ Shift(Tinv0[(_c3 >> 8) & 255], 24) ^ Shift(Tinv0[(_c2 >> 16) & 255], 16) ^
+                 Shift(Tinv0[(_c1 >> 24) & 255], 8) ^ kw[r, 0];
+            r1 = Tinv0[_c1 & 255] ^ Shift(Tinv0[(_c0 >> 8) & 255], 24) ^ Shift(Tinv0[(_c3 >> 16) & 255], 16) ^
+                 Shift(Tinv0[(_c2 >> 24) & 255], 8) ^ kw[r, 1];
+            r2 = Tinv0[_c2 & 255] ^ Shift(Tinv0[(_c1 >> 8) & 255], 24) ^ Shift(Tinv0[(_c0 >> 16) & 255], 16) ^
+                 Shift(Tinv0[(_c3 >> 24) & 255], 8) ^ kw[r, 2];
+            r3 = Tinv0[_c3 & 255] ^ Shift(Tinv0[(_c2 >> 8) & 255], 24) ^ Shift(Tinv0[(_c1 >> 16) & 255], 16) ^
+                 Shift(Tinv0[(_c0 >> 24) & 255], 8) ^ kw[r, 3];
 
             // the final round's table is a simple function of Si so we don't use a whole other four tables for it
 
-            C0 = Si[r0 & 255] ^ ((uint) Si[(r3 >> 8) & 255] << 8) ^ ((uint) Si[(r2 >> 16) & 255] << 16) ^
-                 ((uint) Si[(r1 >> 24) & 255] << 24) ^ KW[0, 0];
-            C1 = Si[r1 & 255] ^ ((uint) Si[(r0 >> 8) & 255] << 8) ^ ((uint) Si[(r3 >> 16) & 255] << 16) ^
-                 ((uint) Si[(r2 >> 24) & 255] << 24) ^ KW[0, 1];
-            C2 = Si[r2 & 255] ^ ((uint) Si[(r1 >> 8) & 255] << 8) ^ ((uint) Si[(r0 >> 16) & 255] << 16) ^
-                 ((uint) Si[(r3 >> 24) & 255] << 24) ^ KW[0, 2];
-            C3 = Si[r3 & 255] ^ ((uint) Si[(r2 >> 8) & 255] << 8) ^ ((uint) Si[(r1 >> 16) & 255] << 16) ^
-                 ((uint) Si[(r0 >> 24) & 255] << 24) ^ KW[0, 3];
+            _c0 = Si[r0 & 255] ^ ((uint) Si[(r3 >> 8) & 255] << 8) ^ ((uint) Si[(r2 >> 16) & 255] << 16) ^
+                 ((uint) Si[(r1 >> 24) & 255] << 24) ^ kw[0, 0];
+            _c1 = Si[r1 & 255] ^ ((uint) Si[(r0 >> 8) & 255] << 8) ^ ((uint) Si[(r3 >> 16) & 255] << 16) ^
+                 ((uint) Si[(r2 >> 24) & 255] << 24) ^ kw[0, 1];
+            _c2 = Si[r2 & 255] ^ ((uint) Si[(r1 >> 8) & 255] << 8) ^ ((uint) Si[(r0 >> 16) & 255] << 16) ^
+                 ((uint) Si[(r3 >> 24) & 255] << 24) ^ kw[0, 2];
+            _c3 = Si[r3 & 255] ^ ((uint) Si[(r2 >> 8) & 255] << 8) ^ ((uint) Si[(r1 >> 16) & 255] << 16) ^
+                 ((uint) Si[(r0 >> 24) & 255] << 24) ^ kw[0, 3];
         }
     }
 

@@ -2,43 +2,43 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(958863608)]
-    public class TLRequestSaveRecentSticker : TLMethod
+    [TlObject(958863608)]
+    public class TlRequestSaveRecentSticker : TlMethod
     {
         public override int Constructor => 958863608;
 
-        public int flags { get; set; }
-        public bool attached { get; set; }
-        public TLAbsInputDocument id { get; set; }
-        public bool unsave { get; set; }
+        public int Flags { get; set; }
+        public bool Attached { get; set; }
+        public TlAbsInputDocument Id { get; set; }
+        public bool Unsave { get; set; }
         public bool Response { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = attached ? flags | 1 : flags & ~1;
+            Flags = 0;
+            Flags = Attached ? Flags | 1 : Flags & ~1;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            attached = (flags & 1) != 0;
-            id = (TLAbsInputDocument) ObjectUtils.DeserializeObject(br);
-            unsave = BoolUtil.Deserialize(br);
+            Flags = br.ReadInt32();
+            Attached = (Flags & 1) != 0;
+            Id = (TlAbsInputDocument) ObjectUtils.DeserializeObject(br);
+            Unsave = BoolUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            ObjectUtils.SerializeObject(id, bw);
-            BoolUtil.Serialize(unsave, bw);
+            ObjectUtils.SerializeObject(Id, bw);
+            BoolUtil.Serialize(Unsave, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

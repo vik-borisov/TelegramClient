@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(1418342645)]
-    public class TLRequestGetPassword : TLMethod
+    [TlObject(1418342645)]
+    public class TlRequestGetPassword : TlMethod
     {
         public override int Constructor => 1418342645;
 
-        public TLAbsPassword Response { get; set; }
+        public TlAbsPassword Response { get; set; }
 
 
         public void ComputeFlags()
@@ -23,9 +23,9 @@ namespace TelegramClient.Entities.TL.Account
             bw.Write(Constructor);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsPassword) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsPassword) ObjectUtils.DeserializeObject(br);
         }
     }
 }

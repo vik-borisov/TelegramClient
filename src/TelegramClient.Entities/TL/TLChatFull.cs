@@ -2,17 +2,17 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(771925524)]
-    public class TLChatFull : TLAbsChatFull
+    [TlObject(771925524)]
+    public class TlChatFull : TlAbsChatFull
     {
         public override int Constructor => 771925524;
 
-        public int id { get; set; }
-        public TLAbsChatParticipants participants { get; set; }
-        public TLAbsPhoto chat_photo { get; set; }
-        public TLAbsPeerNotifySettings notify_settings { get; set; }
-        public TLAbsExportedChatInvite exported_invite { get; set; }
-        public TLVector<TLBotInfo> bot_info { get; set; }
+        public int Id { get; set; }
+        public TlAbsChatParticipants Participants { get; set; }
+        public TlAbsPhoto ChatPhoto { get; set; }
+        public TlAbsPeerNotifySettings NotifySettings { get; set; }
+        public TlAbsExportedChatInvite ExportedInvite { get; set; }
+        public TlVector<TlBotInfo> BotInfo { get; set; }
 
 
         public void ComputeFlags()
@@ -21,23 +21,23 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = br.ReadInt32();
-            participants = (TLAbsChatParticipants) ObjectUtils.DeserializeObject(br);
-            chat_photo = (TLAbsPhoto) ObjectUtils.DeserializeObject(br);
-            notify_settings = (TLAbsPeerNotifySettings) ObjectUtils.DeserializeObject(br);
-            exported_invite = (TLAbsExportedChatInvite) ObjectUtils.DeserializeObject(br);
-            bot_info = ObjectUtils.DeserializeVector<TLBotInfo>(br);
+            Id = br.ReadInt32();
+            Participants = (TlAbsChatParticipants) ObjectUtils.DeserializeObject(br);
+            ChatPhoto = (TlAbsPhoto) ObjectUtils.DeserializeObject(br);
+            NotifySettings = (TlAbsPeerNotifySettings) ObjectUtils.DeserializeObject(br);
+            ExportedInvite = (TlAbsExportedChatInvite) ObjectUtils.DeserializeObject(br);
+            BotInfo = ObjectUtils.DeserializeVector<TlBotInfo>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(id);
-            ObjectUtils.SerializeObject(participants, bw);
-            ObjectUtils.SerializeObject(chat_photo, bw);
-            ObjectUtils.SerializeObject(notify_settings, bw);
-            ObjectUtils.SerializeObject(exported_invite, bw);
-            ObjectUtils.SerializeObject(bot_info, bw);
+            bw.Write(Id);
+            ObjectUtils.SerializeObject(Participants, bw);
+            ObjectUtils.SerializeObject(ChatPhoto, bw);
+            ObjectUtils.SerializeObject(NotifySettings, bw);
+            ObjectUtils.SerializeObject(ExportedInvite, bw);
+            ObjectUtils.SerializeObject(BotInfo, bw);
         }
     }
 }

@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsInputEncryptedFile : TLObject
+    public abstract class TlAbsInputEncryptedFile : TlObject
     {
     }
 }

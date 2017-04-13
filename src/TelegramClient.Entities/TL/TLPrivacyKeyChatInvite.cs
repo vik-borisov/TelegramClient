@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1343122938)]
-    public class TLPrivacyKeyChatInvite : TLAbsPrivacyKey
+    [TlObject(1343122938)]
+    public class TlPrivacyKeyChatInvite : TlAbsPrivacyKey
     {
         public override int Constructor => 1343122938;
 

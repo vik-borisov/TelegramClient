@@ -2,20 +2,20 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-2027738169)]
-    public class TLDocument : TLAbsDocument
+    [TlObject(-2027738169)]
+    public class TlDocument : TlAbsDocument
     {
         public override int Constructor => -2027738169;
 
-        public long id { get; set; }
-        public long access_hash { get; set; }
-        public int date { get; set; }
-        public string mime_type { get; set; }
-        public int size { get; set; }
-        public TLAbsPhotoSize thumb { get; set; }
-        public int dc_id { get; set; }
-        public int version { get; set; }
-        public TLVector<TLAbsDocumentAttribute> attributes { get; set; }
+        public long Id { get; set; }
+        public long AccessHash { get; set; }
+        public int Date { get; set; }
+        public string MimeType { get; set; }
+        public int Size { get; set; }
+        public TlAbsPhotoSize Thumb { get; set; }
+        public int DcId { get; set; }
+        public int Version { get; set; }
+        public TlVector<TlAbsDocumentAttribute> Attributes { get; set; }
 
 
         public void ComputeFlags()
@@ -24,29 +24,29 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = br.ReadInt64();
-            access_hash = br.ReadInt64();
-            date = br.ReadInt32();
-            mime_type = StringUtil.Deserialize(br);
-            size = br.ReadInt32();
-            thumb = (TLAbsPhotoSize) ObjectUtils.DeserializeObject(br);
-            dc_id = br.ReadInt32();
-            version = br.ReadInt32();
-            attributes = ObjectUtils.DeserializeVector<TLAbsDocumentAttribute>(br);
+            Id = br.ReadInt64();
+            AccessHash = br.ReadInt64();
+            Date = br.ReadInt32();
+            MimeType = StringUtil.Deserialize(br);
+            Size = br.ReadInt32();
+            Thumb = (TlAbsPhotoSize) ObjectUtils.DeserializeObject(br);
+            DcId = br.ReadInt32();
+            Version = br.ReadInt32();
+            Attributes = ObjectUtils.DeserializeVector<TlAbsDocumentAttribute>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(id);
-            bw.Write(access_hash);
-            bw.Write(date);
-            StringUtil.Serialize(mime_type, bw);
-            bw.Write(size);
-            ObjectUtils.SerializeObject(thumb, bw);
-            bw.Write(dc_id);
-            bw.Write(version);
-            ObjectUtils.SerializeObject(attributes, bw);
+            bw.Write(Id);
+            bw.Write(AccessHash);
+            bw.Write(Date);
+            StringUtil.Serialize(MimeType, bw);
+            bw.Write(Size);
+            ObjectUtils.SerializeObject(Thumb, bw);
+            bw.Write(DcId);
+            bw.Write(Version);
+            ObjectUtils.SerializeObject(Attributes, bw);
         }
     }
 }

@@ -2,45 +2,45 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Channels
 {
-    [TLObject(-1490162350)]
-    public class TLRequestUpdatePinnedMessage : TLMethod
+    [TlObject(-1490162350)]
+    public class TlRequestUpdatePinnedMessage : TlMethod
     {
         public override int Constructor => -1490162350;
 
-        public int flags { get; set; }
-        public bool silent { get; set; }
-        public TLAbsInputChannel channel { get; set; }
-        public int id { get; set; }
-        public TLAbsUpdates Response { get; set; }
+        public int Flags { get; set; }
+        public bool Silent { get; set; }
+        public TlAbsInputChannel Channel { get; set; }
+        public int Id { get; set; }
+        public TlAbsUpdates Response { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = silent ? flags | 1 : flags & ~1;
+            Flags = 0;
+            Flags = Silent ? Flags | 1 : Flags & ~1;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            silent = (flags & 1) != 0;
-            channel = (TLAbsInputChannel) ObjectUtils.DeserializeObject(br);
-            id = br.ReadInt32();
+            Flags = br.ReadInt32();
+            Silent = (Flags & 1) != 0;
+            Channel = (TlAbsInputChannel) ObjectUtils.DeserializeObject(br);
+            Id = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            ObjectUtils.SerializeObject(channel, bw);
-            bw.Write(id);
+            ObjectUtils.SerializeObject(Channel, bw);
+            bw.Write(Id);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsUpdates) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsUpdates) ObjectUtils.DeserializeObject(br);
         }
     }
 }

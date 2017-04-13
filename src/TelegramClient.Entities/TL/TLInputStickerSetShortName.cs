@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-2044933984)]
-    public class TLInputStickerSetShortName : TLAbsInputStickerSet
+    [TlObject(-2044933984)]
+    public class TlInputStickerSetShortName : TlAbsInputStickerSet
     {
         public override int Constructor => -2044933984;
 
-        public string short_name { get; set; }
+        public string ShortName { get; set; }
 
 
         public void ComputeFlags()
@@ -16,13 +16,13 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            short_name = StringUtil.Deserialize(br);
+            ShortName = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(short_name, bw);
+            StringUtil.Serialize(ShortName, bw);
         }
     }
 }

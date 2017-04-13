@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsWallPaper : TLObject
+    public abstract class TlAbsWallPaper : TlObject
     {
     }
 }

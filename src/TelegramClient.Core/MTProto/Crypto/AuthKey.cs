@@ -6,7 +6,7 @@ namespace TelegramClient.Core.MTProto.Crypto
 {
     public class AuthKey
     {
-        private readonly ulong auxHash;
+        private readonly ulong _auxHash;
 
         public AuthKey(BigInteger gab)
         {
@@ -17,7 +17,7 @@ namespace TelegramClient.Core.MTProto.Crypto
                 {
                     using (var hashReader = new BinaryReader(hashStream))
                     {
-                        auxHash = hashReader.ReadUInt64();
+                        _auxHash = hashReader.ReadUInt64();
                         hashReader.ReadBytes(4);
                         Id = hashReader.ReadUInt64();
                     }
@@ -34,7 +34,7 @@ namespace TelegramClient.Core.MTProto.Crypto
                 {
                     using (var hashReader = new BinaryReader(hashStream))
                     {
-                        auxHash = hashReader.ReadUInt64();
+                        _auxHash = hashReader.ReadUInt64();
                         hashReader.ReadBytes(4);
                         Id = hashReader.ReadUInt64();
                     }
@@ -54,7 +54,7 @@ namespace TelegramClient.Core.MTProto.Crypto
                 {
                     bufferWriter.Write(newNonce);
                     bufferWriter.Write((byte) number);
-                    bufferWriter.Write(auxHash);
+                    bufferWriter.Write(_auxHash);
                     using (SHA1 sha1 = SHA1.Create())
                     {
                         stream.TryGetBuffer(out var buffer);
@@ -70,7 +70,7 @@ namespace TelegramClient.Core.MTProto.Crypto
 
         public override string ToString()
         {
-            return string.Format("(Key: {0}, KeyId: {1}, AuxHash: {2})", Data, Id, auxHash);
+            return string.Format("(Key: {0}, KeyId: {1}, AuxHash: {2})", Data, Id, _auxHash);
         }
     }
 }

@@ -16,21 +16,21 @@ using TelegramClient.Entities.TL.Contacts;
 using TelegramClient.Entities.TL.Help;
 using TelegramClient.Entities.TL.Messages;
 using TelegramClient.Entities.TL.Upload;
-using TLAuthorization = TelegramClient.Entities.TL.Auth.TLAuthorization;
-using TLRequestSearch = TelegramClient.Entities.TL.Contacts.TLRequestSearch;
+using TlAuthorization = TelegramClient.Entities.TL.Auth.TlAuthorization;
+using TlRequestSearch = TelegramClient.Entities.TL.Messages.TlRequestSearch;
 
 namespace TelegramClient.Core
 {
-    public class TClient : IDisposable
+    public class Client : IDisposable
     {
         private readonly string _apiHash;
         private readonly int _apiId;
         private MtProtoSender _sender;
         private readonly Session _session;
         private TcpTransport _transport;
-        private List<TLDcOption> _dcOptions;
+        private List<TlDcOption> _dcOptions;
 
-        public TClient(int apiId, string apiHash,
+        public Client(int apiId, string apiHash,
             ISessionStore store = null, string sessionUserId = "session")
         {
             if (apiId == default(int))
@@ -41,7 +41,7 @@ namespace TelegramClient.Core
             if (store == null)
                 store = new FileSessionStore();
 
-            TLContext.Init();
+            TlContext.Init();
             _apiHash = apiHash;
             _apiId = apiId;
 
@@ -70,21 +70,21 @@ namespace TelegramClient.Core
             _sender = new MtProtoSender(_transport, _session);
 
             //set-up layer
-            var config = new TLRequestGetConfig();
-            var request = new TLRequestInitConnection
+            var config = new TlRequestGetConfig();
+            var request = new TlRequestInitConnection
             {
-                api_id = _apiId,
-                app_version = "1.0.0",
-                device_model = "PC",
-                lang_code = "en",
-                query = config,
-                system_version = "Win 10.0"
+                ApiId = _apiId,
+                AppVersion = "1.0.0",
+                DeviceModel = "PC",
+                LangCode = "en",
+                Query = config,
+                SystemVersion = "Win 10.0"
             };
-            var invokewithLayer = new TLRequestInvokeWithLayer {layer = 57, query = request};
+            var invokewithLayer = new TlRequestInvokeWithLayer {Layer = 57, Query = request};
             await _sender.Send(invokewithLayer);
             await _sender.Receive(invokewithLayer);
 
-            _dcOptions = ((TLConfig) invokewithLayer.Response).dc_options.lists;
+            _dcOptions = ((TlConfig) invokewithLayer.Response).DcOptions.Lists;
 
             return true;
         }
@@ -94,18 +94,18 @@ namespace TelegramClient.Core
             if (_dcOptions == null || !_dcOptions.Any())
                 throw new InvalidOperationException($"Can't reconnect. Establish initial connection first.");
 
-            var dc = _dcOptions.First(d => d.id == dcId);
+            var dc = _dcOptions.First(d => d.Id == dcId);
 
-            _transport = new TcpTransport(dc.ip_address, dc.port);
-            _session.ServerAddress = dc.ip_address;
-            _session.Port = dc.port;
+            _transport = new TcpTransport(dc.IpAddress, dc.Port);
+            _session.ServerAddress = dc.IpAddress;
+            _session.Port = dc.Port;
 
             await ConnectAsync(true);
         }
 
         public bool IsUserAuthorized()
         {
-            return _session.TLUser != null;
+            return _session.TlUser != null;
         }
 
         public async Task<bool> IsPhoneRegisteredAsync(string phoneNumber)
@@ -116,7 +116,7 @@ namespace TelegramClient.Core
             if (_sender == null)
                 throw new InvalidOperationException("Not connected!");
 
-            var authCheckPhoneRequest = new TLRequestCheckPhone {phone_number = phoneNumber};
+            var authCheckPhoneRequest = new TlRequestCheckPhone {PhoneNumber = phoneNumber};
             var completed = false;
             while (!completed)
                 try
@@ -127,9 +127,9 @@ namespace TelegramClient.Core
                 }
                 catch (PhoneMigrationException e)
                 {
-                    await ReconnectToDcAsync(e.DC);
+                    await ReconnectToDcAsync(e.Dc);
                 }
-            return authCheckPhoneRequest.Response.phone_registered;
+            return authCheckPhoneRequest.Response.PhoneRegistered;
         }
 
         public async Task<string> SendCodeRequestAsync(string phoneNumber)
@@ -139,11 +139,11 @@ namespace TelegramClient.Core
 
             var completed = false;
 
-            TLRequestSendCode request = null;
+            TlRequestSendCode request = null;
 
             while (!completed)
             {
-                request = new TLRequestSendCode {phone_number = phoneNumber, api_id = _apiId, api_hash = _apiHash};
+                request = new TlRequestSendCode {PhoneNumber = phoneNumber, ApiId = _apiId, ApiHash = _apiHash};
                 try
                 {
                     await _sender.Send(request);
@@ -153,14 +153,14 @@ namespace TelegramClient.Core
                 }
                 catch (PhoneMigrationException ex)
                 {
-                    await ReconnectToDcAsync(ex.DC);
+                    await ReconnectToDcAsync(ex.Dc);
                 }
             }
 
-            return request.Response.phone_code_hash;
+            return request.Response.PhoneCodeHash;
         }
 
-        public async Task<TLUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code)
+        public async Task<TlUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code)
         {
             if (string.IsNullOrWhiteSpace(phoneNumber))
                 throw new ArgumentNullException(nameof(phoneNumber));
@@ -171,70 +171,70 @@ namespace TelegramClient.Core
             if (string.IsNullOrWhiteSpace(code))
                 throw new ArgumentNullException(nameof(code));
 
-            var request = new TLRequestSignIn
+            var request = new TlRequestSignIn
             {
-                phone_number = phoneNumber,
-                phone_code_hash = phoneCodeHash,
-                phone_code = code
+                PhoneNumber = phoneNumber,
+                PhoneCodeHash = phoneCodeHash,
+                PhoneCode = code
             };
             await _sender.Send(request);
             await _sender.Receive(request);
 
-            OnUserAuthenticated((TLUser) request.Response.user);
+            OnUserAuthenticated((TlUser) request.Response.User);
 
-            return (TLUser) request.Response.user;
+            return (TlUser) request.Response.User;
         }
 
-        public async Task<TLPassword> GetPasswordSetting()
+        public async Task<TlPassword> GetPasswordSetting()
         {
-            var request = new TLRequestGetPassword();
+            var request = new TlRequestGetPassword();
 
             await _sender.Send(request);
             await _sender.Receive(request);
 
-            return (TLPassword) request.Response;
+            return (TlPassword) request.Response;
         }
 
-        public async Task<TLUser> MakeAuthWithPasswordAsync(TLPassword password, string password_str)
+        public async Task<TlUser> MakeAuthWithPasswordAsync(TlPassword password, string passwordStr)
         {
-            var password_bytes = Encoding.UTF8.GetBytes(password_str);
-            var rv = password.current_salt.Concat(password_bytes).Concat(password.current_salt);
+            var passwordBytes = Encoding.UTF8.GetBytes(passwordStr);
+            var rv = password.CurrentSalt.Concat(passwordBytes).Concat(password.CurrentSalt);
 
-            byte[] password_hash;
+            byte[] passwordHash;
             using (var sha = SHA256.Create())
             {
-                password_hash = sha.ComputeHash(rv.ToArray());
+                passwordHash = sha.ComputeHash(rv.ToArray());
             }
 
-            var request = new TLRequestCheckPassword {password_hash = password_hash};
+            var request = new TlRequestCheckPassword {PasswordHash = passwordHash};
             await _sender.Send(request);
             await _sender.Receive(request);
 
-            OnUserAuthenticated((TLUser) request.Response.user);
+            OnUserAuthenticated((TlUser) request.Response.User);
 
-            return (TLUser) request.Response.user;
+            return (TlUser) request.Response.User;
         }
 
-        public async Task<TLUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName,
+        public async Task<TlUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName,
             string lastName)
         {
-            var request = new TLRequestSignUp
+            var request = new TlRequestSignUp
             {
-                phone_number = phoneNumber,
-                phone_code = code,
-                phone_code_hash = phoneCodeHash,
-                first_name = firstName,
-                last_name = lastName
+                PhoneNumber = phoneNumber,
+                PhoneCode = code,
+                PhoneCodeHash = phoneCodeHash,
+                FirstName = firstName,
+                LastName = lastName
             };
             await _sender.Send(request);
             await _sender.Receive(request);
 
-            OnUserAuthenticated((TLUser) request.Response.user);
+            OnUserAuthenticated((TlUser) request.Response.User);
 
-            return (TLUser) request.Response.user;
+            return (TlUser) request.Response.User;
         }
 
-        public async Task<T> SendRequestAsync<T>(TLMethod methodToExecute)
+        public async Task<T> SendRequestAsync<T>(TlMethod methodToExecute)
         {
             await _sender.Send(methodToExecute);
             await _sender.Receive(methodToExecute);
@@ -244,106 +244,106 @@ namespace TelegramClient.Core
             return (T) result;
         }
 
-        public async Task<TLContacts> GetContactsAsync()
+        public async Task<TlContacts> GetContactsAsync()
         {
             if (!IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
 
-            var req = new TLRequestGetContacts {hash = ""};
+            var req = new TlRequestGetContacts {Hash = ""};
 
-            return await SendRequestAsync<TLContacts>(req);
+            return await SendRequestAsync<TlContacts>(req);
         }
 
-        public async Task<TLAbsUpdates> SendMessageAsync(TLAbsInputPeer peer, string message)
+        public async Task<TlAbsUpdates> SendMessageAsync(TlAbsInputPeer peer, string message)
         {
             if (!IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
 
-            return await SendRequestAsync<TLAbsUpdates>(
-                new TLRequestSendMessage
+            return await SendRequestAsync<TlAbsUpdates>(
+                new TlRequestSendMessage
                 {
-                    peer = peer,
-                    message = message,
-                    random_id = Helpers.GenerateRandomLong()
+                    Peer = peer,
+                    Message = message,
+                    RandomId = Helpers.GenerateRandomLong()
                 });
         }
 
-        public async Task<bool> SendTypingAsync(TLAbsInputPeer peer)
+        public async Task<bool> SendTypingAsync(TlAbsInputPeer peer)
         {
-            var req = new TLRequestSetTyping
+            var req = new TlRequestSetTyping
             {
-                action = new TLSendMessageTypingAction(),
-                peer = peer
+                Action = new TlSendMessageTypingAction(),
+                Peer = peer
             };
             return await SendRequestAsync<bool>(req);
         }
 
-        public async Task<TLAbsDialogs> GetUserDialogsAsync()
+        public async Task<TlAbsDialogs> GetUserDialogsAsync()
         {
-            var peer = new TLInputPeerSelf();
-            return await SendRequestAsync<TLAbsDialogs>(
-                new TLRequestGetDialogs {offset_date = 0, offset_peer = peer, limit = 100});
+            var peer = new TlInputPeerSelf();
+            return await SendRequestAsync<TlAbsDialogs>(
+                new TlRequestGetDialogs {OffsetDate = 0, OffsetPeer = peer, Limit = 100});
         }
 
-        public async Task<TLAbsUpdates> SendUploadedPhoto(TLAbsInputPeer peer, TLAbsInputFile file, string caption)
+        public async Task<TlAbsUpdates> SendUploadedPhoto(TlAbsInputPeer peer, TlAbsInputFile file, string caption)
         {
-            return await SendRequestAsync<TLAbsUpdates>(new TLRequestSendMedia
+            return await SendRequestAsync<TlAbsUpdates>(new TlRequestSendMedia
             {
-                random_id = Helpers.GenerateRandomLong(),
-                background = false,
-                clear_draft = false,
-                media = new TLInputMediaUploadedPhoto {file = file, caption = caption},
-                peer = peer
+                RandomId = Helpers.GenerateRandomLong(),
+                Background = false,
+                ClearDraft = false,
+                Media = new TlInputMediaUploadedPhoto {File = file, Caption = caption},
+                Peer = peer
             });
         }
 
-        public async Task<TLAbsUpdates> SendUploadedDocument(
-            TLAbsInputPeer peer, TLAbsInputFile file, string caption, string mimeType,
-            TLVector<TLAbsDocumentAttribute> attributes)
+        public async Task<TlAbsUpdates> SendUploadedDocument(
+            TlAbsInputPeer peer, TlAbsInputFile file, string caption, string mimeType,
+            TlVector<TlAbsDocumentAttribute> attributes)
         {
-            return await SendRequestAsync<TLAbsUpdates>(new TLRequestSendMedia
+            return await SendRequestAsync<TlAbsUpdates>(new TlRequestSendMedia
             {
-                random_id = Helpers.GenerateRandomLong(),
-                background = false,
-                clear_draft = false,
-                media = new TLInputMediaUploadedDocument
+                RandomId = Helpers.GenerateRandomLong(),
+                Background = false,
+                ClearDraft = false,
+                Media = new TlInputMediaUploadedDocument
                 {
-                    file = file,
-                    caption = caption,
-                    mime_type = mimeType,
-                    attributes = attributes
+                    File = file,
+                    Caption = caption,
+                    MimeType = mimeType,
+                    Attributes = attributes
                 },
-                peer = peer
+                Peer = peer
             });
         }
 
-        public async Task<TLFile> GetFile(TLAbsInputFileLocation location, int filePartSize, int offset = 0)
+        public async Task<TlFile> GetFile(TlAbsInputFileLocation location, int filePartSize, int offset = 0)
         {
-            TLFile result = null;
+            TlFile result = null;
             try
             {
-                result = await SendRequestAsync<TLFile>(new TLRequestGetFile
+                result = await SendRequestAsync<TlFile>(new TlRequestGetFile
                 {
-                    location = location,
-                    limit = filePartSize,
-                    offset = offset
+                    Location = location,
+                    Limit = filePartSize,
+                    Offset = offset
                 });
             }
             catch (FileMigrationException ex)
             {
                 var exportedAuth =
-                    await SendRequestAsync<TLExportedAuthorization>(new TLRequestExportAuthorization {dc_id = ex.DC});
+                    await SendRequestAsync<TlExportedAuthorization>(new TlRequestExportAuthorization {DcId = ex.Dc});
 
                 var authKey = _session.AuthKey;
                 var timeOffset = _session.TimeOffset;
                 var serverAddress = _session.ServerAddress;
                 var serverPort = _session.Port;
 
-                await ReconnectToDcAsync(ex.DC);
-                var auth = await SendRequestAsync<TLAuthorization>(new TLRequestImportAuthorization
+                await ReconnectToDcAsync(ex.Dc);
+                var auth = await SendRequestAsync<TlAuthorization>(new TlRequestImportAuthorization
                 {
-                    bytes = exportedAuth.bytes,
-                    id = exportedAuth.id
+                    Bytes = exportedAuth.Bytes,
+                    Id = exportedAuth.Id
                 });
                 result = await GetFile(location, filePartSize, offset);
 
@@ -363,19 +363,19 @@ namespace TelegramClient.Core
             await _sender.SendPingAsync();
         }
 
-        public async Task<TLAbsMessages> GetHistoryAsync(TLAbsInputPeer peer, int offset, int max_id, int limit)
+        public async Task<TlAbsMessages> GetHistoryAsync(TlAbsInputPeer peer, int offset, int maxId, int limit)
         {
             if (!IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
 
-            var req = new TLRequestGetHistory
+            var req = new TlRequestGetHistory
             {
-                peer = peer,
-                add_offset = offset,
-                max_id = max_id,
-                limit = limit
+                Peer = peer,
+                AddOffset = offset,
+                MaxId = maxId,
+                Limit = limit
             };
-            return await SendRequestAsync<TLAbsMessages>(req);
+            return await SendRequestAsync<TlAbsMessages>(req);
         }
 
         /// <summary>
@@ -384,20 +384,20 @@ namespace TelegramClient.Core
         /// <param name="q">User or chat name</param>
         /// <param name="limit">Max result count</param>
         /// <returns></returns>
-        public async Task<TLFound> SearchUserAsync(string q, int limit = 10)
+        public async Task<TlFound> SearchUserAsync(string q, int limit = 10)
         {
-            var r = new TLRequestSearch
+            var r = new TlRequestSearch
             {
-                q = q,
-                limit = limit
+                Q = q,
+                Limit = limit
             };
 
-            return await SendRequestAsync<TLFound>(r);
+            return await SendRequestAsync<TlFound>(r);
         }
 
-        private void OnUserAuthenticated(TLUser TLUser)
+        private void OnUserAuthenticated(TlUser tlUser)
         {
-            _session.TLUser = TLUser;
+            _session.TlUser = tlUser;
             _session.SessionExpires = int.MaxValue;
 
             _session.Save();

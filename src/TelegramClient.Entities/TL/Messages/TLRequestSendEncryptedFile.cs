@@ -2,16 +2,16 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1701831834)]
-    public class TLRequestSendEncryptedFile : TLMethod
+    [TlObject(-1701831834)]
+    public class TlRequestSendEncryptedFile : TlMethod
     {
         public override int Constructor => -1701831834;
 
-        public TLInputEncryptedChat peer { get; set; }
-        public long random_id { get; set; }
-        public byte[] data { get; set; }
-        public TLAbsInputEncryptedFile file { get; set; }
-        public TLAbsSentEncryptedMessage Response { get; set; }
+        public TlInputEncryptedChat Peer { get; set; }
+        public long RandomId { get; set; }
+        public byte[] Data { get; set; }
+        public TlAbsInputEncryptedFile File { get; set; }
+        public TlAbsSentEncryptedMessage Response { get; set; }
 
 
         public void ComputeFlags()
@@ -20,24 +20,24 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            peer = (TLInputEncryptedChat) ObjectUtils.DeserializeObject(br);
-            random_id = br.ReadInt64();
-            data = BytesUtil.Deserialize(br);
-            file = (TLAbsInputEncryptedFile) ObjectUtils.DeserializeObject(br);
+            Peer = (TlInputEncryptedChat) ObjectUtils.DeserializeObject(br);
+            RandomId = br.ReadInt64();
+            Data = BytesUtil.Deserialize(br);
+            File = (TlAbsInputEncryptedFile) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(peer, bw);
-            bw.Write(random_id);
-            BytesUtil.Serialize(data, bw);
-            ObjectUtils.SerializeObject(file, bw);
+            ObjectUtils.SerializeObject(Peer, bw);
+            bw.Write(RandomId);
+            BytesUtil.Serialize(Data, bw);
+            ObjectUtils.SerializeObject(File, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsSentEncryptedMessage) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsSentEncryptedMessage) ObjectUtils.DeserializeObject(br);
         }
     }
 }

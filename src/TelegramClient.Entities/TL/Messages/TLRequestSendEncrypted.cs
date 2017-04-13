@@ -2,15 +2,15 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1451792525)]
-    public class TLRequestSendEncrypted : TLMethod
+    [TlObject(-1451792525)]
+    public class TlRequestSendEncrypted : TlMethod
     {
         public override int Constructor => -1451792525;
 
-        public TLInputEncryptedChat peer { get; set; }
-        public long random_id { get; set; }
-        public byte[] data { get; set; }
-        public TLAbsSentEncryptedMessage Response { get; set; }
+        public TlInputEncryptedChat Peer { get; set; }
+        public long RandomId { get; set; }
+        public byte[] Data { get; set; }
+        public TlAbsSentEncryptedMessage Response { get; set; }
 
 
         public void ComputeFlags()
@@ -19,22 +19,22 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            peer = (TLInputEncryptedChat) ObjectUtils.DeserializeObject(br);
-            random_id = br.ReadInt64();
-            data = BytesUtil.Deserialize(br);
+            Peer = (TlInputEncryptedChat) ObjectUtils.DeserializeObject(br);
+            RandomId = br.ReadInt64();
+            Data = BytesUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(peer, bw);
-            bw.Write(random_id);
-            BytesUtil.Serialize(data, bw);
+            ObjectUtils.SerializeObject(Peer, bw);
+            bw.Write(RandomId);
+            BytesUtil.Serialize(Data, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsSentEncryptedMessage) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsSentEncryptedMessage) ObjectUtils.DeserializeObject(br);
         }
     }
 }

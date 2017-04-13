@@ -3,12 +3,12 @@ using TelegramClient.Entities.TL.Messages;
 
 namespace TelegramClient.Entities.TL.Channels
 {
-    [TLObject(-1920105769)]
-    public class TLRequestGetAdminedPublicChannels : TLMethod
+    [TlObject(-1920105769)]
+    public class TlRequestGetAdminedPublicChannels : TlMethod
     {
         public override int Constructor => -1920105769;
 
-        public TLChats Response { get; set; }
+        public TlChats Response { get; set; }
 
 
         public void ComputeFlags()
@@ -24,9 +24,9 @@ namespace TelegramClient.Entities.TL.Channels
             bw.Write(Constructor);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLChats) ObjectUtils.DeserializeObject(br);
+            Response = (TlChats) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-17968211)]
-    public class TLContactLinkNone : TLAbsContactLink
+    [TlObject(-17968211)]
+    public class TlContactLinkNone : TlAbsContactLink
     {
         public override int Constructor => -17968211;
 

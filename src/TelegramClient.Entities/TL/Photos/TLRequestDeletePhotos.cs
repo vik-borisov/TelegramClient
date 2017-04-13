@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Photos
 {
-    [TLObject(-2016444625)]
-    public class TLRequestDeletePhotos : TLMethod
+    [TlObject(-2016444625)]
+    public class TlRequestDeletePhotos : TlMethod
     {
         public override int Constructor => -2016444625;
 
-        public TLVector<TLAbsInputPhoto> id { get; set; }
-        public TLVector<long> Response { get; set; }
+        public TlVector<TlAbsInputPhoto> Id { get; set; }
+        public TlVector<long> Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,16 +17,16 @@ namespace TelegramClient.Entities.TL.Photos
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = ObjectUtils.DeserializeVector<TLAbsInputPhoto>(br);
+            Id = ObjectUtils.DeserializeVector<TlAbsInputPhoto>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(id, bw);
+            ObjectUtils.SerializeObject(Id, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = ObjectUtils.DeserializeVector<long>(br);
         }

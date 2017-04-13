@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(164646985)]
-    public class TLUserStatusEmpty : TLAbsUserStatus
+    [TlObject(164646985)]
+    public class TlUserStatusEmpty : TlAbsUserStatus
     {
         public override int Constructor => 164646985;
 

@@ -2,15 +2,15 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1791935732)]
-    public class TLUpdateUserPhoto : TLAbsUpdate
+    [TlObject(-1791935732)]
+    public class TlUpdateUserPhoto : TlAbsUpdate
     {
         public override int Constructor => -1791935732;
 
-        public int user_id { get; set; }
-        public int date { get; set; }
-        public TLAbsUserProfilePhoto photo { get; set; }
-        public bool previous { get; set; }
+        public int UserId { get; set; }
+        public int Date { get; set; }
+        public TlAbsUserProfilePhoto Photo { get; set; }
+        public bool Previous { get; set; }
 
 
         public void ComputeFlags()
@@ -19,19 +19,19 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            user_id = br.ReadInt32();
-            date = br.ReadInt32();
-            photo = (TLAbsUserProfilePhoto) ObjectUtils.DeserializeObject(br);
-            previous = BoolUtil.Deserialize(br);
+            UserId = br.ReadInt32();
+            Date = br.ReadInt32();
+            Photo = (TlAbsUserProfilePhoto) ObjectUtils.DeserializeObject(br);
+            Previous = BoolUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(user_id);
-            bw.Write(date);
-            ObjectUtils.SerializeObject(photo, bw);
-            BoolUtil.Serialize(previous, bw);
+            bw.Write(UserId);
+            bw.Write(Date);
+            ObjectUtils.SerializeObject(Photo, bw);
+            BoolUtil.Serialize(Previous, bw);
         }
     }
 }

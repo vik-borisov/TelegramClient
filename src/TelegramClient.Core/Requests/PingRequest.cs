@@ -5,7 +5,7 @@ using TelegramClient.Entities;
 
 namespace TelegramClient.Core.Requests
 {
-    public class PingRequest : TLMethod
+    public class PingRequest : TlMethod
     {
         public override int Constructor => 0x7abe77ec;
 
@@ -20,7 +20,7 @@ namespace TelegramClient.Core.Requests
             throw new NotImplementedException();
         }
 
-        public override void deserializeResponse(BinaryReader stream)
+        public override void DeserializeResponse(BinaryReader stream)
         {
             throw new NotImplementedException();
         }

@@ -2,46 +2,46 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(766443943)]
-    public class TLInputBotInlineMessageMediaContact : TLAbsInputBotInlineMessage
+    [TlObject(766443943)]
+    public class TlInputBotInlineMessageMediaContact : TlAbsInputBotInlineMessage
     {
         public override int Constructor => 766443943;
 
-        public int flags { get; set; }
-        public string phone_number { get; set; }
-        public string first_name { get; set; }
-        public string last_name { get; set; }
-        public TLAbsReplyMarkup reply_markup { get; set; }
+        public int Flags { get; set; }
+        public string PhoneNumber { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public TlAbsReplyMarkup ReplyMarkup { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = reply_markup != null ? flags | 4 : flags & ~4;
+            Flags = 0;
+            Flags = ReplyMarkup != null ? Flags | 4 : Flags & ~4;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            phone_number = StringUtil.Deserialize(br);
-            first_name = StringUtil.Deserialize(br);
-            last_name = StringUtil.Deserialize(br);
-            if ((flags & 4) != 0)
-                reply_markup = (TLAbsReplyMarkup) ObjectUtils.DeserializeObject(br);
+            Flags = br.ReadInt32();
+            PhoneNumber = StringUtil.Deserialize(br);
+            FirstName = StringUtil.Deserialize(br);
+            LastName = StringUtil.Deserialize(br);
+            if ((Flags & 4) != 0)
+                ReplyMarkup = (TlAbsReplyMarkup) ObjectUtils.DeserializeObject(br);
             else
-                reply_markup = null;
+                ReplyMarkup = null;
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
-            StringUtil.Serialize(phone_number, bw);
-            StringUtil.Serialize(first_name, bw);
-            StringUtil.Serialize(last_name, bw);
-            if ((flags & 4) != 0)
-                ObjectUtils.SerializeObject(reply_markup, bw);
+            bw.Write(Flags);
+            StringUtil.Serialize(PhoneNumber, bw);
+            StringUtil.Serialize(FirstName, bw);
+            StringUtil.Serialize(LastName, bw);
+            if ((Flags & 4) != 0)
+                ObjectUtils.SerializeObject(ReplyMarkup, bw);
         }
     }
 }

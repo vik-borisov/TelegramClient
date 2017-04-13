@@ -2,40 +2,40 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-57668565)]
-    public class TLChatParticipantsForbidden : TLAbsChatParticipants
+    [TlObject(-57668565)]
+    public class TlChatParticipantsForbidden : TlAbsChatParticipants
     {
         public override int Constructor => -57668565;
 
-        public int flags { get; set; }
-        public int chat_id { get; set; }
-        public TLAbsChatParticipant self_participant { get; set; }
+        public int Flags { get; set; }
+        public int ChatId { get; set; }
+        public TlAbsChatParticipant SelfParticipant { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = self_participant != null ? flags | 1 : flags & ~1;
+            Flags = 0;
+            Flags = SelfParticipant != null ? Flags | 1 : Flags & ~1;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            chat_id = br.ReadInt32();
-            if ((flags & 1) != 0)
-                self_participant = (TLAbsChatParticipant) ObjectUtils.DeserializeObject(br);
+            Flags = br.ReadInt32();
+            ChatId = br.ReadInt32();
+            if ((Flags & 1) != 0)
+                SelfParticipant = (TlAbsChatParticipant) ObjectUtils.DeserializeObject(br);
             else
-                self_participant = null;
+                SelfParticipant = null;
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
-            bw.Write(chat_id);
-            if ((flags & 1) != 0)
-                ObjectUtils.SerializeObject(self_participant, bw);
+            bw.Write(Flags);
+            bw.Write(ChatId);
+            if ((Flags & 1) != 0)
+                ObjectUtils.SerializeObject(SelfParticipant, bw);
         }
     }
 }

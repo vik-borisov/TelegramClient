@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsPhotoSize : TLObject
+    public abstract class TlAbsPhotoSize : TlObject
     {
     }
 }

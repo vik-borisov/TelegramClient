@@ -2,15 +2,15 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1361650766)]
-    public class TLMaskCoords : TLObject
+    [TlObject(-1361650766)]
+    public class TlMaskCoords : TlObject
     {
         public override int Constructor => -1361650766;
 
-        public int n { get; set; }
-        public double x { get; set; }
-        public double y { get; set; }
-        public double zoom { get; set; }
+        public int N { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Zoom { get; set; }
 
 
         public void ComputeFlags()
@@ -19,19 +19,19 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            n = br.ReadInt32();
-            x = br.ReadDouble();
-            y = br.ReadDouble();
-            zoom = br.ReadDouble();
+            N = br.ReadInt32();
+            X = br.ReadDouble();
+            Y = br.ReadDouble();
+            Zoom = br.ReadDouble();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(n);
-            bw.Write(x);
-            bw.Write(y);
-            bw.Write(zoom);
+            bw.Write(N);
+            bw.Write(X);
+            bw.Write(Y);
+            bw.Write(Zoom);
         }
     }
 }

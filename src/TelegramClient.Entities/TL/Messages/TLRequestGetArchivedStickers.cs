@@ -2,45 +2,45 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(1475442322)]
-    public class TLRequestGetArchivedStickers : TLMethod
+    [TlObject(1475442322)]
+    public class TlRequestGetArchivedStickers : TlMethod
     {
         public override int Constructor => 1475442322;
 
-        public int flags { get; set; }
-        public bool masks { get; set; }
-        public long offset_id { get; set; }
-        public int limit { get; set; }
-        public TLArchivedStickers Response { get; set; }
+        public int Flags { get; set; }
+        public bool Masks { get; set; }
+        public long OffsetId { get; set; }
+        public int Limit { get; set; }
+        public TlArchivedStickers Response { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = masks ? flags | 1 : flags & ~1;
+            Flags = 0;
+            Flags = Masks ? Flags | 1 : Flags & ~1;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            masks = (flags & 1) != 0;
-            offset_id = br.ReadInt64();
-            limit = br.ReadInt32();
+            Flags = br.ReadInt32();
+            Masks = (Flags & 1) != 0;
+            OffsetId = br.ReadInt64();
+            Limit = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            bw.Write(offset_id);
-            bw.Write(limit);
+            bw.Write(OffsetId);
+            bw.Write(Limit);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLArchivedStickers) ObjectUtils.DeserializeObject(br);
+            Response = (TlArchivedStickers) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Account
 {
-    [TLObject(-1374118561)]
-    public class TLRequestReportPeer : TLMethod
+    [TlObject(-1374118561)]
+    public class TlRequestReportPeer : TlMethod
     {
         public override int Constructor => -1374118561;
 
-        public TLAbsInputPeer peer { get; set; }
-        public TLAbsReportReason reason { get; set; }
+        public TlAbsInputPeer Peer { get; set; }
+        public TlAbsReportReason Reason { get; set; }
         public bool Response { get; set; }
 
 
@@ -18,18 +18,18 @@ namespace TelegramClient.Entities.TL.Account
 
         public override void DeserializeBody(BinaryReader br)
         {
-            peer = (TLAbsInputPeer) ObjectUtils.DeserializeObject(br);
-            reason = (TLAbsReportReason) ObjectUtils.DeserializeObject(br);
+            Peer = (TlAbsInputPeer) ObjectUtils.DeserializeObject(br);
+            Reason = (TlAbsReportReason) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(peer, bw);
-            ObjectUtils.SerializeObject(reason, bw);
+            ObjectUtils.SerializeObject(Peer, bw);
+            ObjectUtils.SerializeObject(Reason, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

@@ -26,13 +26,13 @@ namespace TelegramClient.Core.MTProto.Crypto
 
     public class SaltCollection
     {
-        private SortedSet<Salt> salts;
+        private SortedSet<Salt> _salts;
 
-        public int Count => salts.Count;
+        public int Count => _salts.Count;
 
         public void Add(Salt salt)
         {
-            salts.Add(salt);
+            _salts.Add(salt);
         }
 
         // TODO: get actual salt and other...

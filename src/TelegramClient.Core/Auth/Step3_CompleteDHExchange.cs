@@ -7,23 +7,23 @@ using TelegramClient.Core.MTProto.Crypto;
 
 namespace TelegramClient.Core.Auth
 {
-	public class Step3_Response
+	public class Step3Response
 	{
 		public AuthKey AuthKey { get; set; }
 		public int TimeOffset { get; set; }
 	}
 
-	public class Step3_CompleteDHExchange
+	public class Step3CompleteDhExchange
 	{
 		private BigInteger _gab;
-		private byte[] newNonce;
-		private int timeOffset;
+		private byte[] _newNonce;
+		private int _timeOffset;
 
 		public byte[] ToBytes(byte[] nonce, byte[] serverNonce, byte[] newNonce, byte[] encryptedAnswer)
 		{
-			this.newNonce = newNonce;
+			this._newNonce = newNonce;
 			var key = AES.GenerateKeyDataFromNonces(serverNonce, newNonce);
-			var plaintextAnswer = AES.DecryptAES(key, encryptedAnswer);
+			var plaintextAnswer = AES.DecryptAes(key, encryptedAnswer);
 
 			// logger.debug("plaintext answer: {0}", BitConverter.ToString(plaintextAnswer));
 
@@ -55,11 +55,11 @@ namespace TelegramClient.Core.Auth
 					// logger.debug("valid server nonce");
 
 					g = dhInnerDataReader.ReadInt32();
-					dhPrime = new BigInteger(1, Serializers.Bytes.read(dhInnerDataReader));
-					ga = new BigInteger(1, Serializers.Bytes.read(dhInnerDataReader));
+					dhPrime = new BigInteger(1, Serializers.Bytes.Read(dhInnerDataReader));
+					ga = new BigInteger(1, Serializers.Bytes.Read(dhInnerDataReader));
 
 					var serverTime = dhInnerDataReader.ReadInt32();
-					timeOffset = serverTime -
+					_timeOffset = serverTime -
 								 (int) (Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1))
 											.TotalMilliseconds) / 1000);
 
@@ -74,7 +74,7 @@ namespace TelegramClient.Core.Auth
 			// logger.debug("gab: {0}", gab);
 
 			// prepare client dh inner data
-			byte[] clientDHInnerDataBytes;
+			byte[] clientDhInnerDataBytes;
 			using (var clientDhInnerData = new MemoryStream())
 			{
 				using (var clientDhInnerDataWriter = new BinaryWriter(clientDhInnerData))
@@ -83,7 +83,7 @@ namespace TelegramClient.Core.Auth
 					clientDhInnerDataWriter.Write(nonce);
 					clientDhInnerDataWriter.Write(serverNonce);
 					clientDhInnerDataWriter.Write((long) 0); // TODO: retry_id
-					Serializers.Bytes.write(clientDhInnerDataWriter, gb.ToByteArrayUnsigned());
+					Serializers.Bytes.Write(clientDhInnerDataWriter, gb.ToByteArrayUnsigned());
 
 					using (var clientDhInnerDataWithHash = new MemoryStream())
 					{
@@ -97,7 +97,7 @@ namespace TelegramClient.Core.Auth
 									(int) clientDhInnerData.Position));
 								clientDhInnerDataWithHashWriter.Write(clientDBuffer.Array, 0,
 									(int) clientDhInnerData.Position);
-								clientDHInnerDataBytes = clientDhInnerDataWithHash.ToArray();
+								clientDhInnerDataBytes = clientDhInnerDataWithHash.ToArray();
 							}
 						}
 					}
@@ -107,7 +107,7 @@ namespace TelegramClient.Core.Auth
 			// logger.debug("client dh inner data papared len {0}: {1}", clientDHInnerDataBytes.Length, BitConverter.ToString(clientDHInnerDataBytes).Replace("-", ""));
 
 			// encryption
-			var clientDhInnerDataEncryptedBytes = AES.EncryptAES(key, clientDHInnerDataBytes);
+			var clientDhInnerDataEncryptedBytes = AES.EncryptAes(key, clientDhInnerDataBytes);
 
 			// logger.debug("inner data encrypted {0}: {1}", clientDhInnerDataEncryptedBytes.Length, BitConverter.ToString(clientDhInnerDataEncryptedBytes).Replace("-", ""));
 
@@ -120,7 +120,7 @@ namespace TelegramClient.Core.Auth
 					setClientDhParamsWriter.Write(0xf5045f1f);
 					setClientDhParamsWriter.Write(nonce);
 					setClientDhParamsWriter.Write(serverNonce);
-					Serializers.Bytes.write(setClientDhParamsWriter, clientDhInnerDataEncryptedBytes);
+					Serializers.Bytes.Write(setClientDhParamsWriter, clientDhInnerDataEncryptedBytes);
 
 					setclientDhParamsBytes = setClientDhParams.ToArray();
 				}
@@ -131,7 +131,7 @@ namespace TelegramClient.Core.Auth
 			return setclientDhParamsBytes;
 		}
 
-		public Step3_Response FromBytes(byte[] response)
+		public Step3Response FromBytes(byte[] response)
 		{
 			using (var responseStream = new MemoryStream(response))
 			{
@@ -171,7 +171,7 @@ namespace TelegramClient.Core.Auth
 
 						var authKey = new AuthKey(_gab);
 
-						var newNonceHashCalculated = authKey.CalcNewNonceHash(newNonce, 1);
+						var newNonceHashCalculated = authKey.CalcNewNonceHash(_newNonce, 1);
 
 						if (!newNonceHash1.SequenceEqual(newNonceHashCalculated))
 							throw new InvalidOperationException("invalid new nonce hash");
@@ -180,10 +180,10 @@ namespace TelegramClient.Core.Auth
 						//logger.info("saving time offset: {0}", timeOffset);
 						//TelegramSession.Instance.TimeOffset = timeOffset;
 
-						return new Step3_Response
+						return new Step3Response
 						{
 							AuthKey = authKey,
-							TimeOffset = timeOffset
+							TimeOffset = _timeOffset
 						};
 					}
 					if (code == 0x46dc1fb9)

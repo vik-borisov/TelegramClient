@@ -2,45 +2,45 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1836524247)]
-    public class TLPhoto : TLAbsPhoto
+    [TlObject(-1836524247)]
+    public class TlPhoto : TlAbsPhoto
     {
         public override int Constructor => -1836524247;
 
-        public int flags { get; set; }
-        public bool has_stickers { get; set; }
-        public long id { get; set; }
-        public long access_hash { get; set; }
-        public int date { get; set; }
-        public TLVector<TLAbsPhotoSize> sizes { get; set; }
+        public int Flags { get; set; }
+        public bool HasStickers { get; set; }
+        public long Id { get; set; }
+        public long AccessHash { get; set; }
+        public int Date { get; set; }
+        public TlVector<TlAbsPhotoSize> Sizes { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = has_stickers ? flags | 1 : flags & ~1;
+            Flags = 0;
+            Flags = HasStickers ? Flags | 1 : Flags & ~1;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            has_stickers = (flags & 1) != 0;
-            id = br.ReadInt64();
-            access_hash = br.ReadInt64();
-            date = br.ReadInt32();
-            sizes = ObjectUtils.DeserializeVector<TLAbsPhotoSize>(br);
+            Flags = br.ReadInt32();
+            HasStickers = (Flags & 1) != 0;
+            Id = br.ReadInt64();
+            AccessHash = br.ReadInt64();
+            Date = br.ReadInt32();
+            Sizes = ObjectUtils.DeserializeVector<TlAbsPhotoSize>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            bw.Write(id);
-            bw.Write(access_hash);
-            bw.Write(date);
-            ObjectUtils.SerializeObject(sizes, bw);
+            bw.Write(Id);
+            bw.Write(AccessHash);
+            bw.Write(Date);
+            ObjectUtils.SerializeObject(Sizes, bw);
         }
     }
 }

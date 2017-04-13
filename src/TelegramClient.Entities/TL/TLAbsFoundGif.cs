@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsFoundGif : TLObject
+    public abstract class TlAbsFoundGif : TlObject
     {
     }
 }

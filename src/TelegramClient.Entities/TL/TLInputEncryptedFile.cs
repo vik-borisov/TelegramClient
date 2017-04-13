@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1511503333)]
-    public class TLInputEncryptedFile : TLAbsInputEncryptedFile
+    [TlObject(1511503333)]
+    public class TlInputEncryptedFile : TlAbsInputEncryptedFile
     {
         public override int Constructor => 1511503333;
 
-        public long id { get; set; }
-        public long access_hash { get; set; }
+        public long Id { get; set; }
+        public long AccessHash { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = br.ReadInt64();
-            access_hash = br.ReadInt64();
+            Id = br.ReadInt64();
+            AccessHash = br.ReadInt64();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(id);
-            bw.Write(access_hash);
+            bw.Write(Id);
+            bw.Write(AccessHash);
         }
     }
 }

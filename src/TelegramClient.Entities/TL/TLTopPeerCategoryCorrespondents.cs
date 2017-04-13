@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(104314861)]
-    public class TLTopPeerCategoryCorrespondents : TLAbsTopPeerCategory
+    [TlObject(104314861)]
+    public class TlTopPeerCategoryCorrespondents : TlAbsTopPeerCategory
     {
         public override int Constructor => 104314861;
 

@@ -16,7 +16,7 @@ namespace TelegramClient.Core.MTProto
 
         public static class Bytes
         {
-            public static byte[] read(BinaryReader binaryReader)
+            public static byte[] Read(BinaryReader binaryReader)
             {
                 var firstByte = binaryReader.ReadByte();
                 int len, padding;
@@ -41,7 +41,7 @@ namespace TelegramClient.Core.MTProto
                 return data;
             }
 
-            public static BinaryWriter write(BinaryWriter binaryWriter, byte[] data)
+            public static BinaryWriter Write(BinaryWriter binaryWriter, byte[] data)
             {
                 int padding;
                 if (data.Length < 254)
@@ -76,15 +76,15 @@ namespace TelegramClient.Core.MTProto
 
         public static class String
         {
-            public static string read(BinaryReader reader)
+            public static string Read(BinaryReader reader)
             {
-                var data = Bytes.read(reader);
+                var data = Bytes.Read(reader);
                 return Encoding.UTF8.GetString(data, 0, data.Length);
             }
 
-            public static BinaryWriter write(BinaryWriter writer, string str)
+            public static BinaryWriter Write(BinaryWriter writer, string str)
             {
-                return Bytes.write(writer, Encoding.UTF8.GetBytes(str));
+                return Bytes.Write(writer, Encoding.UTF8.GetBytes(str));
             }
         }
     }

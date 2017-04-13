@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-206066487)]
-    public class TLInputGeoPoint : TLAbsInputGeoPoint
+    [TlObject(-206066487)]
+    public class TlInputGeoPoint : TlAbsInputGeoPoint
     {
         public override int Constructor => -206066487;
 
-        public double lat { get; set; }
-        public double @long { get; set; }
+        public double Lat { get; set; }
+        public double Long { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            lat = br.ReadDouble();
-            @long = br.ReadDouble();
+            Lat = br.ReadDouble();
+            Long = br.ReadDouble();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(lat);
-            bw.Write(@long);
+            bw.Write(Lat);
+            bw.Write(Long);
         }
     }
 }

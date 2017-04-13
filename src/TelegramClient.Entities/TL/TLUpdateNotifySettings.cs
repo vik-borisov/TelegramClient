@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(-1094555409)]
-    public class TLUpdateNotifySettings : TLAbsUpdate
+    [TlObject(-1094555409)]
+    public class TlUpdateNotifySettings : TlAbsUpdate
     {
         public override int Constructor => -1094555409;
 
-        public TLAbsNotifyPeer peer { get; set; }
-        public TLAbsPeerNotifySettings notify_settings { get; set; }
+        public TlAbsNotifyPeer Peer { get; set; }
+        public TlAbsPeerNotifySettings NotifySettings { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            peer = (TLAbsNotifyPeer) ObjectUtils.DeserializeObject(br);
-            notify_settings = (TLAbsPeerNotifySettings) ObjectUtils.DeserializeObject(br);
+            Peer = (TlAbsNotifyPeer) ObjectUtils.DeserializeObject(br);
+            NotifySettings = (TlAbsPeerNotifySettings) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(peer, bw);
-            ObjectUtils.SerializeObject(notify_settings, bw);
+            ObjectUtils.SerializeObject(Peer, bw);
+            ObjectUtils.SerializeObject(NotifySettings, bw);
         }
     }
 }

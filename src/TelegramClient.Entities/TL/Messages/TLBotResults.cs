@@ -2,57 +2,57 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(627509670)]
-    public class TLBotResults : TLObject
+    [TlObject(627509670)]
+    public class TlBotResults : TlObject
     {
         public override int Constructor => 627509670;
 
-        public int flags { get; set; }
-        public bool gallery { get; set; }
-        public long query_id { get; set; }
-        public string next_offset { get; set; }
-        public TLInlineBotSwitchPM switch_pm { get; set; }
-        public TLVector<TLAbsBotInlineResult> results { get; set; }
+        public int Flags { get; set; }
+        public bool Gallery { get; set; }
+        public long QueryId { get; set; }
+        public string NextOffset { get; set; }
+        public TlInlineBotSwitchPm SwitchPm { get; set; }
+        public TlVector<TlAbsBotInlineResult> Results { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = gallery ? flags | 1 : flags & ~1;
-            flags = next_offset != null ? flags | 2 : flags & ~2;
-            flags = switch_pm != null ? flags | 4 : flags & ~4;
+            Flags = 0;
+            Flags = Gallery ? Flags | 1 : Flags & ~1;
+            Flags = NextOffset != null ? Flags | 2 : Flags & ~2;
+            Flags = SwitchPm != null ? Flags | 4 : Flags & ~4;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            gallery = (flags & 1) != 0;
-            query_id = br.ReadInt64();
-            if ((flags & 2) != 0)
-                next_offset = StringUtil.Deserialize(br);
+            Flags = br.ReadInt32();
+            Gallery = (Flags & 1) != 0;
+            QueryId = br.ReadInt64();
+            if ((Flags & 2) != 0)
+                NextOffset = StringUtil.Deserialize(br);
             else
-                next_offset = null;
+                NextOffset = null;
 
-            if ((flags & 4) != 0)
-                switch_pm = (TLInlineBotSwitchPM) ObjectUtils.DeserializeObject(br);
+            if ((Flags & 4) != 0)
+                SwitchPm = (TlInlineBotSwitchPm) ObjectUtils.DeserializeObject(br);
             else
-                switch_pm = null;
+                SwitchPm = null;
 
-            results = ObjectUtils.DeserializeVector<TLAbsBotInlineResult>(br);
+            Results = ObjectUtils.DeserializeVector<TlAbsBotInlineResult>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            bw.Write(query_id);
-            if ((flags & 2) != 0)
-                StringUtil.Serialize(next_offset, bw);
-            if ((flags & 4) != 0)
-                ObjectUtils.SerializeObject(switch_pm, bw);
-            ObjectUtils.SerializeObject(results, bw);
+            bw.Write(QueryId);
+            if ((Flags & 2) != 0)
+                StringUtil.Serialize(NextOffset, bw);
+            if ((Flags & 4) != 0)
+                ObjectUtils.SerializeObject(SwitchPm, bw);
+            ObjectUtils.SerializeObject(Results, bw);
         }
     }
 }

@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(772213157)]
-    public class TLSavedGifs : TLAbsSavedGifs
+    [TlObject(772213157)]
+    public class TlSavedGifs : TlAbsSavedGifs
     {
         public override int Constructor => 772213157;
 
-        public int hash { get; set; }
-        public TLVector<TLAbsDocument> gifs { get; set; }
+        public int Hash { get; set; }
+        public TlVector<TlAbsDocument> Gifs { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL.Messages
 
         public override void DeserializeBody(BinaryReader br)
         {
-            hash = br.ReadInt32();
-            gifs = ObjectUtils.DeserializeVector<TLAbsDocument>(br);
+            Hash = br.ReadInt32();
+            Gifs = ObjectUtils.DeserializeVector<TlAbsDocument>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            bw.Write(hash);
-            ObjectUtils.SerializeObject(gifs, bw);
+            bw.Write(Hash);
+            ObjectUtils.SerializeObject(Gifs, bw);
         }
     }
 }

@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(524838915)]
-    public class TLExportedMessageLink : TLObject
+    [TlObject(524838915)]
+    public class TlExportedMessageLink : TlObject
     {
         public override int Constructor => 524838915;
 
-        public string link { get; set; }
+        public string Link { get; set; }
 
 
         public void ComputeFlags()
@@ -16,13 +16,13 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            link = StringUtil.Deserialize(br);
+            Link = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            StringUtil.Serialize(link, bw);
+            StringUtil.Serialize(Link, bw);
         }
     }
 }

@@ -2,16 +2,16 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Channels
 {
-    [TLObject(618237842)]
-    public class TLRequestGetParticipants : TLMethod
+    [TlObject(618237842)]
+    public class TlRequestGetParticipants : TlMethod
     {
         public override int Constructor => 618237842;
 
-        public TLAbsInputChannel channel { get; set; }
-        public TLAbsChannelParticipantsFilter filter { get; set; }
-        public int offset { get; set; }
-        public int limit { get; set; }
-        public TLChannelParticipants Response { get; set; }
+        public TlAbsInputChannel Channel { get; set; }
+        public TlAbsChannelParticipantsFilter Filter { get; set; }
+        public int Offset { get; set; }
+        public int Limit { get; set; }
+        public TlChannelParticipants Response { get; set; }
 
 
         public void ComputeFlags()
@@ -20,24 +20,24 @@ namespace TelegramClient.Entities.TL.Channels
 
         public override void DeserializeBody(BinaryReader br)
         {
-            channel = (TLAbsInputChannel) ObjectUtils.DeserializeObject(br);
-            filter = (TLAbsChannelParticipantsFilter) ObjectUtils.DeserializeObject(br);
-            offset = br.ReadInt32();
-            limit = br.ReadInt32();
+            Channel = (TlAbsInputChannel) ObjectUtils.DeserializeObject(br);
+            Filter = (TlAbsChannelParticipantsFilter) ObjectUtils.DeserializeObject(br);
+            Offset = br.ReadInt32();
+            Limit = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(channel, bw);
-            ObjectUtils.SerializeObject(filter, bw);
-            bw.Write(offset);
-            bw.Write(limit);
+            ObjectUtils.SerializeObject(Channel, bw);
+            ObjectUtils.SerializeObject(Filter, bw);
+            bw.Write(Offset);
+            bw.Write(Limit);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLChannelParticipants) ObjectUtils.DeserializeObject(br);
+            Response = (TlChannelParticipants) ObjectUtils.DeserializeObject(br);
         }
     }
 }

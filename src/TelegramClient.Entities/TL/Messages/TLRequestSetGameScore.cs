@@ -2,51 +2,51 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Messages
 {
-    [TLObject(-1896289088)]
-    public class TLRequestSetGameScore : TLMethod
+    [TlObject(-1896289088)]
+    public class TlRequestSetGameScore : TlMethod
     {
         public override int Constructor => -1896289088;
 
-        public int flags { get; set; }
-        public bool edit_message { get; set; }
-        public TLAbsInputPeer peer { get; set; }
-        public int id { get; set; }
-        public TLAbsInputUser user_id { get; set; }
-        public int score { get; set; }
-        public TLAbsUpdates Response { get; set; }
+        public int Flags { get; set; }
+        public bool EditMessage { get; set; }
+        public TlAbsInputPeer Peer { get; set; }
+        public int Id { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public int Score { get; set; }
+        public TlAbsUpdates Response { get; set; }
 
 
         public void ComputeFlags()
         {
-            flags = 0;
-            flags = edit_message ? flags | 1 : flags & ~1;
+            Flags = 0;
+            Flags = EditMessage ? Flags | 1 : Flags & ~1;
         }
 
         public override void DeserializeBody(BinaryReader br)
         {
-            flags = br.ReadInt32();
-            edit_message = (flags & 1) != 0;
-            peer = (TLAbsInputPeer) ObjectUtils.DeserializeObject(br);
-            id = br.ReadInt32();
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
-            score = br.ReadInt32();
+            Flags = br.ReadInt32();
+            EditMessage = (Flags & 1) != 0;
+            Peer = (TlAbsInputPeer) ObjectUtils.DeserializeObject(br);
+            Id = br.ReadInt32();
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Score = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
             ComputeFlags();
-            bw.Write(flags);
+            bw.Write(Flags);
 
-            ObjectUtils.SerializeObject(peer, bw);
-            bw.Write(id);
-            ObjectUtils.SerializeObject(user_id, bw);
-            bw.Write(score);
+            ObjectUtils.SerializeObject(Peer, bw);
+            bw.Write(Id);
+            ObjectUtils.SerializeObject(UserId, bw);
+            bw.Write(Score);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsUpdates) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsUpdates) ObjectUtils.DeserializeObject(br);
         }
     }
 }

@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1458172132)]
-    public class TLInputMessagesFilterPhotoVideo : TLAbsMessagesFilter
+    [TlObject(1458172132)]
+    public class TlInputMessagesFilterPhotoVideo : TlAbsMessagesFilter
     {
         public override int Constructor => 1458172132;
 

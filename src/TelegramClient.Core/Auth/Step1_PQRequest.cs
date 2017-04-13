@@ -7,7 +7,7 @@ using TelegramClient.Core.MTProto.Crypto;
 
 namespace TelegramClient.Core.Auth
 {
-    public class Step1_Response
+    public class Step1Response
     {
         public byte[] Nonce { get; set; }
         public byte[] ServerNonce { get; set; }
@@ -15,18 +15,18 @@ namespace TelegramClient.Core.Auth
         public List<byte[]> Fingerprints { get; set; }
     }
 
-    public class Step1_PQRequest
+    public class Step1PqRequest
     {
-        private readonly byte[] nonce;
+        private readonly byte[] _nonce;
 
-        public Step1_PQRequest()
+        public Step1PqRequest()
         {
-            nonce = new byte[16];
+            _nonce = new byte[16];
         }
 
         public byte[] ToBytes()
         {
-            new Random().NextBytes(nonce);
+            new Random().NextBytes(_nonce);
             const int constructorNumber = 0x60469778;
 
             using (var memoryStream = new MemoryStream())
@@ -34,14 +34,14 @@ namespace TelegramClient.Core.Auth
                 using (var binaryWriter = new BinaryWriter(memoryStream))
                 {
                     binaryWriter.Write(constructorNumber);
-                    binaryWriter.Write(nonce);
+                    binaryWriter.Write(_nonce);
                 }
 
                 return memoryStream.ToArray();
             }
         }
 
-        public Step1_Response FromBytes(byte[] bytes)
+        public Step1Response FromBytes(byte[] bytes)
         {
             var fingerprints = new List<byte[]>();
 
@@ -56,12 +56,12 @@ namespace TelegramClient.Core.Auth
 
                     var nonceFromServer = binaryReader.ReadBytes(16);
 
-                    if (!nonceFromServer.SequenceEqual(nonce))
+                    if (!nonceFromServer.SequenceEqual(_nonce))
                         throw new InvalidOperationException("invalid nonce from server");
 
                     var serverNonce = binaryReader.ReadBytes(16);
 
-                    var pqbytes = Serializers.Bytes.read(binaryReader);
+                    var pqbytes = Serializers.Bytes.Read(binaryReader);
                     var pq = new BigInteger(1, pqbytes);
 
                     var vectorId = binaryReader.ReadInt32();
@@ -76,10 +76,10 @@ namespace TelegramClient.Core.Auth
                         fingerprints.Add(fingerprint);
                     }
 
-                    return new Step1_Response
+                    return new Step1Response
                     {
                         Fingerprints = fingerprints,
-                        Nonce = nonce,
+                        Nonce = _nonce,
                         Pq = pq,
                         ServerNonce = serverNonce
                     };

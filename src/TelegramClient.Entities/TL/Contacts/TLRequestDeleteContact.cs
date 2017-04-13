@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Contacts
 {
-    [TLObject(-1902823612)]
-    public class TLRequestDeleteContact : TLMethod
+    [TlObject(-1902823612)]
+    public class TlRequestDeleteContact : TlMethod
     {
         public override int Constructor => -1902823612;
 
-        public TLAbsInputUser id { get; set; }
-        public TLLink Response { get; set; }
+        public TlAbsInputUser Id { get; set; }
+        public TlLink Response { get; set; }
 
 
         public void ComputeFlags()
@@ -17,18 +17,18 @@ namespace TelegramClient.Entities.TL.Contacts
 
         public override void DeserializeBody(BinaryReader br)
         {
-            id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Id = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(id, bw);
+            ObjectUtils.SerializeObject(Id, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLLink) ObjectUtils.DeserializeObject(br);
+            Response = (TlLink) ObjectUtils.DeserializeObject(br);
         }
     }
 }

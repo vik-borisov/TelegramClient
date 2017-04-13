@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1830677896)]
-    public class TLPeerNotifyEventsAll : TLAbsPeerNotifyEvents
+    [TlObject(1830677896)]
+    public class TlPeerNotifyEventsAll : TlAbsPeerNotifyEvents
     {
         public override int Constructor => 1830677896;
 

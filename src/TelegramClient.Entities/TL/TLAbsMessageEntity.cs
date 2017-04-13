@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsMessageEntity : TLObject
+    public abstract class TlAbsMessageEntity : TlObject
     {
     }
 }

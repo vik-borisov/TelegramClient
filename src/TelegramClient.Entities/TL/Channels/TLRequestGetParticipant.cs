@@ -2,14 +2,14 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Channels
 {
-    [TLObject(1416484774)]
-    public class TLRequestGetParticipant : TLMethod
+    [TlObject(1416484774)]
+    public class TlRequestGetParticipant : TlMethod
     {
         public override int Constructor => 1416484774;
 
-        public TLAbsInputChannel channel { get; set; }
-        public TLAbsInputUser user_id { get; set; }
-        public TLChannelParticipant Response { get; set; }
+        public TlAbsInputChannel Channel { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public TlChannelParticipant Response { get; set; }
 
 
         public void ComputeFlags()
@@ -18,20 +18,20 @@ namespace TelegramClient.Entities.TL.Channels
 
         public override void DeserializeBody(BinaryReader br)
         {
-            channel = (TLAbsInputChannel) ObjectUtils.DeserializeObject(br);
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Channel = (TlAbsInputChannel) ObjectUtils.DeserializeObject(br);
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(channel, bw);
-            ObjectUtils.SerializeObject(user_id, bw);
+            ObjectUtils.SerializeObject(Channel, bw);
+            ObjectUtils.SerializeObject(UserId, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLChannelParticipant) ObjectUtils.DeserializeObject(br);
+            Response = (TlChannelParticipant) ObjectUtils.DeserializeObject(br);
         }
     }
 }

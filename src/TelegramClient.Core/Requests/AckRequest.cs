@@ -5,7 +5,7 @@ using TelegramClient.Entities;
 
 namespace TelegramClient.Core.Requests
 {
-    public class AckRequest : TLMethod
+    public class AckRequest : TlMethod
     {
         private readonly List<ulong> _msgs;
 
@@ -33,7 +33,7 @@ namespace TelegramClient.Core.Requests
             throw new NotImplementedException();
         }
 
-        public override void deserializeResponse(BinaryReader stream)
+        public override void DeserializeResponse(BinaryReader stream)
         {
             throw new NotImplementedException();
         }

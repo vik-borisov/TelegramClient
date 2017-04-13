@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Help
 {
-    [TLObject(531836966)]
-    public class TLRequestGetNearestDc : TLMethod
+    [TlObject(531836966)]
+    public class TlRequestGetNearestDc : TlMethod
     {
         public override int Constructor => 531836966;
 
-        public TLNearestDc Response { get; set; }
+        public TlNearestDc Response { get; set; }
 
 
         public void ComputeFlags()
@@ -23,9 +23,9 @@ namespace TelegramClient.Entities.TL.Help
             bw.Write(Constructor);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLNearestDc) ObjectUtils.DeserializeObject(br);
+            Response = (TlNearestDc) ObjectUtils.DeserializeObject(br);
         }
     }
 }

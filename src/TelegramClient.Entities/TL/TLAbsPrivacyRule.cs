@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsPrivacyRule : TLObject
+    public abstract class TlAbsPrivacyRule : TlObject
     {
     }
 }

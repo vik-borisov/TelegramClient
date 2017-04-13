@@ -2,16 +2,16 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Photos
 {
-    [TLObject(-1848823128)]
-    public class TLRequestGetUserPhotos : TLMethod
+    [TlObject(-1848823128)]
+    public class TlRequestGetUserPhotos : TlMethod
     {
         public override int Constructor => -1848823128;
 
-        public TLAbsInputUser user_id { get; set; }
-        public int offset { get; set; }
-        public long max_id { get; set; }
-        public int limit { get; set; }
-        public TLAbsPhotos Response { get; set; }
+        public TlAbsInputUser UserId { get; set; }
+        public int Offset { get; set; }
+        public long MaxId { get; set; }
+        public int Limit { get; set; }
+        public TlAbsPhotos Response { get; set; }
 
 
         public void ComputeFlags()
@@ -20,24 +20,24 @@ namespace TelegramClient.Entities.TL.Photos
 
         public override void DeserializeBody(BinaryReader br)
         {
-            user_id = (TLAbsInputUser) ObjectUtils.DeserializeObject(br);
-            offset = br.ReadInt32();
-            max_id = br.ReadInt64();
-            limit = br.ReadInt32();
+            UserId = (TlAbsInputUser) ObjectUtils.DeserializeObject(br);
+            Offset = br.ReadInt32();
+            MaxId = br.ReadInt64();
+            Limit = br.ReadInt32();
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(user_id, bw);
-            bw.Write(offset);
-            bw.Write(max_id);
-            bw.Write(limit);
+            ObjectUtils.SerializeObject(UserId, bw);
+            bw.Write(Offset);
+            bw.Write(MaxId);
+            bw.Write(Limit);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
-            Response = (TLAbsPhotos) ObjectUtils.DeserializeObject(br);
+            Response = (TlAbsPhotos) ObjectUtils.DeserializeObject(br);
         }
     }
 }

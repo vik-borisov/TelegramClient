@@ -2,12 +2,12 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Help
 {
-    [TLObject(1862465352)]
-    public class TLRequestSaveAppLog : TLMethod
+    [TlObject(1862465352)]
+    public class TlRequestSaveAppLog : TlMethod
     {
         public override int Constructor => 1862465352;
 
-        public TLVector<TLInputAppEvent> events { get; set; }
+        public TlVector<TlInputAppEvent> Events { get; set; }
         public bool Response { get; set; }
 
 
@@ -17,16 +17,16 @@ namespace TelegramClient.Entities.TL.Help
 
         public override void DeserializeBody(BinaryReader br)
         {
-            events = ObjectUtils.DeserializeVector<TLInputAppEvent>(br);
+            Events = ObjectUtils.DeserializeVector<TlInputAppEvent>(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(events, bw);
+            ObjectUtils.SerializeObject(Events, bw);
         }
 
-        public override void deserializeResponse(BinaryReader br)
+        public override void DeserializeResponse(BinaryReader br)
         {
             Response = BoolUtil.Deserialize(br);
         }

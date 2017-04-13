@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL.Help
 {
-    [TLObject(-1350696044)]
-    public class TLAppChangelogEmpty : TLAbsAppChangelog
+    [TlObject(-1350696044)]
+    public class TlAppChangelogEmpty : TlAbsAppChangelog
     {
         public override int Constructor => -1350696044;
 

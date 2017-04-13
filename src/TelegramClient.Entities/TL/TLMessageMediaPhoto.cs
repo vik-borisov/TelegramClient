@@ -2,13 +2,13 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1032643901)]
-    public class TLMessageMediaPhoto : TLAbsMessageMedia
+    [TlObject(1032643901)]
+    public class TlMessageMediaPhoto : TlAbsMessageMedia
     {
         public override int Constructor => 1032643901;
 
-        public TLAbsPhoto photo { get; set; }
-        public string caption { get; set; }
+        public TlAbsPhoto Photo { get; set; }
+        public string Caption { get; set; }
 
 
         public void ComputeFlags()
@@ -17,15 +17,15 @@ namespace TelegramClient.Entities.TL
 
         public override void DeserializeBody(BinaryReader br)
         {
-            photo = (TLAbsPhoto) ObjectUtils.DeserializeObject(br);
-            caption = StringUtil.Deserialize(br);
+            Photo = (TlAbsPhoto) ObjectUtils.DeserializeObject(br);
+            Caption = StringUtil.Deserialize(br);
         }
 
         public override void SerializeBody(BinaryWriter bw)
         {
             bw.Write(Constructor);
-            ObjectUtils.SerializeObject(photo, bw);
-            StringUtil.Serialize(caption, bw);
+            ObjectUtils.SerializeObject(Photo, bw);
+            StringUtil.Serialize(Caption, bw);
         }
     }
 }

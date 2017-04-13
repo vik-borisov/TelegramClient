@@ -1,6 +1,6 @@
 namespace TelegramClient.Entities.TL
 {
-    public abstract class TLAbsInputGame : TLObject
+    public abstract class TlAbsInputGame : TlObject
     {
     }
 }

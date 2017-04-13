@@ -4,42 +4,42 @@ namespace TelegramClient.Core.MTProto.Crypto
 {
     public class FactorizedPair
     {
-        private readonly BigInteger p;
-        private readonly BigInteger q;
+        private readonly BigInteger _p;
+        private readonly BigInteger _q;
 
         public FactorizedPair(BigInteger p, BigInteger q)
         {
-            this.p = p;
-            this.q = q;
+            this._p = p;
+            this._q = q;
         }
 
         public FactorizedPair(long p, long q)
         {
-            this.p = BigInteger.ValueOf(p);
-            this.q = BigInteger.ValueOf(q);
+            this._p = BigInteger.ValueOf(p);
+            this._q = BigInteger.ValueOf(q);
         }
 
-        public BigInteger Min => p.Min(q);
+        public BigInteger Min => _p.Min(_q);
 
-        public BigInteger Max => p.Max(q);
+        public BigInteger Max => _p.Max(_q);
 
         public override string ToString()
         {
-            return string.Format("P: {0}, Q: {1}", p, q);
+            return string.Format("P: {0}, Q: {1}", _p, _q);
         }
     }
 
     public class Factorizator
     {
-        public static Random random = new Random();
+        public static Random Random = new Random();
 
-        public static long findSmallMultiplierLopatin(long what)
+        public static long FindSmallMultiplierLopatin(long what)
         {
             long g = 0;
             for (var i = 0; i < 3; i++)
             {
-                var q = (random.Next(128) & 15) + 17;
-                long x = random.Next(1000000000) + 1, y = x;
+                var q = (Random.Next(128) & 15) + 17;
+                long x = Random.Next(1000000000) + 1, y = x;
                 var lim = 1 << (i + 18);
                 for (var j = 1; j < lim; j++)
                 {
@@ -59,7 +59,7 @@ namespace TelegramClient.Core.MTProto.Crypto
                     }
                     x = c;
                     var z = x < y ? y - x : x - y;
-                    g = GCD(z, what);
+                    g = Gcd(z, what);
                     if (g != 1)
                         break;
                     if ((j & (j - 1)) == 0)
@@ -73,7 +73,7 @@ namespace TelegramClient.Core.MTProto.Crypto
             return Math.Min(p, g);
         }
 
-        public static long GCD(long a, long b)
+        public static long Gcd(long a, long b)
         {
             while (a != 0 && b != 0)
             {
@@ -93,7 +93,7 @@ namespace TelegramClient.Core.MTProto.Crypto
             if (pq.BitLength < 64)
             {
                 var pqlong = pq.LongValue;
-                var divisor = findSmallMultiplierLopatin(pqlong);
+                var divisor = FindSmallMultiplierLopatin(pqlong);
                 return new FactorizedPair(BigInteger.ValueOf(divisor), BigInteger.ValueOf(pqlong / divisor));
             }
             // TODO: port pollard factorization

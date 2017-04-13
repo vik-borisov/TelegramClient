@@ -2,8 +2,8 @@ using System.IO;
 
 namespace TelegramClient.Entities.TL
 {
-    [TLObject(1038967584)]
-    public class TLMessageMediaEmpty : TLAbsMessageMedia
+    [TlObject(1038967584)]
+    public class TlMessageMediaEmpty : TlAbsMessageMedia
     {
         public override int Constructor => 1038967584;
 

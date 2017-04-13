@@ -8,7 +8,7 @@ namespace TelegramClient.Entities.Generator
 {
     internal class Program
     {
-        private static readonly List<string> keywords = new List<string>(new[]
+        private static readonly List<string> Keywords = new List<string>(new[]
         {
             "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const",
             "continue", "decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern",
@@ -22,79 +22,79 @@ namespace TelegramClient.Entities.Generator
             "where", "where", "yield"
         });
 
-        private static readonly List<string> interfacesList = new List<string>();
-        private static readonly List<string> classesList = new List<string>();
+        private static readonly List<string> InterfacesList = new List<string>();
+        private static readonly List<string> ClassesList = new List<string>();
 
         private static void Main(string[] args)
         {
-            var AbsStyle = File.ReadAllText("ConstructorAbs.tmp");
-            var NormalStyle = File.ReadAllText("Constructor.tmp");
-            var MethodStyle = File.ReadAllText("Method.tmp");
+            var absStyle = File.ReadAllText("ConstructorAbs.tmp");
+            var normalStyle = File.ReadAllText("Constructor.tmp");
+            var methodStyle = File.ReadAllText("Method.tmp");
             //string method = File.ReadAllText("constructor.tt");
-            var Json = "";
+            var json = "";
             string url;
             if (args.Count() == 0) url = "tl-schema.json";
             else url = args[0];
 
-            Json = File.ReadAllText(url);
+            json = File.ReadAllText(url);
             var file = File.OpenWrite("Result.cs");
             var sw = new StreamWriter(file);
-            Schema schema = JsonConvert.DeserializeObject<Schema>(Json);
-            foreach (var c in schema.constructors)
+            Schema schema = JsonConvert.DeserializeObject<Schema>(json);
+            foreach (var c in schema.Constructors)
             {
-                interfacesList.Add(c.type);
-                classesList.Add(c.predicate);
+                InterfacesList.Add(c.Type);
+                ClassesList.Add(c.Predicate);
             }
-            foreach (var c in schema.constructors)
+            foreach (var c in schema.Constructors)
             {
-                var list = schema.constructors.Where(x => x.type == c.type);
+                var list = schema.Constructors.Where(x => x.Type == c.Type);
                 if (list.Count() > 1)
                 {
-                    var path = (GetNameSpace(c.type).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" +
-                                GetNameofClass(c.type, true) + ".cs").Replace("\\\\", "\\");
+                    var path = (GetNameSpace(c.Type).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" +
+                                GetNameofClass(c.Type, true) + ".cs").Replace("\\\\", "\\");
                     var classFile = MakeFile(path);
                     using (var writer = new StreamWriter(classFile))
                     {
-                        var nspace = GetNameSpace(c.type)
+                        var nspace = GetNameSpace(c.Type)
                             .Replace("TeleSharp.TL", "TL\\")
                             .Replace(".", "")
                             .Replace("\\\\", "\\")
                             .Replace("\\", ".");
                         if (nspace.EndsWith("."))
                             nspace = nspace.Remove(nspace.Length - 1, 1);
-                        var temp = AbsStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
-                        temp = temp.Replace("/* NAME */", GetNameofClass(c.type, true));
+                        var temp = absStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
+                        temp = temp.Replace("/* NAME */", GetNameofClass(c.Type, true));
                         writer.Write(temp);
                     }
                 }
                 else
                 {
-                    interfacesList.Remove(list.First().type);
-                    list.First().type = "himself";
+                    InterfacesList.Remove(list.First().Type);
+                    list.First().Type = "himself";
                 }
             }
-            foreach (var c in schema.constructors)
+            foreach (var c in schema.Constructors)
             {
-                var path = (GetNameSpace(c.predicate).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" +
-                            GetNameofClass(c.predicate, false) + ".cs").Replace("\\\\", "\\");
+                var path = (GetNameSpace(c.Predicate).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" +
+                            GetNameofClass(c.Predicate, false) + ".cs").Replace("\\\\", "\\");
                 var classFile = MakeFile(path);
                 using (var writer = new StreamWriter(classFile))
                 {
                     #region About Class
 
-                    var nspace = GetNameSpace(c.predicate)
+                    var nspace = GetNameSpace(c.Predicate)
                         .Replace("TeleSharp.TL", "TL\\")
                         .Replace(".", "")
                         .Replace("\\\\", "\\")
                         .Replace("\\", ".");
                     if (nspace.EndsWith("."))
                         nspace = nspace.Remove(nspace.Length - 1, 1);
-                    var temp = NormalStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
-                    temp = c.type == "himself"
+                    var temp = normalStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
+                    temp = c.Type == "himself"
                         ? temp.Replace("/* PARENT */", "TLObject")
-                        : temp.Replace("/* PARENT */", GetNameofClass(c.type, true));
-                    temp = temp.Replace("/*Constructor*/", c.id.ToString());
-                    temp = temp.Replace("/* NAME */", GetNameofClass(c.predicate, false));
+                        : temp.Replace("/* PARENT */", GetNameofClass(c.Type, true));
+                    temp = temp.Replace("/*Constructor*/", c.Id.ToString());
+                    temp = temp.Replace("/* NAME */", GetNameofClass(c.Predicate, false));
 
                     #endregion
 
@@ -103,7 +103,7 @@ namespace TelegramClient.Entities.Generator
                     var fields = "";
                     foreach (var tmp in c.Params)
                         fields +=
-                            $"     public {CheckForFlagBase(tmp.type, GetTypeName(tmp.type))} {CheckForKeyword(tmp.name)} " +
+                            $"     public {CheckForFlagBase(tmp.Type, GetTypeName(tmp.Type))} {CheckForKeyword(tmp.Name)} " +
                             "{get;set;}" + Environment.NewLine;
                     temp = temp.Replace("/* PARAMS */", fields);
 
@@ -111,21 +111,21 @@ namespace TelegramClient.Entities.Generator
 
                     #region ComputeFlagFunc
 
-                    if (!c.Params.Any(x => x.name == "flags"))
+                    if (!c.Params.Any(x => x.Name == "flags"))
                     {
                         temp = temp.Replace("/* COMPUTE */", "");
                     }
                     else
                     {
                         var compute = "flags = 0;" + Environment.NewLine;
-                        foreach (var param in c.Params.Where(x => IsFlagBase(x.type)))
-                            if (IsTrueFlag(param.type))
+                        foreach (var param in c.Params.Where(x => IsFlagBase(x.Type)))
+                            if (IsTrueFlag(param.Type))
                                 compute +=
-                                    $"flags = {CheckForKeyword(param.name)} ? (flags | {GetBitMask(param.type)}) : (flags & ~{GetBitMask(param.type)});" +
+                                    $"flags = {CheckForKeyword(param.Name)} ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
                                     Environment.NewLine;
                             else
                                 compute +=
-                                    $"flags = {CheckForKeyword(param.name)} != null ? (flags | {GetBitMask(param.type)}) : (flags & ~{GetBitMask(param.type)});" +
+                                    $"flags = {CheckForKeyword(param.Name)} != null ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
                                     Environment.NewLine;
                         temp = temp.Replace("/* COMPUTE */", compute);
                     }
@@ -136,9 +136,9 @@ namespace TelegramClient.Entities.Generator
 
                     var serialize = "";
 
-                    if (c.Params.Any(x => x.name == "flags"))
+                    if (c.Params.Any(x => x.Name == "flags"))
                         serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(flags);" + Environment.NewLine;
-                    foreach (var p in c.Params.Where(x => x.name != "flags"))
+                    foreach (var p in c.Params.Where(x => x.Name != "flags"))
                         serialize += WriteWriteCode(p) + Environment.NewLine;
                     temp = temp.Replace("/* SERIALIZE */", serialize);
 
@@ -157,7 +157,7 @@ namespace TelegramClient.Entities.Generator
                     writer.Write(temp);
                 }
             }
-            foreach (var c in schema.methods)
+            foreach (var c in schema.Methods)
             {
                 var path = (GetNameSpace(c.method).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" +
                             GetNameofClass(c.method, false, true) + ".cs").Replace("\\\\", "\\");
@@ -173,9 +173,9 @@ namespace TelegramClient.Entities.Generator
                         .Replace("\\", ".");
                     if (nspace.EndsWith("."))
                         nspace = nspace.Remove(nspace.Length - 1, 1);
-                    var temp = MethodStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
+                    var temp = methodStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
                     temp = temp.Replace("/* PARENT */", "TLMethod");
-                    temp = temp.Replace("/*Constructor*/", c.id.ToString());
+                    temp = temp.Replace("/*Constructor*/", c.Id.ToString());
                     temp = temp.Replace("/* NAME */", GetNameofClass(c.method, false, true));
 
                     #endregion
@@ -185,9 +185,9 @@ namespace TelegramClient.Entities.Generator
                     var fields = "";
                     foreach (var tmp in c.Params)
                         fields +=
-                            $"        public {CheckForFlagBase(tmp.type, GetTypeName(tmp.type))} {CheckForKeyword(tmp.name)} " +
+                            $"        public {CheckForFlagBase(tmp.Type, GetTypeName(tmp.Type))} {CheckForKeyword(tmp.Name)} " +
                             "{get;set;}" + Environment.NewLine;
-                    fields += $"        public {CheckForFlagBase(c.type, GetTypeName(c.type))} Response" +
+                    fields += $"        public {CheckForFlagBase(c.Type, GetTypeName(c.Type))} Response" +
                               "{ get; set;}" + Environment.NewLine;
                     temp = temp.Replace("/* PARAMS */", fields);
 
@@ -195,21 +195,21 @@ namespace TelegramClient.Entities.Generator
 
                     #region ComputeFlagFunc
 
-                    if (!c.Params.Any(x => x.name == "flags"))
+                    if (!c.Params.Any(x => x.Name == "flags"))
                     {
                         temp = temp.Replace("/* COMPUTE */", "");
                     }
                     else
                     {
                         var compute = "flags = 0;" + Environment.NewLine;
-                        foreach (var param in c.Params.Where(x => IsFlagBase(x.type)))
-                            if (IsTrueFlag(param.type))
+                        foreach (var param in c.Params.Where(x => IsFlagBase(x.Type)))
+                            if (IsTrueFlag(param.Type))
                                 compute +=
-                                    $"flags = {CheckForKeyword(param.name)} ? (flags | {GetBitMask(param.type)}) : (flags & ~{GetBitMask(param.type)});" +
+                                    $"flags = {CheckForKeyword(param.Name)} ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
                                     Environment.NewLine;
                             else
                                 compute +=
-                                    $"flags = {CheckForKeyword(param.name)} != null ? (flags | {GetBitMask(param.type)}) : (flags & ~{GetBitMask(param.type)});" +
+                                    $"flags = {CheckForKeyword(param.Name)} != null ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
                                     Environment.NewLine;
                         temp = temp.Replace("/* COMPUTE */", compute);
                     }
@@ -220,9 +220,9 @@ namespace TelegramClient.Entities.Generator
 
                     var serialize = "";
 
-                    if (c.Params.Any(x => x.name == "flags"))
+                    if (c.Params.Any(x => x.Name == "flags"))
                         serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(flags);" + Environment.NewLine;
-                    foreach (var p in c.Params.Where(x => x.name != "flags"))
+                    foreach (var p in c.Params.Where(x => x.Name != "flags"))
                         serialize += WriteWriteCode(p) + Environment.NewLine;
                     temp = temp.Replace("/* SERIALIZE */", serialize);
 
@@ -241,7 +241,7 @@ namespace TelegramClient.Entities.Generator
                     #region DeSerializeRespFunc
 
                     var deserializeResp = "";
-                    var p2 = new Param {name = "Response", type = c.type};
+                    var p2 = new Param {Name = "Response", Type = c.Type};
                     deserializeResp += WriteReadCode(p2) + Environment.NewLine;
                     temp = temp.Replace("/* DESERIALIZEResp */", deserializeResp);
 
@@ -269,7 +269,7 @@ namespace TelegramClient.Entities.Generator
 
         public static string CheckForKeyword(string name)
         {
-            if (keywords.Contains(name)) return "@" + name;
+            if (Keywords.Contains(name)) return "@" + name;
             return name;
         }
 
@@ -359,16 +359,16 @@ namespace TelegramClient.Entities.Generator
 
 
             if (type.IndexOf('.') != -1 && type.IndexOf('?') == -1)
-                if (interfacesList.Any(x => x.ToLower() == type.ToLower()))
+                if (InterfacesList.Any(x => x.ToLower() == type.ToLower()))
                     return FormatName(type.Split('.')[0]) + "." + "TLAbs" + type.Split('.')[1];
-                else if (classesList.Any(x => x.ToLower() == type.ToLower()))
+                else if (ClassesList.Any(x => x.ToLower() == type.ToLower()))
                     return FormatName(type.Split('.')[0]) + "." + "TL" + type.Split('.')[1];
                 else
                     return FormatName(type.Split('.')[1]);
             if (type.IndexOf('?') == -1)
-                if (interfacesList.Any(x => x.ToLower() == type.ToLower()))
+                if (InterfacesList.Any(x => x.ToLower() == type.ToLower()))
                     return "TLAbs" + type;
-                else if (classesList.Any(x => x.ToLower() == type.ToLower()))
+                else if (ClassesList.Any(x => x.ToLower() == type.ToLower()))
                     return "TL" + type;
                 else
                     return type;
@@ -377,51 +377,51 @@ namespace TelegramClient.Entities.Generator
 
         public static string LookTypeInLists(string src)
         {
-            if (interfacesList.Any(x => x.ToLower() == src.ToLower()))
+            if (InterfacesList.Any(x => x.ToLower() == src.ToLower()))
                 return "TLAbs" + FormatName(src);
-            if (classesList.Any(x => x.ToLower() == src.ToLower()))
+            if (ClassesList.Any(x => x.ToLower() == src.ToLower()))
                 return "TL" + FormatName(src);
             return src;
         }
 
         public static string WriteWriteCode(Param p, bool flag = false)
         {
-            switch (p.type.ToLower())
+            switch (p.Type.ToLower())
             {
                 case "#":
                 case "int":
                     return flag
-                        ? $"bw.Write({CheckForKeyword(p.name)}.Value);"
-                        : $"bw.Write({CheckForKeyword(p.name)});";
+                        ? $"bw.Write({CheckForKeyword(p.Name)}.Value);"
+                        : $"bw.Write({CheckForKeyword(p.Name)});";
                 case "long":
                     return flag
-                        ? $"bw.Write({CheckForKeyword(p.name)}.Value);"
-                        : $"bw.Write({CheckForKeyword(p.name)});";
+                        ? $"bw.Write({CheckForKeyword(p.Name)}.Value);"
+                        : $"bw.Write({CheckForKeyword(p.Name)});";
                 case "string":
-                    return $"StringUtil.Serialize({CheckForKeyword(p.name)},bw);";
+                    return $"StringUtil.Serialize({CheckForKeyword(p.Name)},bw);";
                 case "bool":
                     return flag
-                        ? $"BoolUtil.Serialize({CheckForKeyword(p.name)}.Value,bw);"
-                        : $"BoolUtil.Serialize({CheckForKeyword(p.name)},bw);";
+                        ? $"BoolUtil.Serialize({CheckForKeyword(p.Name)}.Value,bw);"
+                        : $"BoolUtil.Serialize({CheckForKeyword(p.Name)},bw);";
                 case "true":
-                    return $"BoolUtil.Serialize({CheckForKeyword(p.name)},bw);";
+                    return $"BoolUtil.Serialize({CheckForKeyword(p.Name)},bw);";
                 case "bytes":
-                    return $"BytesUtil.Serialize({CheckForKeyword(p.name)},bw);";
+                    return $"BytesUtil.Serialize({CheckForKeyword(p.Name)},bw);";
                 case "double":
                     return flag
-                        ? $"bw.Write({CheckForKeyword(p.name)}.Value);"
-                        : $"bw.Write({CheckForKeyword(p.name)});";
+                        ? $"bw.Write({CheckForKeyword(p.Name)}.Value);"
+                        : $"bw.Write({CheckForKeyword(p.Name)});";
                 default:
-                    if (!IsFlagBase(p.type))
+                    if (!IsFlagBase(p.Type))
                     {
-                        return $"ObjectUtils.SerializeObject({CheckForKeyword(p.name)},bw);";
+                        return $"ObjectUtils.SerializeObject({CheckForKeyword(p.Name)},bw);";
                     }
                     else
                     {
-                        if (IsTrueFlag(p.type))
+                        if (IsTrueFlag(p.Type))
                             return $"";
-                        var p2 = new Param {name = p.name, type = p.type.Split('?')[1]};
-                        return $"if ((flags & {GetBitMask(p.type)}) != 0)" + Environment.NewLine +
+                        var p2 = new Param {Name = p.Name, Type = p.Type.Split('?')[1]};
+                        return $"if ((flags & {GetBitMask(p.Type)}) != 0)" + Environment.NewLine +
                                WriteWriteCode(p2, true);
                     }
             }
@@ -429,41 +429,41 @@ namespace TelegramClient.Entities.Generator
 
         public static string WriteReadCode(Param p)
         {
-            switch (p.type.ToLower())
+            switch (p.Type.ToLower())
             {
                 case "#":
                 case "int":
-                    return $"{CheckForKeyword(p.name)} = br.ReadInt32();";
+                    return $"{CheckForKeyword(p.Name)} = br.ReadInt32();";
                 case "long":
-                    return $"{CheckForKeyword(p.name)} = br.ReadInt64();";
+                    return $"{CheckForKeyword(p.Name)} = br.ReadInt64();";
                 case "string":
-                    return $"{CheckForKeyword(p.name)} = StringUtil.Deserialize(br);";
+                    return $"{CheckForKeyword(p.Name)} = StringUtil.Deserialize(br);";
                 case "bool":
                 case "true":
-                    return $"{CheckForKeyword(p.name)} = BoolUtil.Deserialize(br);";
+                    return $"{CheckForKeyword(p.Name)} = BoolUtil.Deserialize(br);";
                 case "bytes":
-                    return $"{CheckForKeyword(p.name)} = BytesUtil.Deserialize(br);";
+                    return $"{CheckForKeyword(p.Name)} = BytesUtil.Deserialize(br);";
                 case "double":
-                    return $"{CheckForKeyword(p.name)} = br.ReadDouble();";
+                    return $"{CheckForKeyword(p.Name)} = br.ReadDouble();";
                 default:
-                    if (!IsFlagBase(p.type))
+                    if (!IsFlagBase(p.Type))
                     {
-                        if (p.type.ToLower().Contains("vector"))
+                        if (p.Type.ToLower().Contains("vector"))
                             return
-                                $"{CheckForKeyword(p.name)} = ({GetTypeName(p.type)})ObjectUtils.DeserializeVector<{GetTypeName(p.type).Replace("TLVector<", "").Replace(">", "")}>(br);";
-                        return $"{CheckForKeyword(p.name)} = ({GetTypeName(p.type)})ObjectUtils.DeserializeObject(br);";
+                                $"{CheckForKeyword(p.Name)} = ({GetTypeName(p.Type)})ObjectUtils.DeserializeVector<{GetTypeName(p.Type).Replace("TLVector<", "").Replace(">", "")}>(br);";
+                        return $"{CheckForKeyword(p.Name)} = ({GetTypeName(p.Type)})ObjectUtils.DeserializeObject(br);";
                     }
                     else
                     {
-                        if (IsTrueFlag(p.type))
+                        if (IsTrueFlag(p.Type))
                         {
-                            return $"{CheckForKeyword(p.name)} = (flags & {GetBitMask(p.type)}) != 0;";
+                            return $"{CheckForKeyword(p.Name)} = (flags & {GetBitMask(p.Type)}) != 0;";
                         }
-                        var p2 = new Param {name = p.name, type = p.type.Split('?')[1]};
-                        return $"if ((flags & {GetBitMask(p.type)}) != 0)" + Environment.NewLine +
+                        var p2 = new Param {Name = p.Name, Type = p.Type.Split('?')[1]};
+                        return $"if ((flags & {GetBitMask(p.Type)}) != 0)" + Environment.NewLine +
                                WriteReadCode(p2) + Environment.NewLine +
                                "else" + Environment.NewLine +
-                               $"{CheckForKeyword(p.name)} = null;" + Environment.NewLine;
+                               $"{CheckForKeyword(p.Name)} = null;" + Environment.NewLine;
                     }
             }
         }
