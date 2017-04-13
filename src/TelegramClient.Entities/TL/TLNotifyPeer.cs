@@ -1,0 +1,28 @@
+using System.IO;
+
+namespace TelegramClient.Entities.TL
+{
+    [TLObject(-1613493288)]
+    public class TLNotifyPeer : TLAbsNotifyPeer
+    {
+        public override int Constructor => -1613493288;
+
+        public TLAbsPeer peer { get; set; }
+
+
+        public void ComputeFlags()
+        {
+        }
+
+        public override void DeserializeBody(BinaryReader br)
+        {
+            peer = (TLAbsPeer) ObjectUtils.DeserializeObject(br);
+        }
+
+        public override void SerializeBody(BinaryWriter bw)
+        {
+            bw.Write(Constructor);
+            ObjectUtils.SerializeObject(peer, bw);
+        }
+    }
+}

@@ -1,0 +1,5 @@
+Microsoft.NET.Test.Sdk
+xunit
+xunit.runner.visualstudio
+Microsoft.Extensions.Configuration
+Microsoft.Extensions.Configuration.Json

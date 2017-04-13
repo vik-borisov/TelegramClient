@@ -1,0 +1,57 @@
+using System.IO;
+
+namespace TelegramClient.Entities.TL.Auth
+{
+    [TLObject(1577067778)]
+    public class TLSentCode : TLObject
+    {
+        public override int Constructor => 1577067778;
+
+        public int flags { get; set; }
+        public bool phone_registered { get; set; }
+        public TLAbsSentCodeType type { get; set; }
+        public string phone_code_hash { get; set; }
+        public TLAbsCodeType next_type { get; set; }
+        public int? timeout { get; set; }
+
+
+        public void ComputeFlags()
+        {
+            flags = 0;
+            flags = phone_registered ? flags | 1 : flags & ~1;
+            flags = next_type != null ? flags | 2 : flags & ~2;
+            flags = timeout != null ? flags | 4 : flags & ~4;
+        }
+
+        public override void DeserializeBody(BinaryReader br)
+        {
+            flags = br.ReadInt32();
+            phone_registered = (flags & 1) != 0;
+            type = (TLAbsSentCodeType) ObjectUtils.DeserializeObject(br);
+            phone_code_hash = StringUtil.Deserialize(br);
+            if ((flags & 2) != 0)
+                next_type = (TLAbsCodeType) ObjectUtils.DeserializeObject(br);
+            else
+                next_type = null;
+
+            if ((flags & 4) != 0)
+                timeout = br.ReadInt32();
+            else
+                timeout = null;
+        }
+
+        public override void SerializeBody(BinaryWriter bw)
+        {
+            bw.Write(Constructor);
+            ComputeFlags();
+            bw.Write(flags);
+
+            ObjectUtils.SerializeObject(type, bw);
+            StringUtil.Serialize(phone_code_hash, bw);
+            if ((flags & 2) != 0)
+                ObjectUtils.SerializeObject(next_type, bw);
+            if ((flags & 4) != 0)
+                bw.Write(timeout.Value);
+        }
+    }
+}

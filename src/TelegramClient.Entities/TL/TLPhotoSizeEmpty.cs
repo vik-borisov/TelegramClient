@@ -1,0 +1,28 @@
+using System.IO;
+
+namespace TelegramClient.Entities.TL
+{
+    [TLObject(236446268)]
+    public class TLPhotoSizeEmpty : TLAbsPhotoSize
+    {
+        public override int Constructor => 236446268;
+
+        public string type { get; set; }
+
+
+        public void ComputeFlags()
+        {
+        }
+
+        public override void DeserializeBody(BinaryReader br)
+        {
+            type = StringUtil.Deserialize(br);
+        }
+
+        public override void SerializeBody(BinaryWriter bw)
+        {
+            bw.Write(Constructor);
+            StringUtil.Serialize(type, bw);
+        }
+    }
+}

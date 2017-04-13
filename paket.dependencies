@@ -1,0 +1,10 @@
+source https://www.nuget.org/api/v2
+framework: net45
+
+nuget Microsoft.NET.Test.Sdk
+nuget Newtonsoft.Json 
+nuget System.Security.Cryptography.Algorithms
+nuget xunit
+nuget xunit.runner.visualstudio
+nuget Microsoft.Extensions.Configuration
+nuget Microsoft.Extensions.Configuration.Json

@@ -1,0 +1,28 @@
+using System.IO;
+
+namespace TelegramClient.Entities.TL
+{
+    [TLObject(-1781355374)]
+    public class TLMessageActionChannelCreate : TLAbsMessageAction
+    {
+        public override int Constructor => -1781355374;
+
+        public string title { get; set; }
+
+
+        public void ComputeFlags()
+        {
+        }
+
+        public override void DeserializeBody(BinaryReader br)
+        {
+            title = StringUtil.Deserialize(br);
+        }
+
+        public override void SerializeBody(BinaryWriter bw)
+        {
+            bw.Write(Constructor);
+            StringUtil.Serialize(title, bw);
+        }
+    }
+}
