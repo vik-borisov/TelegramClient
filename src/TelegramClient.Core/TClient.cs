@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using TelegramClient.Core.Auth;
-using TelegramClient.Core.MTProto.Crypto;
 using TelegramClient.Core.Network;
 using TelegramClient.Core.Utils;
 using TelegramClient.Entities;
@@ -24,13 +23,12 @@ namespace TelegramClient.Core
 {
     public class TClient : IDisposable
     {
-        private readonly string _apiHash = "";
+        private readonly string _apiHash;
         private readonly int _apiId;
-        private AuthKey _key;
         private MtProtoSender _sender;
         private readonly Session _session;
         private TcpTransport _transport;
-        private List<TLDcOption> dcOptions;
+        private List<TLDcOption> _dcOptions;
 
         public TClient(int apiId, string apiHash,
             ISessionStore store = null, string sessionUserId = "session")
@@ -86,17 +84,17 @@ namespace TelegramClient.Core
             await _sender.Send(invokewithLayer);
             await _sender.Receive(invokewithLayer);
 
-            dcOptions = ((TLConfig) invokewithLayer.Response).dc_options.lists;
+            _dcOptions = ((TLConfig) invokewithLayer.Response).dc_options.lists;
 
             return true;
         }
 
         private async Task ReconnectToDcAsync(int dcId)
         {
-            if (dcOptions == null || !dcOptions.Any())
+            if (_dcOptions == null || !_dcOptions.Any())
                 throw new InvalidOperationException($"Can't reconnect. Establish initial connection first.");
 
-            var dc = dcOptions.First(d => d.id == dcId);
+            var dc = _dcOptions.First(d => d.id == dcId);
 
             _transport = new TcpTransport(dc.ip_address, dc.port);
             _session.ServerAddress = dc.ip_address;

@@ -1,5 +1,4 @@
 source https://www.nuget.org/api/v2
-framework: net45
 
 nuget Microsoft.NET.Test.Sdk
 nuget Newtonsoft.Json 
