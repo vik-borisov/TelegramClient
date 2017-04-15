@@ -2,12 +2,14 @@
 
 namespace TelegramClient.Entities.Generator
 {
+    using Newtonsoft.Json;
+
     internal class Method
     {
         public int Id { get; set; }
         public string method { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("params")]
+        [JsonProperty("params")]
         public List<Param> Params { get; set; }
 
         public string Type { get; set; }
@@ -24,7 +26,7 @@ namespace TelegramClient.Entities.Generator
         public int Id { get; set; }
         public string Predicate { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("params")]
+        [JsonProperty("params")]
         public List<Param> Params { get; set; }
 
         public string Type { get; set; }

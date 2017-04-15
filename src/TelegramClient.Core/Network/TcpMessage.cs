@@ -4,19 +4,24 @@ using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core.Network
 {
+    using BarsGroup.CodeGuard;
+    using BarsGroup.CodeGuard.Validators;
+
     public class TcpMessage
     {
+        private readonly int _sequneceNumber;
+
+        public byte[] Body { get; }
+
         public TcpMessage(int seqNumber, byte[] body)
         {
-            if (body == null)
-                throw new ArgumentNullException(nameof(body));
+            Guard.That(seqNumber, nameof(seqNumber)).IsPositive();
+            Guard.That(body, nameof(body)).IsNotNull();
 
-            SequneceNumber = seqNumber;
+            _sequneceNumber = seqNumber;
             Body = body;
         }
 
-        public int SequneceNumber { get; }
-        public byte[] Body { get; }
 
         public byte[] Encode()
         {
@@ -33,7 +38,7 @@ namespace TelegramClient.Core.Network
                         and 4 CRC32 bytes at the end (length, sequence number, and payload together).
                     */
                     binaryWriter.Write(Body.Length + 12);
-                    binaryWriter.Write(SequneceNumber);
+                    binaryWriter.Write(_sequneceNumber);
                     binaryWriter.Write(Body);
                     var crc32 = new Crc32();
 
@@ -53,11 +58,8 @@ namespace TelegramClient.Core.Network
 
         public static TcpMessage Decode(byte[] body)
         {
-            if (body == null)
-                throw new ArgumentNullException(nameof(body));
-
-            if (body.Length < 12)
-                throw new InvalidOperationException("Ops, wrong size of input packet");
+            Guard.That(body, nameof(body)).IsNotNull();
+            Guard.That(body.Length, nameof(body.Length)).IsLessThan(12);
 
             using (var memoryStream = new MemoryStream(body))
             {

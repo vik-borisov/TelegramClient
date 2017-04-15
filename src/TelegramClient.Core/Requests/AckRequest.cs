@@ -25,7 +25,9 @@ namespace TelegramClient.Core.Requests
             writer.Write(0x1cb5c415); // Vector
             writer.Write(_msgs.Count);
             foreach (var messageId in _msgs)
+            {
                 writer.Write(messageId);
+            }
         }
 
         public override void DeserializeBody(BinaryReader reader)

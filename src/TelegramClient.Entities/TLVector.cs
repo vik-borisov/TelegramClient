@@ -49,6 +49,7 @@ namespace TelegramClient.Entities
             bw.Write(Lists.Count());
 
             foreach (var item in Lists)
+            {
                 if (typeof(T) == typeof(int))
                 {
                     var res = (int) Convert.ChangeType(item, typeof(int));
@@ -75,6 +76,7 @@ namespace TelegramClient.Entities
                     var res = (TlObject) (object) item;
                     res.SerializeBody(bw);
                 }
+            }
         }
     }
 }

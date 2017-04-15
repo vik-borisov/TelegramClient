@@ -11,7 +11,7 @@ namespace TelegramClient.Core.MTProto.Crypto
         public AuthKey(BigInteger gab)
         {
             Data = gab.ToByteArrayUnsigned();
-            using (SHA1 hash = SHA1.Create())
+            using (var hash = SHA1.Create())
             {
                 using (var hashStream = new MemoryStream(hash.ComputeHash(Data), false))
                 {
@@ -28,7 +28,7 @@ namespace TelegramClient.Core.MTProto.Crypto
         public AuthKey(byte[] data)
         {
             Data = data;
-            using (SHA1 hash = SHA1.Create())
+            using (var hash = SHA1.Create())
             {
                 using (var hashStream = new MemoryStream(hash.ComputeHash(Data), false))
                 {
@@ -55,7 +55,7 @@ namespace TelegramClient.Core.MTProto.Crypto
                     bufferWriter.Write(newNonce);
                     bufferWriter.Write((byte) number);
                     bufferWriter.Write(_auxHash);
-                    using (SHA1 sha1 = SHA1.Create())
+                    using (var sha1 = SHA1.Create())
                     {
                         stream.TryGetBuffer(out var buffer);
 

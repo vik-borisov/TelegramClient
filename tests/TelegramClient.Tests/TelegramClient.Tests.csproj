@@ -18,13 +18,16 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TelegramClient.Core\TelegramClient.Core.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TelegramClient.Core\TelegramClient.Core.csproj">
+      <Project>{6ddad7ef-af3b-40ef-84df-a364e83f9946}</Project>
+      <Name>TelegramClient.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

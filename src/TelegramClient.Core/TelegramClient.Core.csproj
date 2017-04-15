@@ -5,5 +5,8 @@
   <ItemGroup>
     <ProjectReference Include="..\TelegramClient.Entities\TelegramClient.Entities.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sessions" />
+  </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

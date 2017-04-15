@@ -7,11 +7,11 @@ namespace TelegramClient.Entities
 {
     public static class TlContext
     {
-        private static Dictionary<int, Type> _types;
+        private static Dictionary<int, Type> Types { get; } = Init();
 
-        public static void Init()
+        public static Dictionary<int, Type> Init()
         {
-            _types = typeof(TlContext).GetTypeInfo().Assembly
+            return typeof(TlContext).GetTypeInfo().Assembly
                 .GetTypes()
                 .Select(t => t.GetTypeInfo())
                 .Where(t => t.IsClass && t.Namespace.StartsWith("TelegramClient.Entities"))
@@ -22,7 +22,7 @@ namespace TelegramClient.Entities
 
         public static Type GetType(int constructor)
         {
-            return _types[constructor];
+            return Types[constructor];
         }
     }
 }

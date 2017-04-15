@@ -24,7 +24,7 @@ namespace TelegramClient.Core.MTProto.Crypto
             using (var buffer = new MemoryStream(255))
             using (var writer = new BinaryWriter(buffer))
             {
-                using (SHA1 sha1 = SHA1.Create())
+                using (var sha1 = SHA1.Create())
                 {
                     var hashsum = sha1.ComputeHash(data, offset, length);
                     writer.Write(hashsum);

@@ -6,24 +6,35 @@ using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core.Network
 {
-    public class TcpTransport : IDisposable
+    using BarsGroup.CodeGuard;
+    using BarsGroup.CodeGuard.Validators;
+
+    using TelegramClient.Core.Settings;
+
+    internal class TcpTransport : ITcpTransport
     {
-        private readonly int _port;
+        private readonly IClientSettings _clientSettings;
+
         private readonly TcpClient _tcpClient = new TcpClient();
         private int _sendCounter;
-        private readonly IPAddress _ipAddress;
 
-        public TcpTransport(string address, int port)
+
+        public TcpTransport(IClientSettings clientSettings)
         {
-            _port = port;
-            _ipAddress = IPAddress.Parse(address);
+            _clientSettings = clientSettings;
         }
-
         private async Task EnsureClientConnected()
         {
-            if (!_tcpClient.Connected)
+            Guard.That(_tcpClient).IsNotNull();
 
-            await _tcpClient.ConnectAsync(_ipAddress, _port);
+            var session = _clientSettings.Session;
+
+            var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
+
+            if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
+            {
+                await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
+            }
         }
 
         public void Dispose()

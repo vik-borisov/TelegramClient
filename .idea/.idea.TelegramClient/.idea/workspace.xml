@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="0eb0f146-b01b-4a52-92ba-71cbfebb59b8" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.idea.TelegramClient/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/.idea.TelegramClient/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.idea.TelegramClient/riderModule.iml" afterPath="$PROJECT_DIR$/.idea/.idea.TelegramClient/riderModule.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/ClientFactory.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/ClientFactory.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/TelegramClient.Core.csproj" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/TelegramClient.Core.csproj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TelegramClient.Tests/TLSharpTests.cs" afterPath="$PROJECT_DIR$/tests/TelegramClient.Tests/TLSharpTests.cs" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Container.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="38" lean-forward="false" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
+              <folding>
+                <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
+                <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
+                <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
+                <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="TCompositionRoot.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="10" column="74" lean-forward="false" selection-start-line="10" selection-start-column="74" selection-end-line="10" selection-end-column="74" />
+              <folding>
+                <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
+                <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
+                <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
+                <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ITelegramClient.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="36" lean-forward="false" selection-start-line="12" selection-start-column="36" selection-end-line="12" selection-end-column="36" />
+              <folding>
+                <marker date="1492185209599" expanded="true" signature="29:457" ph="{...}" />
+                <marker date="1492185209599" expanded="true" signature="42:157" ph="..." />
+                <marker date="1492185209599" expanded="true" signature="208:455" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UploadHelper.cs" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="548">
+              <caret line="121" column="47" lean-forward="false" selection-start-line="121" selection-start-column="47" selection-end-line="121" selection-end-column="47" />
+              <folding>
+                <marker date="1492185232236" expanded="false" signature="6:224" ph="..." />
+                <marker date="1492185232236" expanded="true" signature="261:4034" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="300:4032" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="361:824" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="446:781" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="620:713" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="960:1123" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="1183:1425" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="1280:1389" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="1489:2362" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="1654:2321" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="1796:2006" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="2031:2307" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="2565:4026" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="2865:3592" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="3071:3272" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="3398:3546" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="3685:3809" ph="{...}" />
+                <marker date="1492185232236" expanded="true" signature="3858:4015" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Models.cs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="30">
+              <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+              <folding>
+                <marker date="1492185256971" expanded="true" signature="78:858" ph="{...}" />
+                <marker date="1492185256971" expanded="true" signature="106:321" ph="{...}" />
+                <marker date="1492185256971" expanded="true" signature="347:441" ph="{...}" />
+                <marker date="1492185256971" expanded="true" signature="473:707" ph="{...}" />
+                <marker date="1492185256971" expanded="true" signature="734:856" ph="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/TelegramClient.Core/Network/MtProtoSender.cs" />
+        <option value="$PROJECT_DIR$/src/TelegramClient.Core/Extentions/AuthExtentions.cs" />
+        <option value="$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs" />
+        <option value="$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs" />
+        <option value="$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs" />
+        <option value="$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs" />
+        <option value="$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1696" />
+    <option name="height" value="1026" />
+  </component>
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="SolutionExplorer" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="SolutionExplorer">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="TelegramClient (4 projects)" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="TelegramClient (4 projects)" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="TelegramClient (4 projects)" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="TelegramClient.Core" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="TelegramClient (4 projects)" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="TelegramClient.Core" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IoC" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="TelegramClient (4 projects)" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value=".paket" />
+              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+        <option name="show-file-system" value="false" />
+        <option name="show-all-items" value="false" />
+      </pane>
+      <pane id="Scratches" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="node.js.path.for.package.jscs" value="project" />
+    <property name="node.js.selected.package.jscs" value="" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected=".NET Project.Default">
+    <configuration default="true" type="DotNetProject" factoryName=".NET Project">
+      <option name="PROJECT_PATH" value="" />
+      <option name="PROJECT_KIND" value="None" />
+      <option name="PROJECT_TFM" value="" />
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="USE_MONO" value="0" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerJest" factoryName="Jest">
+      <node-interpreter value="project" />
+      <working-dir value="" />
+      <envs />
+      <scope-kind value="ALL" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerProtractor" factoryName="Protractor">
+      <config-file value="" />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" working-dir="">
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.npm" factoryName="npm">
+      <command value="run" />
+      <scripts />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="mocha-javascript-test-runner" factoryName="Mocha">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <working-directory />
+      <pass-parent-env>true</pass-parent-env>
+      <envs />
+      <ui />
+      <extra-mocha-options />
+      <test-kind>DIRECTORY</test-kind>
+      <test-directory />
+      <recursive>false</recursive>
+      <method />
+    </configuration>
+    <configuration default="false" name="Default" type="DotNetProject" factoryName=".NET Project">
+      <option name="PROJECT_PATH" value="" />
+      <option name="PROJECT_KIND" value="None" />
+      <option name="PROJECT_TFM" value="" />
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="USE_MONO" value="0" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <envs />
+      <method />
+    </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue=".NET Project.Default" />
+    </list>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0eb0f146-b01b-4a52-92ba-71cbfebb59b8" name="Default" comment="" />
+      <created>1492171074097</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1492171074097</updated>
+      <workItem from="1492171076769" duration="836000" />
+      <workItem from="1492173470227" duration="164000" />
+      <workItem from="1492173857688" duration="690000" />
+      <workItem from="1492184903135" duration="361000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="2051000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
+    <layout>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Errors In Solution" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2106987" sideWeight="0.5" order="15" side_tool="true" content_ui="tabs" x="462" y="562" width="865" height="312" />
+      <window_info id="NuGet" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Change Signature" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1625" sideWeight="0.5" order="0" side_tool="true" content_ui="combo" x="-312" y="63" width="312" height="975" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="false" weight="0.32980973" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" x="499" y="499" width="734" height="287" />
+      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Run Dashboard" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
+            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="21" lean-forward="false" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
+          <folding>
+            <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
+            <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
+            <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
+            <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Extentions/AuthExtentions.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2010">
+          <caret line="134" column="12" lean-forward="false" selection-start-line="134" selection-start-column="12" selection-end-line="134" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Network/MtProtoSender.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
+          <folding>
+            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
+            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="21" lean-forward="false" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
+          <folding>
+            <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
+            <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
+            <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
+            <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Extentions/AuthExtentions.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2010">
+          <caret line="134" column="12" lean-forward="false" selection-start-line="134" selection-start-column="12" selection-end-line="134" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Network/MtProtoSender.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="25" lean-forward="true" selection-start-line="6" selection-start-column="25" selection-end-line="6" selection-end-column="25" />
+          <folding>
+            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
+            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Network/MtProtoSender.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Extentions/AuthExtentions.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2010">
+          <caret line="134" column="12" lean-forward="false" selection-start-line="134" selection-start-column="12" selection-end-line="134" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/paket.dependencies">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="17" lean-forward="true" selection-start-line="9" selection-start-column="17" selection-end-line="9" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/MSBuild/Sdks/Microsoft.NET.Sdk/build/Microsoft.NET.Sdk.targets">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="90" column="7" lean-forward="false" selection-start-line="90" selection-start-column="7" selection-end-line="90" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="38" lean-forward="false" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
+          <folding>
+            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
+            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
+            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="74" lean-forward="false" selection-start-line="10" selection-start-column="74" selection-end-line="10" selection-end-column="74" />
+          <folding>
+            <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
+            <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
+            <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
+            <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="36" lean-forward="false" selection-start-line="12" selection-start-column="36" selection-end-line="12" selection-end-column="36" />
+          <folding>
+            <marker date="1492185209599" expanded="true" signature="29:457" ph="{...}" />
+            <marker date="1492185209599" expanded="true" signature="42:157" ph="..." />
+            <marker date="1492185209599" expanded="true" signature="208:455" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="548">
+          <caret line="121" column="47" lean-forward="false" selection-start-line="121" selection-start-column="47" selection-end-line="121" selection-end-column="47" />
+          <folding>
+            <marker date="1492185232236" expanded="false" signature="6:224" ph="..." />
+            <marker date="1492185232236" expanded="true" signature="261:4034" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="300:4032" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="361:824" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="446:781" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="620:713" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="960:1123" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="1183:1425" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="1280:1389" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="1489:2362" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="1654:2321" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="1796:2006" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="2031:2307" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="2565:4026" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="2865:3592" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="3071:3272" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="3398:3546" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="3685:3809" ph="{...}" />
+            <marker date="1492185232236" expanded="true" signature="3858:4015" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+          <folding>
+            <marker date="1492185256971" expanded="true" signature="78:858" ph="{...}" />
+            <marker date="1492185256971" expanded="true" signature="106:321" ph="{...}" />
+            <marker date="1492185256971" expanded="true" signature="347:441" ph="{...}" />
+            <marker date="1492185256971" expanded="true" signature="473:707" ph="{...}" />
+            <marker date="1492185256971" expanded="true" signature="734:856" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

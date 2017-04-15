@@ -4,21 +4,17 @@ using System.Threading.Tasks;
 
 namespace TelegramClient.Core.Network
 {
-    public class MtProtoPlainSender
+    using CodeProject.ObjectPool;
+
+    internal class MtProtoPlainSender : IMtProtoPlainSender
     {
-        private readonly TcpTransport _transport;
         private long _lastMessageId;
-        private readonly Random _random;
-        private int _sequence = 0;
+        private readonly Random _random = new Random();
         private int _timeOffset;
 
-        public MtProtoPlainSender(TcpTransport transport)
-        {
-            _transport = transport;
-            _random = new Random();
-        }
+        public IObjectPool<PooledObjectWrapper<ITcpTransport>> TcpTransportPool { get; set; }
 
-        public async Task Send(byte[] data)
+        private async Task Send(ITcpTransport tcpTransport, byte[] data)
         {
             using (var memoryStream = new MemoryStream())
             {
@@ -31,14 +27,23 @@ namespace TelegramClient.Core.Network
 
                     var packet = memoryStream.ToArray();
 
-                    await _transport.Send(packet);
+                    await tcpTransport.Send(packet);
                 }
             }
         }
 
-        public async Task<byte[]> Receive()
+        public async Task<byte[]> SendAndReceive(byte[] data)
         {
-            var result = await _transport.Receieve();
+            using (var wrapper = TcpTransportPool.GetObject())
+            {
+                await Send(wrapper.InternalResource, data);
+                return await Receive(wrapper.InternalResource);
+            }
+        }
+
+        private async Task<byte[]> Receive(ITcpTransport tcpTransport)
+        {
+            var result = await tcpTransport.Receieve();
 
             using (var memoryStream = new MemoryStream(result.Body))
             using (var binaryReader = new BinaryReader(memoryStream))

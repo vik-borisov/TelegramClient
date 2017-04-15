@@ -79,7 +79,7 @@ namespace TelegramClient.Core.Utils
 
         public static byte[] Sha1(byte[] data)
         {
-            using (SHA1 sha1 = SHA1.Create())
+            using (var sha1 = SHA1.Create())
             {
                 return sha1.ComputeHash(data);
             }
@@ -87,7 +87,7 @@ namespace TelegramClient.Core.Utils
 
         public static byte[] Sha1(byte[] data, int offset, int limit)
         {
-            using (SHA1 sha1 = SHA1.Create())
+            using (var sha1 = SHA1.Create())
             {
                 return sha1.ComputeHash(data, offset, limit);
             }

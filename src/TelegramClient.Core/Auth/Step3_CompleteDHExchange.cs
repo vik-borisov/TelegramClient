@@ -89,7 +89,7 @@ namespace TelegramClient.Core.Auth
 					{
 						using (var clientDhInnerDataWithHashWriter = new BinaryWriter(clientDhInnerDataWithHash))
 						{
-							using (SHA1 sha1 = SHA1.Create())
+							using (var sha1 = SHA1.Create())
 							{
 							    clientDhInnerData.TryGetBuffer(out var clientDBuffer);
 

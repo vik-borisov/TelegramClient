@@ -39,7 +39,7 @@ namespace TelegramClient.Entities.Generator
             json = File.ReadAllText(url);
             var file = File.OpenWrite("Result.cs");
             var sw = new StreamWriter(file);
-            Schema schema = JsonConvert.DeserializeObject<Schema>(json);
+            var schema = JsonConvert.DeserializeObject<Schema>(json);
             foreach (var c in schema.Constructors)
             {
                 InterfacesList.Add(c.Type);
@@ -102,9 +102,11 @@ namespace TelegramClient.Entities.Generator
 
                     var fields = "";
                     foreach (var tmp in c.Params)
+                    {
                         fields +=
                             $"     public {CheckForFlagBase(tmp.Type, GetTypeName(tmp.Type))} {CheckForKeyword(tmp.Name)} " +
                             "{get;set;}" + Environment.NewLine;
+                    }
                     temp = temp.Replace("/* PARAMS */", fields);
 
                     #endregion
@@ -119,6 +121,7 @@ namespace TelegramClient.Entities.Generator
                     {
                         var compute = "flags = 0;" + Environment.NewLine;
                         foreach (var param in c.Params.Where(x => IsFlagBase(x.Type)))
+                        {
                             if (IsTrueFlag(param.Type))
                                 compute +=
                                     $"flags = {CheckForKeyword(param.Name)} ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
@@ -127,6 +130,7 @@ namespace TelegramClient.Entities.Generator
                                 compute +=
                                     $"flags = {CheckForKeyword(param.Name)} != null ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
                                     Environment.NewLine;
+                        }
                         temp = temp.Replace("/* COMPUTE */", compute);
                     }
 
@@ -139,7 +143,9 @@ namespace TelegramClient.Entities.Generator
                     if (c.Params.Any(x => x.Name == "flags"))
                         serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(flags);" + Environment.NewLine;
                     foreach (var p in c.Params.Where(x => x.Name != "flags"))
+                    {
                         serialize += WriteWriteCode(p) + Environment.NewLine;
+                    }
                     temp = temp.Replace("/* SERIALIZE */", serialize);
 
                     #endregion
@@ -149,7 +155,9 @@ namespace TelegramClient.Entities.Generator
                     var deserialize = "";
 
                     foreach (var p in c.Params)
+                    {
                         deserialize += WriteReadCode(p) + Environment.NewLine;
+                    }
                     temp = temp.Replace("/* DESERIALIZE */", deserialize);
 
                     #endregion
@@ -184,9 +192,11 @@ namespace TelegramClient.Entities.Generator
 
                     var fields = "";
                     foreach (var tmp in c.Params)
+                    {
                         fields +=
                             $"        public {CheckForFlagBase(tmp.Type, GetTypeName(tmp.Type))} {CheckForKeyword(tmp.Name)} " +
                             "{get;set;}" + Environment.NewLine;
+                    }
                     fields += $"        public {CheckForFlagBase(c.Type, GetTypeName(c.Type))} Response" +
                               "{ get; set;}" + Environment.NewLine;
                     temp = temp.Replace("/* PARAMS */", fields);
@@ -203,6 +213,7 @@ namespace TelegramClient.Entities.Generator
                     {
                         var compute = "flags = 0;" + Environment.NewLine;
                         foreach (var param in c.Params.Where(x => IsFlagBase(x.Type)))
+                        {
                             if (IsTrueFlag(param.Type))
                                 compute +=
                                     $"flags = {CheckForKeyword(param.Name)} ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
@@ -211,6 +222,7 @@ namespace TelegramClient.Entities.Generator
                                 compute +=
                                     $"flags = {CheckForKeyword(param.Name)} != null ? (flags | {GetBitMask(param.Type)}) : (flags & ~{GetBitMask(param.Type)});" +
                                     Environment.NewLine;
+                        }
                         temp = temp.Replace("/* COMPUTE */", compute);
                     }
 
@@ -223,7 +235,9 @@ namespace TelegramClient.Entities.Generator
                     if (c.Params.Any(x => x.Name == "flags"))
                         serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(flags);" + Environment.NewLine;
                     foreach (var p in c.Params.Where(x => x.Name != "flags"))
+                    {
                         serialize += WriteWriteCode(p) + Environment.NewLine;
+                    }
                     temp = temp.Replace("/* SERIALIZE */", serialize);
 
                     #endregion
@@ -233,7 +247,9 @@ namespace TelegramClient.Entities.Generator
                     var deserialize = "";
 
                     foreach (var p in c.Params)
+                    {
                         deserialize += WriteReadCode(p) + Environment.NewLine;
+                    }
                     temp = temp.Replace("/* DESERIALIZE */", deserialize);
 
                     #endregion
@@ -261,7 +277,9 @@ namespace TelegramClient.Entities.Generator
                 input = input.Replace(".", " ");
                 var temp = "";
                 foreach (var s in input.Split(' '))
+                {
                     temp += FormatName(s) + " ";
+                }
                 input = temp.Trim();
             }
             return input.First().ToString().ToUpper() + input.Substring(1);

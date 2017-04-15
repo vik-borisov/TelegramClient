@@ -20,7 +20,9 @@ namespace TelegramClient.Core.Utils
                 var hashResult = new StringBuilder(hash.Length * 2);
 
                 foreach (var t in hash)
+                {
                     hashResult.Append(t.ToString("x2"));
+                }
 
                 md5Checksum = hashResult.ToString();
             }
@@ -28,7 +30,7 @@ namespace TelegramClient.Core.Utils
             return md5Checksum;
         }
 
-        public static async Task<TlAbsInputFile> UploadFile(this Client client, string name,
+        public static async Task<TlAbsInputFile> UploadFile(this ITelegramClient client, string name,
             StreamReader reader)
         {
             const long tenMb = 10 * 1024 * 1024;
@@ -75,7 +77,7 @@ namespace TelegramClient.Core.Utils
         }
 
         private static async Task<TlAbsInputFile> UploadFile(string name, StreamReader reader,
-            Client client, bool isBigFileUpload)
+                                                             ITelegramClient client, bool isBigFileUpload)
         {
             var file = GetFile(reader);
             var fileParts = GetFileParts(file);

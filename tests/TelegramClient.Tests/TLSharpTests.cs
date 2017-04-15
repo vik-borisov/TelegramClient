@@ -14,6 +14,8 @@ using Xunit;
 
 namespace TelegramClient.Tests
 {
+    using TelegramClient.Core.Exceptions;
+
     public class TlSharpTests
     {
         private string NumberToSendMessage { get; set; }
@@ -41,11 +43,11 @@ namespace TelegramClient.Tests
             GatherTestConfiguration();
         }
 
-        private Client NewClient()
+        private ITelegramClient NewClient()
         {
             try
             {
-                return new Client(ApiId, ApiHash);
+                return ClientFactory.GetClient(ApiId, ApiHash);
             }
             catch (MissingApiConfigurationException ex)
             {

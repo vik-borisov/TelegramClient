@@ -21,7 +21,7 @@ namespace TelegramClient.Core.MTProto.Crypto
     {
         public static byte[] DecryptWithNonces(byte[] data, byte[] serverNonce, byte[] newNonce)
         {
-            using (SHA1 hash = SHA1.Create())
+            using (var hash = SHA1.Create())
             {
                 var nonces = new byte[48];
 
@@ -55,7 +55,7 @@ namespace TelegramClient.Core.MTProto.Crypto
 
         public static AesKeyData GenerateKeyDataFromNonces(byte[] serverNonce, byte[] newNonce)
         {
-            using (SHA1 hash = SHA1.Create())
+            using (var hash = SHA1.Create())
             {
                 var nonces = new byte[48];
 
