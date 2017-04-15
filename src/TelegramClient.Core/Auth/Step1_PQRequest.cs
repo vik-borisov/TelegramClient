@@ -27,13 +27,13 @@ namespace TelegramClient.Core.Auth
         public byte[] ToBytes()
         {
             new Random().NextBytes(_nonce);
-            const int constructorNumber = 0x60469778;
+            const int ConstructorNumber = 0x60469778;
 
             using (var memoryStream = new MemoryStream())
             {
                 using (var binaryWriter = new BinaryWriter(memoryStream))
                 {
-                    binaryWriter.Write(constructorNumber);
+                    binaryWriter.Write(ConstructorNumber);
                     binaryWriter.Write(_nonce);
                 }
 

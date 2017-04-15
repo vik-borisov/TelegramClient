@@ -10,13 +10,7 @@
 
     public class Session : ISession
     {
-        private const string DefaultConnectionAddress = "149.154.175.100"; //"149.154.167.50";
-
-        private const int DefaultConnectionPort = 443;
-
-        private readonly Random _random;
-
-        private readonly ISessionStore _store;
+        private static readonly Random Random = new Random();
 
         public string SessionUserId { get; set; }
 
@@ -40,13 +34,7 @@
 
         public TlUser TlUser { get; set; }
 
-        private Session(ISessionStore store)
-        {
-            _random = new Random();
-            _store = store;
-        }
-
-        public static Session FromBytes(byte[] buffer, ISessionStore store, string sessionUserId)
+        public static Session FromBytes(byte[] buffer, string sessionUserId)
         {
             using (var stream = new MemoryStream(buffer))
             using (var reader = new BinaryReader(stream))
@@ -70,7 +58,7 @@
 
                 var authData = Serializers.Bytes.Read(reader);
 
-                return new Session(store)
+                return new Session()
                        {
                            AuthKey = new AuthKey(authData),
                            Id = id,
@@ -92,7 +80,7 @@
             var time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds);
             var newMessageId = ((time / 1000 + TimeOffset) << 32) |
                                ((time % 1000) << 22) |
-                               (_random.Next(524288) << 2); // 2^19
+                               (Random.Next(524288) << 2); // 2^19
 
             // [ unix timestamp : 32 bit] [ milliseconds : 10 bit ] [ buffer space : 1 bit ] [ random : 19 bit ] [ msg_id type : 2 bit ] = [ msg_id : 64 bit ]
 
@@ -103,11 +91,6 @@
 
             LastMessageId = newMessageId;
             return newMessageId;
-        }
-
-        public void Save()
-        {
-            _store.Save(this);
         }
 
         public byte[] ToBytes()
@@ -138,24 +121,6 @@
 
                 return stream.ToArray();
             }
-        }
-
-        public static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId)
-        {
-            return store.Load(sessionUserId) ?? new Session(store)
-                                                {
-                                                    Id = GenerateRandomUlong(),
-                                                    SessionUserId = sessionUserId,
-                                                    ServerAddress = DefaultConnectionAddress,
-                                                    Port = DefaultConnectionPort
-                                                };
-        }
-
-        private static ulong GenerateRandomUlong()
-        {
-            var random = new Random();
-            var rand = ((ulong)random.Next() << 32) | (ulong)random.Next();
-            return rand;
         }
     }
 }

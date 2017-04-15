@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
   </PropertyGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

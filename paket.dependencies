@@ -1,12 +1,25 @@
-source https://www.nuget.org/api/v2
 
-nuget Microsoft.NET.Test.Sdk
-nuget Newtonsoft.Json 
-nuget System.Security.Cryptography.Algorithms
-nuget xunit
-nuget xunit.runner.visualstudio
-nuget CodeProject.ObjectPool
-nuget Microsoft.Extensions.Configuration
-nuget Microsoft.Extensions.Configuration.Json
-nuget LightInject
-nuget BarsGroup.CodeGuard
+group app
+	source https://www.nuget.org/api/v2
+	framework: net46, netstandard15
+
+	nuget Newtonsoft.Json 
+	nuget System.Security.Cryptography.Algorithms
+	nuget CodeProject.ObjectPool
+	nuget LightInject
+	nuget BarsGroup.CodeGuard
+
+group test
+    source https://www.nuget.org/api/v2
+    framework: net46, netstandard15
+    
+	nuget Microsoft.NET.Test.Sdk
+    nuget xunit
+    nuget xunit.runner.visualstudio
+    nuget Microsoft.Extensions.Configuration.Json
+    nuget Microsoft.Extensions.Configuration
+
+group build
+    source https://www.nuget.org/api/v2
+    nuget FAKE
+    

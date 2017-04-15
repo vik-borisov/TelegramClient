@@ -18,6 +18,8 @@ namespace TelegramClient.Core
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
+    using TlAuthorization = TelegramClient.Entities.TL.Auth.TlAuthorization;
+
     public static class AuthExtentions
     {
         public static async Task<bool> IsPhoneRegisteredAsync(this ITelegramClient client, string phoneNumber)
@@ -53,7 +55,7 @@ namespace TelegramClient.Core
             {
                 try
                 {
-                    await client.SendRequestAsync<TlRequestSendCode>(request);
+                    await client.SendRequestAsync<TlSentCode>(request);
 
                     completed = true;
                 }
@@ -79,13 +81,9 @@ namespace TelegramClient.Core
                 PhoneCode = code
             };
 
-            await client.SendRequestAsync<TlRequestSignIn>(request);
+            await client.SendRequestAsync<TlAuthorization>(request);
 
-            var clientSettings = client.Container.GetInstance<IClientSettings>();
-            Guard.That(clientSettings).IsNotNull();
-
-
-            OnUserAuthenticated(clientSettings.Session, (TlUser)request.Response.User);
+            OnUserAuthenticated(client.Container, (TlUser)request.Response.User);
 
             return (TlUser)request.Response.User;
         }
@@ -94,7 +92,7 @@ namespace TelegramClient.Core
         {
             var request = new TlRequestGetPassword();
 
-            await client.SendRequestAsync<TlRequestGetPassword>(request);
+            await client.SendRequestAsync<TlPassword>(request);
 
             return (TlPassword)request.Response;
         }
@@ -111,12 +109,9 @@ namespace TelegramClient.Core
             }
 
             var request = new TlRequestCheckPassword { PasswordHash = passwordHash };
-            await client.SendRequestAsync<TlRequestCheckPassword>(request);
+            await client.SendRequestAsync<TlAuthorization>(request);
 
-            var clientSettings = client.Container.GetInstance<IClientSettings>();
-            Guard.That(clientSettings).IsNotNull();
-
-            OnUserAuthenticated(clientSettings.Session, (TlUser)request.Response.User);
+            OnUserAuthenticated(client.Container, (TlUser)request.Response.User);
 
             return (TlUser)request.Response.User;
         }
@@ -134,25 +129,27 @@ namespace TelegramClient.Core
                 FirstName = firstName,
                 LastName = lastName
             };
-            await client.SendRequestAsync<TlRequestCheckPassword>(request);
+            await client.SendRequestAsync<TlAuthorization>(request);
 
-            var clientSettings = client.Container.GetInstance<IClientSettings>();
-            Guard.That(clientSettings).IsNotNull();
-
-
-            OnUserAuthenticated(clientSettings.Session, (TlUser)request.Response.User);
+            OnUserAuthenticated(client.Container, (TlUser)request.Response.User);
 
             return (TlUser)request.Response.User;
         }
 
-        private static void OnUserAuthenticated(ISession session, TlUser tlUser)
+        private static void OnUserAuthenticated(IServiceFactory container, TlUser tlUser)
         {
+            var clientSettings = container.GetInstance<IClientSettings>();
+            Guard.That(clientSettings).IsNotNull();
+
+            var session = clientSettings.Session;
             Guard.That(session).IsNotNull();
 
             session.TlUser = tlUser;
             session.SessionExpires = int.MaxValue;
 
-            session.Save();
+            var sessionStore = container.GetInstance<ISessionStore>();
+
+            sessionStore.Save(session);
         }
 
         public static bool IsUserAuthorized(this ITelegramClient client)

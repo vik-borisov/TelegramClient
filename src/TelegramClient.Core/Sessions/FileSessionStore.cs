@@ -24,7 +24,7 @@ namespace TelegramClient.Core.Sessions
                 var buffer = new byte[2048];
                 stream.Read(buffer, 0, 2048);
 
-                return Session.FromBytes(buffer, this, sessionUserId);
+                return Session.FromBytes(buffer, sessionUserId);
             }
         }
     }

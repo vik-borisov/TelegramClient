@@ -16,6 +16,7 @@ namespace TelegramClient.Core.Network
     using CodeProject.ObjectPool;
 
     using TelegramClient.Core.Exceptions;
+    using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
     internal class MtProtoSender : IMtProtoSender
@@ -25,6 +26,8 @@ namespace TelegramClient.Core.Network
 	    public IObjectPool<PooledObjectWrapper<ITcpTransport>> TcpTransportPool { get; set; }
 
 	    public IClientSettings ClientSettings { get; set; }
+
+        public ISessionStore SessionStore { get; set; }
 
 		private int GenerateSequence(bool confirmed)
 		{
@@ -54,7 +57,7 @@ namespace TelegramClient.Core.Network
 				await Send(tcpTransport, memory.ToArray(), request);
 			}
 
-		    ClientSettings.Session.Save();
+		    SessionStore.Save(ClientSettings.Session);
 		}
 
         private async Task Send(ITcpTransport tcpTransport, byte[] packet, TlMethod request)

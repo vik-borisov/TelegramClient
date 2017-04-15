@@ -124,7 +124,7 @@ namespace TelegramClient.Tests
                 throw new Exception(
                     "CodeToAuthenticate is empty in the appsettings.json file, fill it with the code you just got now by SMS/Telegram");
 
-            TlUser user = null;
+            TlUser user;
             try
             {
                 user = await client.MakeAuthAsync(NumberToAuthenticate, hash, code);

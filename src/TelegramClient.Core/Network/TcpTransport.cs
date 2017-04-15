@@ -6,16 +6,13 @@ using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core.Network
 {
-    using BarsGroup.CodeGuard;
-    using BarsGroup.CodeGuard.Validators;
-
     using TelegramClient.Core.Settings;
 
     internal class TcpTransport : ITcpTransport
     {
         private readonly IClientSettings _clientSettings;
 
-        private readonly TcpClient _tcpClient = new TcpClient();
+        private TcpClient _tcpClient;
         private int _sendCounter;
 
 
@@ -23,18 +20,26 @@ namespace TelegramClient.Core.Network
         {
             _clientSettings = clientSettings;
         }
+
         private async Task EnsureClientConnected()
         {
-            Guard.That(_tcpClient).IsNotNull();
-
             var session = _clientSettings.Session;
 
-            var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
-
-            if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
+            if (_tcpClient != null)
             {
-                await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
+                var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
+
+                if (_tcpClient.Connected && endpoint.Address.ToString() == session.ServerAddress && endpoint.Port == session.Port)
+                {
+                    return;
+                }
+
+                _tcpClient.Dispose();
             }
+
+            _tcpClient = new TcpClient();
+            _sendCounter = 0;
+            await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
         }
 
         public void Dispose()
@@ -47,8 +52,8 @@ namespace TelegramClient.Core.Network
             await EnsureClientConnected();
 
             var tcpMessage = new TcpMessage(_sendCounter, packet);
-
-            await _tcpClient.GetStream().WriteAsync(tcpMessage.Encode(), 0, tcpMessage.Encode().Length);
+            var encodedMessage = tcpMessage.Encode();
+            await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length);
             _sendCounter++;
         }
 

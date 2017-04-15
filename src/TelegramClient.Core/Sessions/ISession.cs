@@ -29,8 +29,6 @@
 
         byte[] ToBytes();
 
-        void Save();
-
         long GetNewMessageId();
     }
 }

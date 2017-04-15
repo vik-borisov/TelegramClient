@@ -15,7 +15,6 @@ namespace TelegramClient.Core.Network
 
         public TcpMessage(int seqNumber, byte[] body)
         {
-            Guard.That(seqNumber, nameof(seqNumber)).IsPositive();
             Guard.That(body, nameof(body)).IsNotNull();
 
             _sequneceNumber = seqNumber;

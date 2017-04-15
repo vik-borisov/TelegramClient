@@ -1,4 +1,5 @@
-System.Security.Cryptography.Algorithms
-LightInject
-BarsGroup.CodeGuard
-CodeProject.ObjectPool
+group app
+	System.Security.Cryptography.Algorithms
+	LightInject
+	BarsGroup.CodeGuard
+	CodeProject.ObjectPool
