@@ -20,6 +20,7 @@ Target "Build" (fun _ ->
 
    DotNetCli.Build (fun p -> 
    { p with
+      Project = "./src/TelegramClient.Core/TelegramClient.Core.csproj"
       Configuration = "Release"
    })
 
