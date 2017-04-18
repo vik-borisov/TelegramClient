@@ -21,8 +21,6 @@
 
         int TimeOffset { get; set; }
 
-        long LastMessageId { get; set; }
-
         int SessionExpires { get; set; }
 
         TlUser TlUser { get; set; }

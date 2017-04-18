@@ -6,13 +6,13 @@ namespace TelegramClient.Core.Network
 {
     using CodeProject.ObjectPool;
 
+    using TelegramClient.Core.Settings;
+
     internal class MtProtoPlainSender : IMtProtoPlainSender
     {
-        private long _lastMessageId;
-        private readonly Random _random = new Random();
-        private int _timeOffset;
-
         public IObjectPool<PooledObjectWrapper<ITcpTransport>> TcpTransportPool { get; set; }
+
+        public IClientSettings ClientSettings { get; set; }
 
         private async Task Send(ITcpTransport tcpTransport, byte[] data)
         {
@@ -21,7 +21,7 @@ namespace TelegramClient.Core.Network
                 using (var binaryWriter = new BinaryWriter(memoryStream))
                 {
                     binaryWriter.Write((long) 0);
-                    binaryWriter.Write(GetNewMessageId());
+                    binaryWriter.Write(ClientSettings.Session.GetNewMessageId());
                     binaryWriter.Write(data.Length);
                     binaryWriter.Write(data);
 
@@ -56,21 +56,6 @@ namespace TelegramClient.Core.Network
 
                 return response;
             }
-        }
-
-        private long GetNewMessageId()
-        {
-            var time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds);
-            var newMessageId = ((time / 1000 + _timeOffset) << 32) |
-                               ((time % 1000) << 22) |
-                               (_random.Next(524288) << 2); // 2^19
-            // [ unix timestamp : 32 bit] [ milliseconds : 10 bit ] [ buffer space : 1 bit ] [ random : 19 bit ] [ msg_id type : 2 bit ] = [ msg_id : 64 bit ]
-
-            if (_lastMessageId >= newMessageId)
-                newMessageId = _lastMessageId + 4;
-
-            _lastMessageId = newMessageId;
-            return newMessageId;
         }
     }
 }

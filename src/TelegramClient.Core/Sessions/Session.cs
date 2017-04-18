@@ -2,15 +2,18 @@
 {
     using System;
     using System.IO;
+    using System.Threading;
 
-    using global::TelegramClient.Core.MTProto;
-    using global::TelegramClient.Core.MTProto.Crypto;
-    using global::TelegramClient.Entities;
-    using global::TelegramClient.Entities.TL;
+    using TelegramClient.Core.MTProto;
+    using TelegramClient.Core.MTProto.Crypto;
+    using TelegramClient.Entities;
+    using TelegramClient.Entities.TL;
 
     public class Session : ISession
     {
-        private static readonly Random Random = new Random();
+        private readonly object _syncObject = new object();
+
+        private int _inc;
 
         public string SessionUserId { get; set; }
 
@@ -28,8 +31,6 @@
 
         public int TimeOffset { get; set; }
 
-        public long LastMessageId { get; set; }
-
         public int SessionExpires { get; set; }
 
         public TlUser TlUser { get; set; }
@@ -42,7 +43,6 @@
                 var id = reader.ReadUInt64();
                 var sequence = reader.ReadInt32();
                 var salt = reader.ReadUInt64();
-                var lastMessageId = reader.ReadInt64();
                 var timeOffset = reader.ReadInt32();
                 var serverAddress = Serializers.String.Read(reader);
                 var port = reader.ReadInt32();
@@ -58,14 +58,13 @@
 
                 var authData = Serializers.Bytes.Read(reader);
 
-                return new Session()
+                return new Session
                        {
                            AuthKey = new AuthKey(authData),
                            Id = id,
                            Salt = salt,
-                           Sequence = sequence,
-                           LastMessageId = lastMessageId,
                            TimeOffset = timeOffset,
+                           Sequence = sequence,
                            SessionExpires = sessionExpires,
                            TlUser = tlUser,
                            SessionUserId = sessionUserId,
@@ -77,19 +76,27 @@
 
         public long GetNewMessageId()
         {
-            var time = Convert.ToInt64((DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds);
-            var newMessageId = ((time / 1000 + TimeOffset) << 32) |
-                               ((time % 1000) << 22) |
-                               (Random.Next(524288) << 2); // 2^19
 
-            // [ unix timestamp : 32 bit] [ milliseconds : 10 bit ] [ buffer space : 1 bit ] [ random : 19 bit ] [ msg_id type : 2 bit ] = [ msg_id : 64 bit ]
-
-            if (LastMessageId >= newMessageId)
+            lock (_syncObject)
             {
-                newMessageId = LastMessageId + 4;
+                if (_inc >= 4194303 - 4)
+                {
+                    _inc = 0;
+                }
+                else
+                {
+                    _inc += 4;
+                }
             }
 
-            LastMessageId = newMessageId;
+            var seconds = (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
+
+
+            var newMessageId = 
+                    ((seconds / 1000 + TimeOffset) << 32) |
+                    ((seconds % 1000) << 22) |
+                    _inc;
+
             return newMessageId;
         }
 
@@ -101,7 +108,6 @@
                 writer.Write(Id);
                 writer.Write(Sequence);
                 writer.Write(Salt);
-                writer.Write(LastMessageId);
                 writer.Write(TimeOffset);
                 Serializers.String.Write(writer, ServerAddress);
                 writer.Write(Port);

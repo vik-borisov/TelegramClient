@@ -4,13 +4,10 @@
     <list default="true" id="0eb0f146-b01b-4a52-92ba-71cbfebb59b8" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.idea.TelegramClient/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/.idea.TelegramClient/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.idea.TelegramClient/riderModule.iml" afterPath="$PROJECT_DIR$/.idea/.idea.TelegramClient/riderModule.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/ClientFactory.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/ClientFactory.cs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/TelegramClient.Core.csproj" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/TelegramClient.Core.csproj" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/Network/MtProtoPlainSender.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/Network/MtProtoPlainSender.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/TelegramClient.Core/Sessions/Session.cs" afterPath="$PROJECT_DIR$/src/TelegramClient.Core/Sessions/Session.cs" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TelegramClient.Tests/TLSharpTests.cs" afterPath="$PROJECT_DIR$/tests/TelegramClient.Tests/TLSharpTests.cs" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/TelegramClient.Tests/appsettings.json" afterPath="$PROJECT_DIR$/tests/TelegramClient.Tests/appsettings.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,100 +17,6 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Container.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="38" lean-forward="false" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
-              <folding>
-                <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
-                <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
-                <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
-                <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TCompositionRoot.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="74" lean-forward="false" selection-start-line="10" selection-start-column="74" selection-end-line="10" selection-end-column="74" />
-              <folding>
-                <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
-                <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
-                <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
-                <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ITelegramClient.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/ITelegramClient.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="36" lean-forward="false" selection-start-line="12" selection-start-column="36" selection-end-line="12" selection-end-column="36" />
-              <folding>
-                <marker date="1492185209599" expanded="true" signature="29:457" ph="{...}" />
-                <marker date="1492185209599" expanded="true" signature="42:157" ph="..." />
-                <marker date="1492185209599" expanded="true" signature="208:455" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UploadHelper.cs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Utils/UploadHelper.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="548">
-              <caret line="121" column="47" lean-forward="false" selection-start-line="121" selection-start-column="47" selection-end-line="121" selection-end-column="47" />
-              <folding>
-                <marker date="1492185232236" expanded="false" signature="6:224" ph="..." />
-                <marker date="1492185232236" expanded="true" signature="261:4034" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="300:4032" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="361:824" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="446:781" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="620:713" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="960:1123" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="1183:1425" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="1280:1389" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="1489:2362" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="1654:2321" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="1796:2006" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="2031:2307" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="2565:4026" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="2865:3592" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="3071:3272" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="3398:3546" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="3685:3809" ph="{...}" />
-                <marker date="1492185232236" expanded="true" signature="3858:4015" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Models.cs" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/TelegramClient.Entities.Generator/Models.cs">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-              <folding>
-                <marker date="1492185256971" expanded="true" signature="78:858" ph="{...}" />
-                <marker date="1492185256971" expanded="true" signature="106:321" ph="{...}" />
-                <marker date="1492185256971" expanded="true" signature="347:441" ph="{...}" />
-                <marker date="1492185256971" expanded="true" signature="473:707" ph="{...}" />
-                <marker date="1492185256971" expanded="true" signature="734:856" ph="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -139,8 +42,8 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
-    <option name="width" value="1696" />
-    <option name="height" value="1026" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -160,6 +63,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="SolutionExplorer">
         <subPane>
           <PATH>
@@ -222,21 +126,7 @@
               <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="IoC" />
-              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" />
-              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerViewPane$ProjectViewPaneTreeStructure$createRoot$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="TelegramClient (4 projects)" />
-              <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value=".paket" />
+              <option name="myItemId" value="Extentions" />
               <option name="myItemType" value="com.jetbrains.resharper.projectView.solutionExplorer.SolutionExplorerNodeRider" />
             </PATH_ELEMENT>
           </PATH>
@@ -244,7 +134,6 @@
         <option name="show-file-system" value="false" />
         <option name="show-all-items" value="false" />
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -357,11 +246,12 @@
       <workItem from="1492173470227" duration="164000" />
       <workItem from="1492173857688" duration="690000" />
       <workItem from="1492184903135" duration="361000" />
+      <workItem from="1492528719856" duration="217000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2051000" />
+    <option name="totallyTimeSpent" value="2268000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -373,31 +263,31 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1696" height="1026" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Errors In Solution" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2106987" sideWeight="0.5" order="15" side_tool="true" content_ui="tabs" x="462" y="562" width="865" height="312" />
-      <window_info id="NuGet" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Change Signature" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1625" sideWeight="0.5" order="0" side_tool="true" content_ui="combo" x="-312" y="63" width="312" height="975" />
-      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="false" weight="0.32980973" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" x="499" y="499" width="734" height="287" />
-      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="true" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
+      <window_info id="Errors In Solution" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3296875" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" show_stripe_button="true" weight="0.21035941" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" x="-1186" y="707" width="865" height="312" />
+      <window_info id="NuGet" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Change Signature" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" show_stripe_button="true" weight="0.1625" sideWeight="0.5" order="0" side_tool="true" content_ui="combo" x="-312" y="63" width="312" height="975" />
+      <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="false" weight="0.32980973" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="499" y="499" width="734" height="287" />
+      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Run Dashboard" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -411,29 +301,11 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
-            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs" />
     <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="21" lean-forward="false" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
-          <folding>
-            <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
-            <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
-            <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
-            <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -451,29 +323,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
-          <folding>
-            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
-            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs" />
     <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="21" lean-forward="false" selection-start-line="2" selection-start-column="21" selection-end-line="2" selection-end-column="21" />
-          <folding>
-            <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
-            <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
-            <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
-            <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -491,30 +345,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="25" lean-forward="true" selection-start-line="6" selection-start-column="25" selection-end-line="6" selection-end-column="25" />
-          <folding>
-            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
-            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs" />
     <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Network/MtProtoSender.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="360">
           <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Extentions/AuthExtentions.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2010">
-          <caret line="134" column="12" lean-forward="false" selection-start-line="134" selection-start-column="12" selection-end-line="134" selection-end-column="12" />
         </state>
       </provider>
     </entry>
@@ -532,29 +367,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="38" lean-forward="false" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
-          <folding>
-            <marker date="1492181984755" expanded="true" signature="33:446" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="46:88" ph="..." />
-            <marker date="1492181984755" expanded="true" signature="118:444" ph="{...}" />
-            <marker date="1492181984755" expanded="true" signature="252:438" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/Container.cs" />
     <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/IoC/TCompositionRoot.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="10" column="74" lean-forward="false" selection-start-line="10" selection-start-column="74" selection-end-line="10" selection-end-column="74" />
-          <folding>
-            <marker date="1492182207958" expanded="true" signature="33:404" ph="{...}" />
-            <marker date="1492182207958" expanded="true" signature="46:99" ph="..." />
-            <marker date="1492182207958" expanded="true" signature="150:402" ph="{...}" />
-            <marker date="1492182207958" expanded="true" signature="218:396" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -562,11 +379,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="12" column="36" lean-forward="false" selection-start-line="12" selection-start-column="36" selection-end-line="12" selection-end-column="36" />
-          <folding>
-            <marker date="1492185209599" expanded="true" signature="29:457" ph="{...}" />
-            <marker date="1492185209599" expanded="true" signature="42:157" ph="..." />
-            <marker date="1492185209599" expanded="true" signature="208:455" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -574,27 +386,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="548">
           <caret line="121" column="47" lean-forward="false" selection-start-line="121" selection-start-column="47" selection-end-line="121" selection-end-column="47" />
-          <folding>
-            <marker date="1492185232236" expanded="false" signature="6:224" ph="..." />
-            <marker date="1492185232236" expanded="true" signature="261:4034" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="300:4032" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="361:824" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="446:781" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="620:713" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="960:1123" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="1183:1425" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="1280:1389" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="1489:2362" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="1654:2321" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="1796:2006" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="2031:2307" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="2565:4026" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="2865:3592" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="3071:3272" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="3398:3546" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="3685:3809" ph="{...}" />
-            <marker date="1492185232236" expanded="true" signature="3858:4015" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -602,12 +393,71 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Extentions/AuthExtentions.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1770">
+          <caret line="134" column="0" lean-forward="false" selection-start-line="134" selection-start-column="0" selection-end-line="134" selection-end-column="0" />
           <folding>
-            <marker date="1492185256971" expanded="true" signature="78:858" ph="{...}" />
-            <marker date="1492185256971" expanded="true" signature="106:321" ph="{...}" />
-            <marker date="1492185256971" expanded="true" signature="347:441" ph="{...}" />
-            <marker date="1492185256971" expanded="true" signature="473:707" ph="{...}" />
-            <marker date="1492185256971" expanded="true" signature="734:856" ph="{...}" />
+            <marker date="1492526267410" expanded="false" signature="6:267" ph="..." />
+            <marker date="1492526267410" expanded="true" signature="298:5814" ph="{...}" />
+            <marker date="1492526267410" expanded="false" signature="311:556" ph="..." />
+            <marker date="1492526267410" expanded="true" signature="596:5812" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="713:1394" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="967:1316" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="988:1157" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="1207:1302" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="1506:2268" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="1864:2206" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="1898:2045" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="2096:2192" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="2408:3067" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="2714:2852" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="3161:3350" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="3488:4131" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="3741:3831" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="4316:4868" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="4440:4654" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="4959:5404" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="5478:5806" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Extentions/ClientExtentions.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1492526267410" expanded="true" signature="29:320" ph="{...}" />
+            <marker date="1492526267410" expanded="false" signature="42:95" ph="..." />
+            <marker date="1492526267410" expanded="true" signature="139:318" ph="{...}" />
+            <marker date="1492526267410" expanded="true" signature="224:312" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/TelegramClient.Core/Client.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <marker date="1492526267406" expanded="true" signature="6:368" ph="..." />
+            <marker date="1492526267406" expanded="true" signature="399:4311" ph="{...}" />
+            <marker date="1492526267406" expanded="false" signature="412:465" ph="..." />
+            <marker date="1492526267406" expanded="true" signature="510:4309" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="863:1912" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="1976:2898" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="2055:2274" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="2420:2663" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="2954:3356" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="3432:3609" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="3704:4113" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="3950:4101" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="4156:4218" ph="{...}" />
+            <marker date="1492526267406" expanded="true" signature="4249:4303" ph="{...}" />
           </folding>
         </state>
       </provider>

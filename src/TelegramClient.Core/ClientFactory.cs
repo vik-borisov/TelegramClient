@@ -13,18 +13,37 @@
 
     public static class ClientFactory
     {
-        public static ITelegramClient GetClient(int appId, string appHash, string sessionUserId = "session")
+        public static ITelegramClient GetClient(int appId, string appHash, string serverAddress, int serverPort, string sessionUserId = "session")
         {
             Guard.That(appId).IsPositive();
             Guard.That(appHash).IsNotNullOrWhiteSpace();
             Guard.That(sessionUserId).IsNotNullOrWhiteSpace();
+            Guard.That(serverAddress).IsNotNullOrWhiteSpace();
+            Guard.That(serverPort).IsPositive();
 
             var container = CreateContainer();
 
-            FillSettings(container, appId, appHash, sessionUserId);
+            FillSettings(container, appId, appHash, sessionUserId, serverAddress, serverPort);
 
-            container.CanGetInstance(typeof(ITelegramClient), String.Empty);
+            container.CanGetInstance(typeof(ITelegramClient), string.Empty);
             return container.GetInstance<ITelegramClient>();
+        }
+
+        private static void FillSettings(IServiceContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort)
+        {
+            Guard.That(appId).IsPositive();
+            Guard.That(appHash).IsNotNullOrWhiteSpace();
+            Guard.That(sessionUserId).IsNotNullOrWhiteSpace();
+            Guard.That(serverAddress).IsNotNullOrWhiteSpace();
+            Guard.That(serverPort).IsPositive();
+
+            var settings = container.GetInstance<IClientSettings>();
+
+            settings.AppId = appId;
+            settings.AppHash = appHash;
+
+            var store = container.GetInstance<ISessionStore>();
+            settings.Session = TryLoadOrCreateNew(store, sessionUserId, serverAddress, serverPort);
         }
 
         private static IServiceContainer CreateContainer()
@@ -37,27 +56,8 @@
             return container;
         }
 
-        private static void FillSettings(IServiceContainer container,  int appId, string appHash, string sessionUserId)
+        private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)
         {
-            Guard.That(appId).IsPositive();
-            Guard.That(appHash).IsNotNullOrWhiteSpace();
-            Guard.That(sessionUserId).IsNotNullOrWhiteSpace();
-
-            var settings = container.GetInstance<IClientSettings>();
-
-            settings.AppId = appId;
-            settings.AppHash = appHash;
-
-            var store = container.GetInstance<ISessionStore>();
-            settings.Session = TryLoadOrCreateNew(store, sessionUserId);
-        }
-
-        private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId)
-        {
-            const string DefaultConnectionAddress = "149.154.175.100"; //"149.154.167.50";
-
-            const int DefaultConnectionPort = 443;
-
             ulong GenerateSessionId()
             {
                 var random = new Random();
@@ -69,9 +69,9 @@
                                                 {
                                                     Id = GenerateSessionId(),
                                                     SessionUserId = sessionUserId,
-                                                    ServerAddress = DefaultConnectionAddress,
-                                                    Port = DefaultConnectionPort
-                                                };
+                                                    ServerAddress = serverAddress,
+                                                    Port = serverPort
+            };
         }
     }
 }

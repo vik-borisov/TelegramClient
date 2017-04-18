@@ -18,6 +18,10 @@ namespace TelegramClient.Tests
 
     public class TlSharpTests
     {
+        private string ServerAddress { get; set; }
+
+        private int ServerPort { get; set; }
+
         private string NumberToSendMessage { get; set; }
 
         private string NumberToAuthenticate { get; set; }
@@ -47,7 +51,7 @@ namespace TelegramClient.Tests
         {
             try
             {
-                return ClientFactory.GetClient(ApiId, ApiHash);
+                return ClientFactory.GetClient(ApiId, ApiHash, ServerAddress, ServerPort);
             }
             catch (MissingApiConfigurationException ex)
             {
@@ -70,6 +74,16 @@ namespace TelegramClient.Tests
             ApiHash = builder[nameof(ApiHash)];
             if (string.IsNullOrEmpty(ApiHash))
                 Debug.WriteLine(appConfigMsgWarning, nameof(ApiHash));
+
+            var serverPort = builder[nameof(ServerPort)];
+            if (string.IsNullOrEmpty(serverPort))
+                Debug.WriteLine(appConfigMsgWarning, nameof(ServerPort));
+            else
+                ServerPort = int.Parse(serverPort);
+
+            ServerAddress = builder[nameof(ServerAddress)];
+            if (string.IsNullOrEmpty(ServerAddress))
+                Debug.WriteLine(appConfigMsgWarning, nameof(ServerAddress));
 
             var apiId = builder[nameof(ApiId)];
             if (string.IsNullOrEmpty(apiId))
@@ -146,6 +160,20 @@ namespace TelegramClient.Tests
             Assert.True(client.IsUserAuthorized());
         }
 
+        private async Task SendMessage(ITelegramClient client, string normalizedNumber)
+        {
+            var result = await client.GetContactsAsync();
+
+            var user = result.Users.Lists
+                             .OfType<TlUser>()
+                             .FirstOrDefault(x => x.Phone == normalizedNumber);
+
+            if (user == null)
+                throw new Exception("Number was not found in Contacts List of user: " + NumberToSendMessage);
+
+            await client.SendMessageAsync(new TlInputPeerUser { UserId = user.Id }, "TEST");
+        }
+
         [Fact]
         public virtual async Task SendMessageTest()
         {
@@ -158,19 +186,26 @@ namespace TelegramClient.Tests
 
             await client.ConnectAsync();
 
-            var result = await client.GetContactsAsync();
-
-            var user = result.Users.Lists
-                .OfType<TlUser>()
-                .FirstOrDefault(x => x.Phone == normalizedNumber);
-
-            if (user == null)
-                throw new Exception("Number was not found in Contacts List of user: " + NumberToSendMessage);
-
-            await client.SendTypingAsync(new TlInputPeerUser {UserId = user.Id});
-            Thread.Sleep(3000);
-            await client.SendMessageAsync(new TlInputPeerUser {UserId = user.Id}, "TEST");
+            await SendMessage(client, normalizedNumber);
         }
+
+        [Fact]
+        public virtual async Task SendMessageParallelTest()
+        {
+            // this is because the contacts in the address come without the "+" prefix
+            var normalizedNumber = NumberToSendMessage.StartsWith("+")
+                                       ? NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1)
+                                       : NumberToSendMessage;
+
+            var client = NewClient();
+
+            await client.ConnectAsync();
+
+            SendMessage(client, normalizedNumber);
+            SendMessage(client, normalizedNumber);
+            SendMessage(client, normalizedNumber);
+        }
+
 
         [Fact]
         public virtual async Task SendMessageToChannelTest()
