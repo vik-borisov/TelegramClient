@@ -16,7 +16,7 @@ namespace TelegramClient.Tests
 {
     using TelegramClient.Core.Exceptions;
 
-    public class TlSharpTests
+    public class TelegramClientTests
     {
         private string ServerAddress { get; set; }
 
@@ -42,7 +42,7 @@ namespace TelegramClient.Tests
 
         private int ApiId { get; set; }
 
-        public TlSharpTests()
+        public TelegramClientTests()
         {
             GatherTestConfiguration();
         }
@@ -51,7 +51,7 @@ namespace TelegramClient.Tests
         {
             try
             {
-                return ClientFactory.GetClient(ApiId, ApiHash, ServerAddress, ServerPort);
+                return ClientFactory.BuildClient(ApiId, ApiHash, ServerAddress, ServerPort);
             }
             catch (MissingApiConfigurationException ex)
             {

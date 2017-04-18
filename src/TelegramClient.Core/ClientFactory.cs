@@ -13,7 +13,7 @@
 
     public static class ClientFactory
     {
-        public static ITelegramClient GetClient(int appId, string appHash, string serverAddress, int serverPort, string sessionUserId = "session")
+        public static ITelegramClient BuildClient(int appId, string appHash, string serverAddress, int serverPort, string sessionUserId = "session")
         {
             Guard.That(appId).IsPositive();
             Guard.That(appHash).IsNotNullOrWhiteSpace();

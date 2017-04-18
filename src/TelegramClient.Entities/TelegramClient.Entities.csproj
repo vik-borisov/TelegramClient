@@ -1,6 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Title>Entities for unofficial Telegram client API library</Title>
+    <Version>0.1.0</Version>
+    <PackageId>TelegramClientApi.Entities</PackageId>
+    <Authors>Viktor Borisov</Authors>
+    <Company />
+    <Product>Entities for Unoffician Telegram client api library</Product>
+    <Description>This is a unofficial Telegram client api library</Description>
+    <PackageTags>telegram api client</PackageTags>
+    <PackageProjectUrl>https://github.com/vik-borisov/TelegramClient</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vik-borisov/TelegramClient</RepositoryUrl>
   </PropertyGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
