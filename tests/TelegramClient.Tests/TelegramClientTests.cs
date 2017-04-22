@@ -14,10 +14,19 @@ using Xunit;
 
 namespace TelegramClient.Tests
 {
+    using System.Reflection;
+
+    using log4net;
+    using log4net.Config;
+
     using TelegramClient.Core.Exceptions;
 
-    public class TelegramClientTests
+    using Xunit.Abstractions;
+
+    public class TelegramClientTests: LogOutputTester
     {
+        private static readonly Random Random = new Random();
+
         private string ServerAddress { get; set; }
 
         private int ServerPort { get; set; }
@@ -42,7 +51,7 @@ namespace TelegramClient.Tests
 
         private int ApiId { get; set; }
 
-        public TelegramClientTests()
+        public TelegramClientTests(ITestOutputHelper output) : base(output)
         {
             GatherTestConfiguration();
         }
@@ -158,6 +167,7 @@ namespace TelegramClient.Tests
             }
             Assert.NotNull(user);
             Assert.True(client.IsUserAuthorized());
+            Thread.Sleep(1000);
         }
 
         private async Task SendMessage(ITelegramClient client, string normalizedNumber)
@@ -171,7 +181,7 @@ namespace TelegramClient.Tests
             if (user == null)
                 throw new Exception("Number was not found in Contacts List of user: " + NumberToSendMessage);
 
-            await client.SendMessageAsync(new TlInputPeerUser { UserId = user.Id }, "TEST");
+            await client.SendMessageAsync(new TlInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next());
         }
 
         [Fact]
@@ -187,23 +197,24 @@ namespace TelegramClient.Tests
             await client.ConnectAsync();
 
             await SendMessage(client, normalizedNumber);
+
+            Thread.Sleep(1000);
         }
 
         [Fact]
         public virtual async Task SendMessageParallelTest()
         {
-            // this is because the contacts in the address come without the "+" prefix
-            var normalizedNumber = NumberToSendMessage.StartsWith("+")
-                                       ? NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1)
-                                       : NumberToSendMessage;
-
             var client = NewClient();
 
             await client.ConnectAsync();
 
-            SendMessage(client, normalizedNumber);
-            SendMessage(client, normalizedNumber);
-            SendMessage(client, normalizedNumber);
+            var m1 = SendMessageToChannel(client);
+            var m2 = SendMessageToChannel(client);
+            var m3 = SendMessageToChannel(client);
+            var m4 = SendMessageToChannel(client);
+
+            Task.WaitAll(m1, m2, m3, m4);
+            Thread.Sleep(1000);
         }
 
 
@@ -214,13 +225,24 @@ namespace TelegramClient.Tests
 
             await client.ConnectAsync();
 
-            var dialogs = (TlDialogs) await client.GetUserDialogsAsync();
+            await SendMessageToChannel(client);
+        }
+
+        private static async Task SendMessageToChannel(ITelegramClient client)
+        {
+            var dialogs = (TlDialogsSlice) await client.GetUserDialogsAsync();
+
             var chat = dialogs.Chats.Lists
-                .OfType<TlChannel>()
-                .FirstOrDefault(c => c.Title == "TestGroup");
+                              .OfType<TlChannel>()
+                              .FirstOrDefault(c => c.Title == "Telegram Client Api Library");
 
             await client.SendMessageAsync(
-                new TlInputPeerChannel {ChannelId = chat.Id, AccessHash = chat.AccessHash.Value}, "TEST MSG");
+                new TlInputPeerChannel
+                {
+                    ChannelId = chat.Id,
+                    AccessHash = chat.AccessHash.Value
+                },
+                "TEST MSG " + Random.Next());
         }
 
         [Fact]

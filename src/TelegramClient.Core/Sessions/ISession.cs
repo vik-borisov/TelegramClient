@@ -15,8 +15,6 @@
 
         ulong Id { get; set; }
 
-        int Sequence { get; set; }
-
         ulong Salt { get; set; }
 
         int TimeOffset { get; set; }
@@ -28,5 +26,7 @@
         byte[] ToBytes();
 
         long GetNewMessageId();
+
+        int GenerateSequence(bool confirmed);
     }
 }

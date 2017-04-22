@@ -13,26 +13,27 @@ using TelegramClient.Entities;
 
 namespace TelegramClient.Core.Network
 {
-	using CodeProject.ObjectPool;
+    using System.Threading;
 
-	using TelegramClient.Core.Exceptions;
+    using CodeProject.ObjectPool;
+
+    using PommaLabs.Thrower.Logging;
+
+    using TelegramClient.Core.Exceptions;
 	using TelegramClient.Core.Sessions;
 	using TelegramClient.Core.Settings;
 
 	internal class MtProtoSender : IMtProtoSender
 	{
-		private readonly List<ulong> _needConfirmation = new List<ulong>();
+        private static readonly ILog Log = LogProvider.GetLogger(typeof(MtProtoSender));
+
+        private readonly List<ulong> _needConfirmation = new List<ulong>();
 
 		public IObjectPool<PooledObjectWrapper<ITcpTransport>> TcpTransportPool { get; set; }
 
 		public IClientSettings ClientSettings { get; set; }
 
 		public ISessionStore SessionStore { get; set; }
-
-		private int GenerateSequence(bool confirmed)
-		{
-			return confirmed ? ClientSettings.Session.Sequence++ * 2 + 1 : ClientSettings.Session.Sequence * 2;
-		}
 
 		private async Task Send(ITcpTransport tcpTransport, TlMethod request)
 		{
@@ -73,7 +74,7 @@ namespace TelegramClient.Core.Network
 					plaintextWriter.Write(ClientSettings.Session.Salt);
 					plaintextWriter.Write(ClientSettings.Session.Id);
 					plaintextWriter.Write(request.MessageId);
-					plaintextWriter.Write(GenerateSequence(request.Confirmed));
+					plaintextWriter.Write(ClientSettings.Session.GenerateSequence(request.Confirmed));
 					plaintextWriter.Write(packet.Length);
 					plaintextWriter.Write(packet);
 
@@ -149,7 +150,9 @@ namespace TelegramClient.Core.Network
 		{
 			using (var wrapper = TcpTransportPool.GetObject())
 			{
-				await Send(wrapper.InternalResource, request);
+			    Log.Log(LogLevel.Debug, () => $"Using TcpTransport instance {wrapper.PooledObjectInfo.Id}");
+
+                await Send(wrapper.InternalResource, request);
 				return await Receive(wrapper.InternalResource, request);
 			}
 		}

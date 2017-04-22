@@ -3,3 +3,4 @@ group app
 	LightInject
 	BarsGroup.CodeGuard
 	CodeProject.ObjectPool
+	log4net

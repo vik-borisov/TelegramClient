@@ -15,10 +15,16 @@ namespace TelegramClient.Core
 {
     using LightInject;
 
+    using PommaLabs.Thrower.Logging;
+
     using TelegramClient.Core.Settings;
+
+    using LogLevel = PommaLabs.Thrower.Logging.LogLevel;
 
     internal class Client : ITelegramClient
     {
+        private static readonly ILog Log = LogProvider.GetLogger(typeof(Client));
+
         public IClientSettings ClientSettings { get; set; }
 
         public IServiceContainer Container { get; set; }
@@ -94,6 +100,8 @@ namespace TelegramClient.Core
 
         public async Task<T> SendRequestAsync<T>(TlMethod methodToExecute)
         {
+            Log.Log(LogLevel.Debug, () => $"Send message of type {methodToExecute}");
+
             await Sender.SendAndRecive(methodToExecute);
             return (T) methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);
         }

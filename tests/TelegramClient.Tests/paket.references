@@ -4,3 +4,4 @@ group test
 	xunit.runner.visualstudio
 	Microsoft.Extensions.Configuration
 	Microsoft.Extensions.Configuration.Json
+	log4net

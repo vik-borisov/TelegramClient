@@ -6,14 +6,19 @@ using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core.Network
 {
+    using log4net;
+
     using TelegramClient.Core.Settings;
+
 
     internal class TcpTransport : ITcpTransport
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
+
         private readonly IClientSettings _clientSettings;
 
         private TcpClient _tcpClient;
-        private int _sendCounter;
+        private int _mesSeqNo;
 
 
         public TcpTransport(IClientSettings clientSettings)
@@ -38,7 +43,7 @@ namespace TelegramClient.Core.Network
             }
 
             _tcpClient = new TcpClient();
-            _sendCounter = 0;
+            _mesSeqNo = 0;
             await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
         }
 
@@ -49,12 +54,14 @@ namespace TelegramClient.Core.Network
 
         public async Task Send(byte[] packet)
         {
+            Log.Debug($"Send message with seq_no {_mesSeqNo}");
+
             await EnsureClientConnected();
 
-            var tcpMessage = new TcpMessage(_sendCounter, packet);
+            var tcpMessage = new TcpMessage(_mesSeqNo, packet);
             var encodedMessage = tcpMessage.Encode();
             await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length);
-            _sendCounter++;
+            _mesSeqNo++;
         }
 
         public async Task<TcpMessage> Receieve()

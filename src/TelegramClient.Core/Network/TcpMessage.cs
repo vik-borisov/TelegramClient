@@ -9,15 +9,15 @@ namespace TelegramClient.Core.Network
 
     public class TcpMessage
     {
-        private readonly int _sequneceNumber;
+        private readonly int _mesSeqNo;
 
         public byte[] Body { get; }
 
-        public TcpMessage(int seqNumber, byte[] body)
+        public TcpMessage(int mesSeqNo, byte[] body)
         {
             Guard.That(body, nameof(body)).IsNotNull();
 
-            _sequneceNumber = seqNumber;
+            _mesSeqNo = mesSeqNo;
             Body = body;
         }
 
@@ -37,7 +37,7 @@ namespace TelegramClient.Core.Network
                         and 4 CRC32 bytes at the end (length, sequence number, and payload together).
                     */
                     binaryWriter.Write(Body.Length + 12);
-                    binaryWriter.Write(_sequneceNumber);
+                    binaryWriter.Write(_mesSeqNo);
                     binaryWriter.Write(Body);
                     var crc32 = new Crc32();
 

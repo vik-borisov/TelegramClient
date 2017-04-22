@@ -25,7 +25,12 @@
 
         public ulong Id { get; set; }
 
-        public int Sequence { get; set; }
+        private int _sequence;
+        public int Sequence
+        {
+            get { return _sequence; }
+            set { _sequence = value; }
+        }
 
         public ulong Salt { get; set; }
 
@@ -72,6 +77,19 @@
                            Port = port
                        };
             }
+        }
+
+        public int GenerateSequence(bool confirmed)
+        {
+            if (confirmed)
+            {
+                var result =  Sequence * 2 + 1;
+                Interlocked.Increment(ref _sequence);
+
+                return result;
+            }
+
+            return Sequence * 2;
         }
 
         public long GetNewMessageId()
