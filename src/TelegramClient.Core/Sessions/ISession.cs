@@ -27,6 +27,8 @@
 
         long GetNewMessageId();
 
-        int GenerateSequence(bool confirmed);
+        int GenerateSessionSeqNo(bool confirmed);
+
+        int GenerateMessageSeqNo();
     }
 }

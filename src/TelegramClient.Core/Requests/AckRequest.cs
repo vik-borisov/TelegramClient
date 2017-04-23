@@ -7,9 +7,9 @@ namespace TelegramClient.Core.Requests
 {
     public class AckRequest : TlMethod
     {
-        private readonly List<ulong> _msgs;
+        private readonly HashSet<ulong> _msgs;
 
-        public AckRequest(List<ulong> msgs)
+        public AckRequest(HashSet<ulong> msgs)
         {
             _msgs = msgs;
         }

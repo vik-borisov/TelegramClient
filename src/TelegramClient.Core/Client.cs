@@ -19,8 +19,6 @@ namespace TelegramClient.Core
 
     using TelegramClient.Core.Settings;
 
-    using LogLevel = PommaLabs.Thrower.Logging.LogLevel;
-
     internal class Client : ITelegramClient
     {
         private static readonly ILog Log = LogProvider.GetLogger(typeof(Client));
@@ -37,9 +35,13 @@ namespace TelegramClient.Core
 
         private async Task<Step3Response> DoAuthentication()
         {
+            Log.Info("Try do authentication");
+
             var step1 = new Step1PqRequest();
             var step1Result = await MtProtoPlainSender.SendAndReceive(step1.ToBytes());
             var step1Response = step1.FromBytes(step1Result);
+
+            Log.Debug("First step is done");
 
             var step2 = new Step2DhExchange();
             var step2Result = await MtProtoPlainSender.SendAndReceive(step2.ToBytes(
@@ -49,6 +51,8 @@ namespace TelegramClient.Core
                                   step1Response.Pq));
             var step2Response = step2.FromBytes(step2Result);
 
+            Log.Debug("Second step is done");
+
             var step3 = new Step3CompleteDhExchange();
             var step3Result = await MtProtoPlainSender.SendAndReceive(step3.ToBytes(
                 step2Response.Nonce,
@@ -56,6 +60,9 @@ namespace TelegramClient.Core
                 step2Response.NewNonce,
                 step2Response.EncryptedAnswer));
             var step3Response = step3.FromBytes(step3Result);
+
+            Log.Debug("Third step is done");
+
             return step3Response;
         }
 
@@ -100,7 +107,7 @@ namespace TelegramClient.Core
 
         public async Task<T> SendRequestAsync<T>(TlMethod methodToExecute)
         {
-            Log.Log(LogLevel.Debug, () => $"Send message of type {methodToExecute}");
+            Log.Debug($"Send message of the constructor {methodToExecute}");
 
             await Sender.SendAndRecive(methodToExecute);
             return (T) methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);

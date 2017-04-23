@@ -210,10 +210,10 @@ namespace TelegramClient.Tests
 
             var m1 = SendMessageToChannel(client);
             var m2 = SendMessageToChannel(client);
-            var m3 = SendMessageToChannel(client);
-            var m4 = SendMessageToChannel(client);
+            //var m3 = SendMessageToChannel(client);
+            //var m4 = SendMessageToChannel(client);
 
-            Task.WaitAll(m1, m2, m3, m4);
+            Task.WaitAll(m1, m2);
             Thread.Sleep(1000);
         }
 

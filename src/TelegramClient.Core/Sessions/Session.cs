@@ -15,6 +15,8 @@
 
         private int _inc;
 
+        private int _messageSeqNo;
+
         public string SessionUserId { get; set; }
 
         public string ServerAddress { get; set; }
@@ -25,11 +27,11 @@
 
         public ulong Id { get; set; }
 
-        private int _sequence;
-        public int Sequence
+        private int _sessionSeqNo;
+        private int SessionSeqNo
         {
-            get { return _sequence; }
-            set { _sequence = value; }
+            get => _sessionSeqNo;
+            set => _sessionSeqNo = value;
         }
 
         public ulong Salt { get; set; }
@@ -69,7 +71,7 @@
                            Id = id,
                            Salt = salt,
                            TimeOffset = timeOffset,
-                           Sequence = sequence,
+                           SessionSeqNo = sequence,
                            SessionExpires = sessionExpires,
                            TlUser = tlUser,
                            SessionUserId = sessionUserId,
@@ -79,17 +81,25 @@
             }
         }
 
-        public int GenerateSequence(bool confirmed)
+        public int GenerateSessionSeqNo(bool confirmed)
         {
             if (confirmed)
             {
-                var result =  Sequence * 2 + 1;
-                Interlocked.Increment(ref _sequence);
+                var result =  SessionSeqNo * 2 + 1;
+                Interlocked.Increment(ref _sessionSeqNo);
 
                 return result;
             }
 
-            return Sequence * 2;
+            return SessionSeqNo * 2;
+        }
+
+        public int GenerateMessageSeqNo()
+        {
+            var result = _messageSeqNo;
+            Interlocked.Increment(ref _messageSeqNo);
+
+            return result;
         }
 
         public long GetNewMessageId()
@@ -124,7 +134,7 @@
             using (var writer = new BinaryWriter(stream))
             {
                 writer.Write(Id);
-                writer.Write(Sequence);
+                writer.Write(SessionSeqNo);
                 writer.Write(Salt);
                 writer.Write(TimeOffset);
                 Serializers.String.Write(writer, ServerAddress);

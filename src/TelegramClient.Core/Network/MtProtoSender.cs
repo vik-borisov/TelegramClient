@@ -13,8 +13,6 @@ using TelegramClient.Entities;
 
 namespace TelegramClient.Core.Network
 {
-    using System.Threading;
-
     using CodeProject.ObjectPool;
 
     using PommaLabs.Thrower.Logging;
@@ -27,7 +25,7 @@ namespace TelegramClient.Core.Network
 	{
         private static readonly ILog Log = LogProvider.GetLogger(typeof(MtProtoSender));
 
-        private readonly List<ulong> _needConfirmation = new List<ulong>();
+        private readonly HashSet<ulong> _needConfirmation = new HashSet<ulong>();
 
 		public IObjectPool<PooledObjectWrapper<ITcpTransport>> TcpTransportPool { get; set; }
 
@@ -40,13 +38,15 @@ namespace TelegramClient.Core.Network
 			// TODO: refactor
 			if (_needConfirmation.Any())
 			{
+                Log.Debug($"Sending confirmation for messages {string.Join(",", _needConfirmation.Select(m => m.ToString()))}");
+
 				var ackRequest = new AckRequest(_needConfirmation);
 				using (var memory = new MemoryStream())
 				using (var writer = new BinaryWriter(memory))
 				{
 					ackRequest.SerializeBody(writer);
-					await Send(tcpTransport, memory.ToArray(), ackRequest);
-					_needConfirmation.Clear();
+					Send(tcpTransport, memory.ToArray(), ackRequest);
+				    _needConfirmation.Clear();
 				}
 			}
 
@@ -65,6 +65,8 @@ namespace TelegramClient.Core.Network
 		{
 			request.MessageId = ClientSettings.Session.GetNewMessageId();
 
+            Log.Debug($"Send message with Id = {request.MessageId}");
+
 			byte[] msgKey;
 			byte[] ciphertext;
 			using (var plaintextPacket = MakeMemory(8 + 8 + 8 + 4 + 4 + packet.Length))
@@ -74,7 +76,7 @@ namespace TelegramClient.Core.Network
 					plaintextWriter.Write(ClientSettings.Session.Salt);
 					plaintextWriter.Write(ClientSettings.Session.Id);
 					plaintextWriter.Write(request.MessageId);
-					plaintextWriter.Write(ClientSettings.Session.GenerateSequence(request.Confirmed));
+					plaintextWriter.Write(ClientSettings.Session.GenerateSessionSeqNo(request.Confirmed));
 					plaintextWriter.Write(packet.Length);
 					plaintextWriter.Write(packet);
 
@@ -127,6 +129,7 @@ namespace TelegramClient.Core.Network
 					message = plaintextReader.ReadBytes(msgLen);
 				}
 			}
+
 			return new Tuple<byte[], ulong, int>(message, remoteMessageId, remoteSequence);
 		}
 
@@ -136,10 +139,12 @@ namespace TelegramClient.Core.Network
 			{
 				var result = DecodeMessage((await transport.Receieve()).Body);
 
-				using (var messageStream = new MemoryStream(result.Item1, false))
+			    Log.Debug($"Recieve message with remote id: {result.Item2}");
+
+                using (var messageStream = new MemoryStream(result.Item1, false))
 				using (var messageReader = new BinaryReader(messageStream))
 				{
-					ProcessMessage(transport, result.Item2, result.Item3, messageReader, request);
+					await ProcessMessage(transport, result.Item2, result.Item3, messageReader, request);
 				}
 			}
 
@@ -150,7 +155,7 @@ namespace TelegramClient.Core.Network
 		{
 			using (var wrapper = TcpTransportPool.GetObject())
 			{
-			    Log.Log(LogLevel.Debug, () => $"Using TcpTransport instance {wrapper.PooledObjectInfo.Id}");
+			    Log.Debug($"Using TcpTransport instance {wrapper.PooledObjectInfo.Id}");
 
                 await Send(wrapper.InternalResource, request);
 				return await Receive(wrapper.InternalResource, request);
@@ -173,68 +178,81 @@ namespace TelegramClient.Core.Network
 			}
 		}
 
-		private bool ProcessMessage(ITcpTransport tcpTransport, ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
+	    private async Task<bool> ProcessMessage(ITcpTransport tcpTransport, ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
+	    {
+	        // TODO: check salt
+	        // TODO: check sessionid
+	        // TODO: check seqno
+
+	        //logger.debug("processMessage: msg_id {0}, sequence {1}, data {2}", BitConverter.ToString(((MemoryStream)messageReader.BaseStream).GetBuffer(), (int) messageReader.BaseStream.Position, (int) (messageReader.BaseStream.Length - messageReader.BaseStream.Position)).Replace("-","").ToLower());
+	        _needConfirmation.Add(messageId);
+
+	        var code = messageReader.ReadUInt32();
+	        messageReader.BaseStream.Position -= 4;
+	        switch (code)
+	        {
+	            case 0x73f1f8dc: // container
+
+	                //logger.debug("MSG container");
+	                return await HandleContainer(tcpTransport, messageId, sequence, messageReader, request);
+	            case 0x7abe77ec: // ping
+
+	                //logger.debug("MSG ping");
+	                return HandlePing(messageId, sequence, messageReader);
+	            case 0x347773c5: // pong
+
+	                //logger.debug("MSG pong");
+	                return HandlePong(messageId, sequence, messageReader, request);
+	            case 0xae500895: // future_salts
+
+	                //logger.debug("MSG future_salts");
+	                return HandleFutureSalts(messageId, sequence, messageReader);
+	            case 0x9ec20908: // new_session_created
+
+	                //logger.debug("MSG new_session_created");
+	                return HandleNewSessionCreated(messageId, sequence, messageReader);
+	            case 0x62d6b459: // msgs_ack
+
+	                //logger.debug("MSG msds_ack");
+	                return HandleMsgsAck(messageId, sequence, messageReader);
+	            case 0xedab447b: // bad_server_salt
+
+	                //logger.debug("MSG bad_server_salt");
+	                return await HandleBadServerSalt(tcpTransport, messageId, sequence, messageReader, request);
+	            case 0xa7eff811: // bad_msg_notification
+
+	                //logger.debug("MSG bad_msg_notification");
+	                return HandleBadMsgNotification(messageId, sequence, messageReader);
+	            case 0x276d3ec6: // msg_detailed_info
+
+	                //logger.debug("MSG msg_detailed_info");
+	                return HandleMsgDetailedInfo(messageId, sequence, messageReader);
+	            case 0xf35c6d01: // rpc_result
+
+	                //logger.debug("MSG rpc_result");
+	                return HandleRpcResult(messageId, sequence, messageReader, request);
+	            case 0x3072cfa1: // gzip_packed
+
+	                //logger.debug("MSG gzip_packed");
+	                return await HandleGzipPacked(tcpTransport, messageId, sequence, messageReader, request);
+	            case 0xe317af7e:
+	            case 0xd3f45784:
+	            case 0x2b2fbd4e:
+	            case 0x78d4dec1:
+	            case 0x725b04c3:
+	            case 0x74ae4240:
+	                return HandleUpdate(messageId, sequence, messageReader);
+	            default:
+	                Log.Error($"Recieved unknown message code: {code}");
+	                return false;
+	        }
+	    }
+
+	    private bool HandleUpdate(ulong messageId, int sequence, BinaryReader messageReader)
 		{
-			// TODO: check salt
-			// TODO: check sessionid
-			// TODO: check seqno
+		    Log.Debug($"Recieved update message with id = {messageId}");
 
-			//logger.debug("processMessage: msg_id {0}, sequence {1}, data {2}", BitConverter.ToString(((MemoryStream)messageReader.BaseStream).GetBuffer(), (int) messageReader.BaseStream.Position, (int) (messageReader.BaseStream.Length - messageReader.BaseStream.Position)).Replace("-","").ToLower());
-			_needConfirmation.Add(messageId);
-
-			var code = messageReader.ReadUInt32();
-			messageReader.BaseStream.Position -= 4;
-			switch (code)
-			{
-				case 0x73f1f8dc: // container
-					//logger.debug("MSG container");
-					return HandleContainer(tcpTransport, messageId, sequence, messageReader, request);
-				case 0x7abe77ec: // ping
-					//logger.debug("MSG ping");
-					return HandlePing(messageId, sequence, messageReader);
-				case 0x347773c5: // pong
-					//logger.debug("MSG pong");
-					return HandlePong(messageId, sequence, messageReader, request);
-				case 0xae500895: // future_salts
-					//logger.debug("MSG future_salts");
-					return HandleFutureSalts(messageId, sequence, messageReader);
-				case 0x9ec20908: // new_session_created
-					//logger.debug("MSG new_session_created");
-					return HandleNewSessionCreated(messageId, sequence, messageReader);
-				case 0x62d6b459: // msgs_ack
-					//logger.debug("MSG msds_ack");
-					return HandleMsgsAck(messageId, sequence, messageReader);
-				case 0xedab447b: // bad_server_salt
-					//logger.debug("MSG bad_server_salt");
-					return HandleBadServerSalt(tcpTransport, messageId, sequence, messageReader, request);
-				case 0xa7eff811: // bad_msg_notification
-					//logger.debug("MSG bad_msg_notification");
-					return HandleBadMsgNotification(messageId, sequence, messageReader);
-				case 0x276d3ec6: // msg_detailed_info
-					//logger.debug("MSG msg_detailed_info");
-					return HandleMsgDetailedInfo(messageId, sequence, messageReader);
-				case 0xf35c6d01: // rpc_result
-					//logger.debug("MSG rpc_result");
-					return HandleRpcResult(messageId, sequence, messageReader, request);
-				case 0x3072cfa1: // gzip_packed
-					//logger.debug("MSG gzip_packed");
-					return HandleGzipPacked(tcpTransport, messageId, sequence, messageReader, request);
-				case 0xe317af7e:
-				case 0xd3f45784:
-				case 0x2b2fbd4e:
-				case 0x78d4dec1:
-				case 0x725b04c3:
-				case 0x74ae4240:
-					return HandleUpdate(messageId, sequence, messageReader);
-				default:
-					//logger.debug("unknown message: {0}", code);
-					return false;
-			}
-		}
-
-		private bool HandleUpdate(ulong messageId, int sequence, BinaryReader messageReader)
-		{
-			return false;
+            return false;
 
 			/*
 			try
@@ -250,8 +268,10 @@ namespace TelegramClient.Core.Network
 			*/
 		}
 
-		private bool HandleGzipPacked(ITcpTransport tcpTransport, ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
+		private async Task<bool> HandleGzipPacked(ITcpTransport tcpTransport, ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
+            Log.Debug($"Recived Gzip message with Id = {messageId}");
+
 			var code = messageReader.ReadUInt32();
 			using (var decompressStream = new MemoryStream())
 			{
@@ -265,7 +285,7 @@ namespace TelegramClient.Core.Network
 			    decompressStream.Position = 0;
 				using (var compressedReader = new BinaryReader(decompressStream))
 				{
-					ProcessMessage(tcpTransport, messageId, sequence, compressedReader, request);
+                    await ProcessMessage(tcpTransport, messageId, sequence, compressedReader, request);
 				}
 			}
 
@@ -278,11 +298,16 @@ namespace TelegramClient.Core.Network
 			var code = messageReader.ReadUInt32();
 			var requestId = messageReader.ReadUInt64();
 
-			if (requestId == (ulong) request.MessageId)
-				request.ConfirmReceived = true;
+		    Log.Debug($"Process RpcResult  with request id = '{requestId}' and messageId = '{messageId}'");
 
-			//throw new NotImplementedException();
-			/*
+            if (requestId == (ulong)request.MessageId)
+		    {
+		        Log.Debug($"Request id = '{requestId}' is confirmed");
+                request.ConfirmReceived = true;
+            }
+
+            //throw new NotImplementedException();
+            /*
 			lock (runningRequests)
 			{
 				if (!runningRequests.ContainsKey(requestId))
@@ -297,12 +322,14 @@ namespace TelegramClient.Core.Network
 			}
 			*/
 
-			var innerCode = messageReader.ReadUInt32();
+            var innerCode = messageReader.ReadUInt32();
 			if (innerCode == 0x2144ca19)
 			{
 				// rpc_error
 				var errorCode = messageReader.ReadInt32();
 				var errorMessage = Serializers.String.Read(messageReader);
+
+                Log.Info($"Recieve error from server: {errorMessage}");
 
 				if (errorMessage.StartsWith("FLOOD_WAIT_"))
 				{
@@ -357,6 +384,7 @@ namespace TelegramClient.Core.Network
 				}
 				catch (NotSupportedException ex)
 				{
+                    Log.ErrorException("gzip_packed", ex);
 				}
 			}
 			else
@@ -430,11 +458,9 @@ namespace TelegramClient.Core.Network
 			//OnBrokenSessionEvent();
 			//MTProtoRequest request = runningRequests[requestId];
 			//request.OnException(new MTProtoBadMessageException(errorCode));
-
-			return true;
 		}
 
-		private bool HandleBadServerSalt(ITcpTransport tcpTransport,  ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
+		private async Task<bool> HandleBadServerSalt(ITcpTransport tcpTransport,  ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
 			var code = messageReader.ReadUInt32();
 			var badMsgId = messageReader.ReadUInt64();
@@ -442,12 +468,15 @@ namespace TelegramClient.Core.Network
 			var errorCode = messageReader.ReadInt32();
 			var newSalt = messageReader.ReadUInt64();
 
+            Log.Info($"Bad server sault detected! message id = {badMsgId} ");
+
 			//logger.debug("bad_server_salt: msgid {0}, seq {1}, errorcode {2}, newsalt {3}", badMsgId, badMsgSeqNo, errorCode, newSalt);
 
 			ClientSettings.Session.Salt = newSalt;
 
 			//resend
-			Send(tcpTransport, request);
+            Log.Debug($"Retry resend the request '{request}' with a valid server sault");
+			await Send(tcpTransport, request);
 			/*
 			if(!runningRequests.ContainsKey(badMsgId)) {
 				logger.debug("bad server salt on unknown message");
@@ -511,9 +540,9 @@ namespace TelegramClient.Core.Network
 			return false;
 		}
 
-		private bool HandleContainer(ITcpTransport transport, ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
+		private async Task<bool> HandleContainer(ITcpTransport transport, ulong messageId, int sequence, BinaryReader messageReader, TlMethod request)
 		{
-			var code = messageReader.ReadUInt32();
+            var code = messageReader.ReadUInt32();
 			var size = messageReader.ReadInt32();
 			for (var i = 0; i < size; i++)
 			{
@@ -523,13 +552,20 @@ namespace TelegramClient.Core.Network
 				var beginPosition = messageReader.BaseStream.Position;
 				try
 				{
-					if (!ProcessMessage(transport, innerMessageId, sequence, messageReader, request))
-						messageReader.BaseStream.Position = beginPosition + innerLength;
-				}
+                    Log.Debug($"Recieve container with id = '{messageId}' and innerId = '{innerMessageId}'");
+
+				    var messageProcessed = await ProcessMessage(transport, innerMessageId, sequence, messageReader, request);
+				    if (!messageProcessed)
+                    {
+                        messageReader.BaseStream.Position = beginPosition + innerLength;
+                    }
+                }
 				catch (Exception e)
 				{
-					//	logger.error("failed to process message in contailer: {0}", e);
-					messageReader.BaseStream.Position = beginPosition + innerLength;
+				    Log.ErrorException("Failed to process message in contailer", e);
+
+                    //	logger.error("failed to process message in contailer: {0}", e);
+                    messageReader.BaseStream.Position = beginPosition + innerLength;
 				}
 			}
 

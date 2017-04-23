@@ -18,7 +18,6 @@ namespace TelegramClient.Core.Network
         private readonly IClientSettings _clientSettings;
 
         private TcpClient _tcpClient;
-        private int _mesSeqNo;
 
 
         public TcpTransport(IClientSettings clientSettings)
@@ -43,7 +42,6 @@ namespace TelegramClient.Core.Network
             }
 
             _tcpClient = new TcpClient();
-            _mesSeqNo = 0;
             await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
         }
 
@@ -54,14 +52,15 @@ namespace TelegramClient.Core.Network
 
         public async Task Send(byte[] packet)
         {
-            Log.Debug($"Send message with seq_no {_mesSeqNo}");
+            var mesSeqNo = _clientSettings.Session.GenerateMessageSeqNo();
+
+            Log.Debug($"Send message with seq_no {mesSeqNo}");
 
             await EnsureClientConnected();
 
-            var tcpMessage = new TcpMessage(_mesSeqNo, packet);
+            var tcpMessage = new TcpMessage(mesSeqNo, packet);
             var encodedMessage = tcpMessage.Encode();
             await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length);
-            _mesSeqNo++;
         }
 
         public async Task<TcpMessage> Receieve()
@@ -73,12 +72,15 @@ namespace TelegramClient.Core.Network
             var packetLengthBytes = new byte[4];
             if (await stream.ReadAsync(packetLengthBytes, 0, 4) != 4)
                 throw new InvalidOperationException("Couldn't read the packet length");
+
             var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
             var seqBytes = new byte[4];
             if (await stream.ReadAsync(seqBytes, 0, 4) != 4)
                 throw new InvalidOperationException("Couldn't read the sequence");
-            var seq = BitConverter.ToInt32(seqBytes, 0);
+            var mesSeqNo = BitConverter.ToInt32(seqBytes, 0);
+
+            Log.Debug($"Recieve message with seq_no {mesSeqNo}");
 
             var readBytes = 0;
             var body = new byte[packetLength - 12];
@@ -110,7 +112,7 @@ namespace TelegramClient.Core.Network
             if (checksum != validChecksum)
                 throw new InvalidOperationException("invalid checksum! skip");
 
-            return new TcpMessage(seq, body);
+            return new TcpMessage(mesSeqNo, body);
         }
     }
 }

@@ -1,12 +1,15 @@
 namespace TelegramClient.Core.Sessions
 {
-    using System;
     using System.IO;
     using System.Threading.Tasks;
 
+    using log4net;
+
     public class FileSessionStore : ISessionStore
     {
-        private readonly Object _syncObject = new object();
+        private static readonly ILog Log = LogManager.GetLogger(typeof(FileSessionStore));
+
+        private readonly object _syncObject = new object();
 
         private Task _saveTask;
 
@@ -28,7 +31,11 @@ namespace TelegramClient.Core.Sessions
 
         private static void SaveToFile(ISession session)
         {
-            using (var stream = new FileStream($"{session.SessionUserId}.dat", FileMode.OpenOrCreate))
+            var sessionFile = $"{session.SessionUserId}.dat";
+
+            Log.Debug($"Save session into file '{sessionFile}'");
+
+            using (var stream = new FileStream(sessionFile, FileMode.OpenOrCreate))
             {
                 var result = session.ToBytes();
                 stream.Write(result, 0, result.Length);
@@ -38,6 +45,9 @@ namespace TelegramClient.Core.Sessions
         public ISession Load(string sessionUserId)
         {
             var sessionFileName = $"{sessionUserId}.dat";
+
+            Log.Debug($"Load session from file '{sessionFileName}'");
+
             if (!File.Exists(sessionFileName))
                 return null;
 
