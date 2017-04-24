@@ -1,7 +1,7 @@
 #TelegramClient
 
-[![Build status](https://ci.appveyor.com/api/projects/status/95rl618ch5c4h2fa?svg=true)](https://ci.appveyor.com/project/vik-borisov/TelegramClient)
-[![NuGet version](https://badge.fury.io/nu/TelegramClient.svg)](https://badge.fury.io/nu/TelegramClient)
+[![Build status](https://ci.appveyor.com/api/projects/status/uia4ljj11m02omj3?svg=true)](https://ci.appveyor.com/project/vik_borisov/telegramclient)
+[![NuGet version](https://badge.fury.io/nu/telegramclientapi.svg)](https://badge.fury.io/nu/telegramclientapi)
 
 _Unofficial_ Telegram (http://telegram.org) client library implemented in C#. Latest TL scheme supported, thanks to Afshin Arani
 
@@ -177,8 +177,7 @@ Latest scheme in JSON format you can find [here](https://gist.github.com/aarani/
 
 # Contributing
 
-Contributing is highly appreciated! Donations required <a href="https://www.paypal.me/IPirozhenko" title="Support project"><img src="https://img.shields.io/badge/Support%20project-paypal-brightgreen.svg"></a>
-
+Contributing is highly appreciated! Donations required 
 ## What things can I Implement (Project Roadmap)?
 
 ### Release 1.0.0
@@ -222,8 +221,7 @@ Ask your question at gitter or create an issue in project bug tracker.
 Without information listen above your issue will be closed. 
 
 # Donations
-Thanks for donations! It's highly appreciated. 
-<a href="https://www.paypal.me/IPirozhenko" title="Support project"><img src="https://img.shields.io/badge/Support%20project-paypal-brightgreen.svg"></a>
+Thanks for donations! It's highly appreciated.
 
 List of donators:
 * [mtbitcoin](https://github.com/mtbitcoin)
