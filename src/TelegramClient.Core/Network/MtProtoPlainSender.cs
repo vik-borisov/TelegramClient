@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 
 namespace TelegramClient.Core.Network
 {
-    using CodeProject.ObjectPool;
-
     using log4net;
 
     using TelegramClient.Core.Settings;
@@ -14,11 +12,11 @@ namespace TelegramClient.Core.Network
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MtProtoPlainSender));
 
-        public IObjectPool<PooledObjectWrapper<ITcpTransport>> TcpTransportPool { get; set; }
+        public ITcpTransport TcpTransport { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
 
-        private async Task Send(ITcpTransport tcpTransport, byte[] data)
+        private byte[] PrepareToSend(byte[] data)
         {
             var newMessageId = ClientSettings.Session.GetNewMessageId();
             Log.Debug($"Send message with id : {newMessageId}");
@@ -32,29 +30,23 @@ namespace TelegramClient.Core.Network
                     binaryWriter.Write(data.Length);
                     binaryWriter.Write(data);
 
-                    var packet = memoryStream.ToArray();
-
-                    await tcpTransport.Send(packet);
+                 return memoryStream.ToArray();
                 }
             }
         }
 
         public async Task<byte[]> SendAndReceive(byte[] data)
         {
-            using (var wrapper = TcpTransportPool.GetObject())
-            {
-                Log.Debug($"Use TcpTransport instance : {wrapper.PooledObjectInfo.Id}");
+            var preparedPacket = PrepareToSend(data);
 
-                await Send(wrapper.InternalResource, data);
-                return await Receive(wrapper.InternalResource);
-            }
+            var result = await TcpTransport.SendAndReceieve(preparedPacket);
+
+            return ProcessReceivedMessage(result);
         }
 
-        private async Task<byte[]> Receive(ITcpTransport tcpTransport)
+        private byte[] ProcessReceivedMessage(TcpMessage recievedMessage)
         {
-            var result = await tcpTransport.Receieve();
-
-            using (var memoryStream = new MemoryStream(result.Body))
+            using (var memoryStream = new MemoryStream(recievedMessage.Body))
             using (var binaryReader = new BinaryReader(memoryStream))
             {
                 var authKeyid = binaryReader.ReadInt64();
@@ -62,7 +54,6 @@ namespace TelegramClient.Core.Network
                 var messageLength = binaryReader.ReadInt32();
 
                 Log.Debug($"Recieve message with id : {messageId}");
-
 
                 var response = binaryReader.ReadBytes(messageLength);
 

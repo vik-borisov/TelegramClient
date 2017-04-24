@@ -6,7 +6,7 @@ namespace TelegramClient.Core.Network
 
     internal interface IMtProtoSender
     {
-        Task<byte[]> SendAndRecive(TlMethod request);
+        Task SendAndProcess(TlMethod request);
 
         Task SendPingAsync();
     }

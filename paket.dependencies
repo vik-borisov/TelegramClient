@@ -4,7 +4,6 @@ group app
 
 	nuget Newtonsoft.Json 
 	nuget System.Security.Cryptography.Algorithms
-	nuget CodeProject.ObjectPool
 	nuget LightInject
 	nuget BarsGroup.CodeGuard
 	nuget log4net

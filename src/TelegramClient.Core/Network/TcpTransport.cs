@@ -6,8 +6,12 @@ using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core.Network
 {
+    using System.Collections.Concurrent;
+    using System.Threading;
+
     using log4net;
 
+    using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
 
@@ -15,14 +19,44 @@ namespace TelegramClient.Core.Network
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
 
+        private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<TcpMessage>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<TcpMessage>>>();
+
+        private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
+
         private readonly IClientSettings _clientSettings;
 
         private TcpClient _tcpClient;
 
+        public ISessionStore SessionStore { get; set; }
+
+        public IClientSettings ClientSettings { get; set; }
 
         public TcpTransport(IClientSettings clientSettings)
         {
             _clientSettings = clientSettings;
+
+            ThreadPool.QueueUserWorkItem(
+                state =>
+                {
+                    while (true)
+                    {
+                        if (_queue.IsEmpty)
+                        {
+                            _resetEvent.Reset();
+                            _resetEvent.Wait();
+                        }
+
+                        _queue.TryDequeue(out var item);
+
+                        Send(item.Item1).Wait();
+
+                        var recieveTask = Receieve();
+                        recieveTask.Wait();
+                        var result = recieveTask.Result;
+
+                        item.Item2.SetResult(result);
+                    }
+                });
         }
 
         private async Task EnsureClientConnected()
@@ -50,7 +84,23 @@ namespace TelegramClient.Core.Network
             _tcpClient.Dispose();
         }
 
-        public async Task Send(byte[] packet)
+        public Task<TcpMessage> SendAndReceieve(byte[] packet)
+        {
+            var tsc  = new TaskCompletionSource<TcpMessage>();
+
+            var task = tsc.Task;
+
+            _queue.Enqueue(Tuple.Create(packet, tsc));
+
+            if (!_resetEvent.IsSet)
+            {
+                _resetEvent.Set();
+            }
+
+            return task;
+        }
+
+        private async Task Send(byte[] packet)
         {
             var mesSeqNo = _clientSettings.Session.GenerateMessageSeqNo();
 
@@ -61,9 +111,11 @@ namespace TelegramClient.Core.Network
             var tcpMessage = new TcpMessage(mesSeqNo, packet);
             var encodedMessage = tcpMessage.Encode();
             await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length);
+
+            SessionStore.Save(ClientSettings.Session);
         }
 
-        public async Task<TcpMessage> Receieve()
+        private async Task<TcpMessage> Receieve()
         {
             await EnsureClientConnected();
 

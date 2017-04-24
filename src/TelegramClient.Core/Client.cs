@@ -13,15 +13,15 @@ using TelegramClient.Entities.TL.Messages;
 
 namespace TelegramClient.Core
 {
-    using LightInject;
+    using log4net;
 
-    using PommaLabs.Thrower.Logging;
+    using LightInject;
 
     using TelegramClient.Core.Settings;
 
     internal class Client : ITelegramClient
     {
-        private static readonly ILog Log = LogProvider.GetLogger(typeof(Client));
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Client));
 
         public IClientSettings ClientSettings { get; set; }
 
@@ -109,7 +109,7 @@ namespace TelegramClient.Core
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
-            await Sender.SendAndRecive(methodToExecute);
+            await Sender.SendAndProcess(methodToExecute);
             return (T) methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);
         }
 
