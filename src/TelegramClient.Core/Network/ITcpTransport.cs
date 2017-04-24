@@ -6,5 +6,7 @@
     internal interface ITcpTransport: IDisposable
     {
         Task<TcpMessage> SendAndReceieve(byte[] packet);
+
+        void Send(byte[] packet);
     }
 }

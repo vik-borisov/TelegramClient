@@ -48,13 +48,22 @@ namespace TelegramClient.Core.Network
 
                         _queue.TryDequeue(out var item);
 
-                        Send(item.Item1).Wait();
+                        try
+                        {
+                            SendPacket(item.Item1).Wait();
 
-                        var recieveTask = Receieve();
-                        recieveTask.Wait();
-                        var result = recieveTask.Result;
+                            var recieveTask = ReceievePacket();
+                            recieveTask.Wait();
+                            var result = recieveTask.Result;
 
-                        item.Item2.SetResult(result);
+                            item.Item2?.SetResult(result);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Process message failed", e);
+
+                            item.Item2?.SetException(e);
+                        }
                     }
                 });
         }
@@ -86,21 +95,21 @@ namespace TelegramClient.Core.Network
 
         public Task<TcpMessage> SendAndReceieve(byte[] packet)
         {
-            var tsc  = new TaskCompletionSource<TcpMessage>();
+            var tsc = new TaskCompletionSource<TcpMessage>();
 
             var task = tsc.Task;
 
-            _queue.Enqueue(Tuple.Create(packet, tsc));
-
-            if (!_resetEvent.IsSet)
-            {
-                _resetEvent.Set();
-            }
+            PushToQueue(packet, tsc);
 
             return task;
         }
 
-        private async Task Send(byte[] packet)
+        public void Send(byte[] packet)
+        {
+            PushToQueue(packet, null);
+        }
+
+        private async Task SendPacket(byte[] packet)
         {
             var mesSeqNo = _clientSettings.Session.GenerateMessageSeqNo();
 
@@ -115,7 +124,16 @@ namespace TelegramClient.Core.Network
             SessionStore.Save(ClientSettings.Session);
         }
 
-        private async Task<TcpMessage> Receieve()
+        private void PushToQueue(byte[] packet, TaskCompletionSource<TcpMessage> tsc)
+        {
+            _queue.Enqueue(Tuple.Create(packet, tsc));
+
+            if (!_resetEvent.IsSet)
+            {
+                _resetEvent.Set();
+            }
+        }
+        private async Task<TcpMessage> ReceievePacket()
         {
             await EnsureClientConnected();
 
