@@ -15,6 +15,7 @@ using Xunit;
 namespace TelegramClient.Tests
 {
     using TelegramClient.Core.Exceptions;
+    using TelegramClient.Entities.TL.Updates;
 
     public class TelegramClientTests
     {
@@ -160,8 +161,12 @@ namespace TelegramClient.Tests
             Assert.True(client.IsUserAuthorized());
         }
 
-        private async Task SendMessage(ITelegramClient client, string normalizedNumber)
+        private async Task SendMessage(ITelegramClient client)
         {
+            var normalizedNumber = NumberToSendMessage.StartsWith("+")
+                                       ? NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1)
+                                       : NumberToSendMessage;
+
             var result = await client.GetContactsAsync();
 
             var user = result.Users.Lists
@@ -175,37 +180,48 @@ namespace TelegramClient.Tests
         }
 
         [Fact]
-        public virtual async Task SendMessageTest()
+        public virtual async Task GetUpdatesTest()
         {
-            // this is because the contacts in the address come without the "+" prefix
-            var normalizedNumber = NumberToSendMessage.StartsWith("+")
-                ? NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1)
-                : NumberToSendMessage;
-
             var client = NewClient();
 
             await client.ConnectAsync();
 
-            await SendMessage(client, normalizedNumber);
+            var currentState = await client.GetCurrentState();
+
+            await SendMessage(client);
+
+            var updates = await client.GetUpdates(currentState);
+
+            Assert.IsNotType<TlDifferenceEmpty>(updates);
         }
 
         [Fact]
         public virtual async Task SendMessageParallelTest()
         {
-            // this is because the contacts in the address come without the "+" prefix
-            var normalizedNumber = NumberToSendMessage.StartsWith("+")
-                                       ? NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1)
-                                       : NumberToSendMessage;
-
             var client = NewClient();
 
             await client.ConnectAsync();
 
-            SendMessage(client, normalizedNumber);
-            SendMessage(client, normalizedNumber);
-            SendMessage(client, normalizedNumber);
+            SendMessage(client);
+            SendMessage(client);
+            SendMessage(client);
         }
 
+        [Fact]
+        public virtual async Task SendMessageTest()
+    {
+            var client = NewClient();
+
+            await client.ConnectAsync();
+
+            var dialogs = (TlDialogs)await client.GetUserDialogsAsync();
+            var chat = dialogs.Chats.Lists
+                              .OfType<TlChannel>()
+                              .FirstOrDefault(c => c.Title == "TestGroup");
+
+            await client.SendMessageAsync(
+                new TlInputPeerChannel { ChannelId = chat.Id, AccessHash = chat.AccessHash.Value }, "TEST MSG");
+        }
 
         [Fact]
         public virtual async Task SendMessageToChannelTest()
