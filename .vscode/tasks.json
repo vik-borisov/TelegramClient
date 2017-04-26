@@ -6,8 +6,8 @@
     "tasks": [
         {
             "taskName": "build",
-            "args": [
-                "${workspaceRoot}\\src\\TelegramClient.Entities.Generator\\TelegramClient.Entities.Generator.csproj"
+ "args": [
+                "${workspaceRoot}\\src\\TelegramClient.Core\\TelegramClient.Core.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
