@@ -5,11 +5,10 @@ using TelegramClient.Core.Utils;
 namespace TelegramClient.Core.Network
 {
     using BarsGroup.CodeGuard;
-    using BarsGroup.CodeGuard.Validators;
 
-    public class TcpMessage
+    internal class TcpMessage
     {
-        private readonly int _sequneceNumber;
+        public int SequneceNumber { get; }
 
         public byte[] Body { get; }
 
@@ -17,7 +16,7 @@ namespace TelegramClient.Core.Network
         {
             Guard.That(body, nameof(body)).IsNotNull();
 
-            _sequneceNumber = seqNumber;
+            SequneceNumber = seqNumber;
             Body = body;
         }
 
@@ -37,7 +36,7 @@ namespace TelegramClient.Core.Network
                         and 4 CRC32 bytes at the end (length, sequence number, and payload together).
                     */
                     binaryWriter.Write(Body.Length + 12);
-                    binaryWriter.Write(_sequneceNumber);
+                    binaryWriter.Write(SequneceNumber);
                     binaryWriter.Write(Body);
                     var crc32 = new Crc32();
 
@@ -58,7 +57,7 @@ namespace TelegramClient.Core.Network
         public static TcpMessage Decode(byte[] body)
         {
             Guard.That(body, nameof(body)).IsNotNull();
-            Guard.That(body.Length, nameof(body.Length)).IsLessThan(12);
+            Guard.That(body.Length, nameof(body.Length)).IsGreaterThan(12);
 
             using (var memoryStream = new MemoryStream(body))
             {

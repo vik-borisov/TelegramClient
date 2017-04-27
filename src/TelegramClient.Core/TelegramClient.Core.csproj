@@ -15,10 +15,14 @@
     <RepositoryUrl>https://github.com/vik-borisov/TelegramClient</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="IoC\**" />
+    <EmbeddedResource Remove="IoC\**" />
+    <None Remove="IoC\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\TelegramClient.Entities\TelegramClient.Entities.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="IoC\" />
     <Folder Include="Sessions" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

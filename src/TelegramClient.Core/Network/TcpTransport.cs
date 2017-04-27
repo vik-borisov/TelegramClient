@@ -10,16 +10,17 @@ namespace TelegramClient.Core.Network
 
         public ITcpService TcpService { get; set; }
 
-        public async Task Send(byte[] packet)
+        public Task Send(byte[] packet)
         {
             var tcpMessage = new TcpMessage(_sendCounter, packet);
             var encodedMessage = tcpMessage.Encode();
-            await TcpService.Send(encodedMessage);
 
             _sendCounter++;
+
+            return TcpService.Send(encodedMessage);
         }
 
-        public async Task<TcpMessage> Receieve()
+        public async Task<byte[]> Receieve()
         {
             var stream = await TcpService.Receieve();
 
@@ -68,7 +69,7 @@ namespace TelegramClient.Core.Network
             if (checksum != validChecksum)
                 throw new InvalidOperationException("invalid checksum! skip");
 
-            return new TcpMessage(seq, body);
+            return body;
         }
     }
 }

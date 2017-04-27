@@ -133,7 +133,9 @@ namespace TelegramClient.Core.Network
 		{
 			while (!request.ConfirmReceived)
 			{
-				var result = DecodeMessage((await transport.Receieve()).Body);
+			    var body = await transport.Receieve();
+
+			    var result = DecodeMessage(body);
 
 				using (var messageStream = new MemoryStream(result.Item1, false))
 				using (var messageReader = new BinaryReader(messageStream))

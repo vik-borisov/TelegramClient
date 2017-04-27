@@ -8,7 +8,6 @@ using TlAuthorization = TelegramClient.Entities.TL.TlAuthorization;
 namespace TelegramClient.Core
 {
     using BarsGroup.CodeGuard;
-    using BarsGroup.CodeGuard.Validators;
 
     public static class UploadExtentions
     {

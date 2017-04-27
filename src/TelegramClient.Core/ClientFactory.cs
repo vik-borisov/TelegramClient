@@ -1,13 +1,10 @@
 ﻿namespace TelegramClient.Core
 {
     using System;
-    using System.Reflection;
 
     using Autofac;
-    using Autofac.Builder;
 
     using BarsGroup.CodeGuard;
-    using BarsGroup.CodeGuard.Validators;
 
     using CodeProject.ObjectPool;
 

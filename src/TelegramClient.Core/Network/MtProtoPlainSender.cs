@@ -45,7 +45,7 @@ namespace TelegramClient.Core.Network
         {
             var result = await tcpTransport.Receieve();
 
-            using (var memoryStream = new MemoryStream(result.Body))
+            using (var memoryStream = new MemoryStream(result))
             using (var binaryReader = new BinaryReader(memoryStream))
             {
                 var authKeyid = binaryReader.ReadInt64();

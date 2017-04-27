@@ -1,12 +1,12 @@
 ﻿namespace TelegramClient.Core.Network
 {
-    using System.Net.Sockets;
+    using System.IO;
     using System.Threading.Tasks;
 
     internal interface ITcpService
     {
         Task Send(byte[] encodedMessage);
 
-        Task<NetworkStream> Receieve();
+        Task<Stream> Receieve();
     }
 }

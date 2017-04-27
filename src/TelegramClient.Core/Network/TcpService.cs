@@ -41,7 +41,7 @@
             await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length);
         }
 
-        public async Task<NetworkStream> Receieve()
+        public async Task<Stream> Receieve()
         {
             await EnsureClientConnected();
 
