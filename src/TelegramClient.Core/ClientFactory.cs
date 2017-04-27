@@ -3,11 +3,15 @@
     using System;
     using System.Reflection;
 
+    using Autofac;
+    using Autofac.Builder;
+
     using BarsGroup.CodeGuard;
     using BarsGroup.CodeGuard.Validators;
 
-    using LightInject;
+    using CodeProject.ObjectPool;
 
+    using TelegramClient.Core.Network;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
@@ -21,15 +25,14 @@
             Guard.That(serverAddress).IsNotNullOrWhiteSpace();
             Guard.That(serverPort).IsPositive();
 
-            var container = CreateContainer();
+            var container = RegisterDependency();
 
             FillSettings(container, appId, appHash, sessionUserId, serverAddress, serverPort);
 
-            container.CanGetInstance(typeof(ITelegramClient), string.Empty);
-            return container.GetInstance<ITelegramClient>();
+            return container.Resolve<ITelegramClient>();
         }
 
-        private static void FillSettings(IServiceContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort)
+        private static void FillSettings(IContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort)
         {
             Guard.That(appId).IsPositive();
             Guard.That(appHash).IsNotNullOrWhiteSpace();
@@ -37,26 +40,40 @@
             Guard.That(serverAddress).IsNotNullOrWhiteSpace();
             Guard.That(serverPort).IsPositive();
 
-            var settings = container.GetInstance<IClientSettings>();
+            var settings = container.Resolve<IClientSettings>();
 
             settings.AppId = appId;
             settings.AppHash = appHash;
 
-            var store = container.GetInstance<ISessionStore>();
+            var store = container.Resolve<ISessionStore>();
             settings.Session = TryLoadOrCreateNew(store, sessionUserId, serverAddress, serverPort);
         }
 
-        private static IServiceContainer CreateContainer()
+        private static IContainer RegisterDependency()
         {
-            var container = new ServiceContainer();
+            var builder = new ContainerBuilder();
 
-            container.RegisterInstance<IServiceContainer>(container);
-            container.RegisterAssembly(typeof(ClientFactory).GetTypeInfo().Assembly);
+            builder.RegisterType<FileSessionStore>().As<ISessionStore>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<Client>().As<ITelegramClient>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<MtProtoSender>().As<IMtProtoSender>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<MtProtoPlainSender>().As<IMtProtoPlainSender>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<ClientSettings>().As<IClientSettings>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<TcpTransport>().As<ITcpTransport>().InstancePerDependency().PropertiesAutowired();
+            builder.RegisterType<TcpService>().As<ITcpService>().InstancePerDependency().PropertiesAutowired();
 
-            return container;
+            builder.Register<IObjectPool<PooledObjectWrapper<ITcpTransport>>>(
+                       context =>
+                       {
+                           var transport = context.Resolve<ITcpTransport>();
+                           return new ObjectPool<PooledObjectWrapper<ITcpTransport>>(10, () => new PooledObjectWrapper<ITcpTransport>(transport));
+                       })
+                .InstancePerDependency()
+                .PropertiesAutowired();
+
+            return builder.Build();
         }
 
-        private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)
+    private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)
         {
             ulong GenerateSessionId()
             {

@@ -1,6 +1,6 @@
 ﻿namespace TelegramClient.Core
 {
-    using LightInject;
+    using Autofac;
 
     using TelegramClient.Core.Settings;
 
@@ -8,7 +8,7 @@
     {
         public static IClientSettings GetSettings(this ITelegramClient client)
         {
-            return client.Container.GetInstance<IClientSettings>();
+            return client.Container.Resolve<IClientSettings>();
         }
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
   </PropertyGroup>
@@ -18,6 +18,7 @@
     <ProjectReference Include="..\TelegramClient.Entities\TelegramClient.Entities.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="IoC\" />
     <Folder Include="Sessions" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />

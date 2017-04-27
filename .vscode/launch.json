@@ -6,9 +6,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}\\src\\TelegramClient.Entities.Generator\\bin\\Debug\\netcoreapp1.1\\TelegramClient.Entities.Generator.dll",
+            "program": "${workspaceRoot}\\src\\TelegramClient.Core\\bin\\Debug\\netcoreapp1.1\\TelegramClient.Core.dll",
             "args": [],
-            "cwd": "${workspaceRoot}\\src\\TelegramClient.Entities.Generator",
+            "cwd": "${workspaceRoot}\\src\\TelegramClient.Core",
             "console": "internalConsole",
             "stopAtEntry": false,
             "internalConsoleOptions": "openOnSessionStart"

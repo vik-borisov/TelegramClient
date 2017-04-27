@@ -67,7 +67,7 @@ namespace TelegramClient.Core.Network
                     var packetLength = binaryReader.ReadInt32();
 
                     if (packetLength < 12)
-                        throw new InvalidOperationException(string.Format("invalid packet length: {0}", packetLength));
+                        throw new InvalidOperationException($"invalid packet length: {packetLength}");
 
                     var seq = binaryReader.ReadInt32();
                     var packet = binaryReader.ReadBytes(packetLength - 12);
