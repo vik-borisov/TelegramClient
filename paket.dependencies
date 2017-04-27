@@ -5,7 +5,7 @@ group app
 	nuget Newtonsoft.Json 
 	nuget System.Security.Cryptography.Algorithms
 	nuget CodeProject.ObjectPool
-	nuget LightInject
+	nuget Autofac
 	nuget BarsGroup.CodeGuard
 
 group test

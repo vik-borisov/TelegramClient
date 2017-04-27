@@ -1,75 +1,39 @@
 ﻿using System;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core.Network
 {
-    using TelegramClient.Core.Settings;
-
     internal class TcpTransport : ITcpTransport
     {
-        private readonly IClientSettings _clientSettings;
-
-        private TcpClient _tcpClient;
         private int _sendCounter;
 
-
-        public TcpTransport(IClientSettings clientSettings)
-        {
-            _clientSettings = clientSettings;
-        }
-
-        private async Task EnsureClientConnected()
-        {
-            var session = _clientSettings.Session;
-
-            if (_tcpClient != null)
-            {
-                var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
-
-                if (_tcpClient.Connected && endpoint.Address.ToString() == session.ServerAddress && endpoint.Port == session.Port)
-                {
-                    return;
-                }
-
-                _tcpClient.Dispose();
-            }
-
-            _tcpClient = new TcpClient();
-            _sendCounter = 0;
-            await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
-        }
-
-        public void Dispose()
-        {
-            _tcpClient.Dispose();
-        }
+        public ITcpService TcpService { get; set; }
 
         public async Task Send(byte[] packet)
         {
-            await EnsureClientConnected();
-
             var tcpMessage = new TcpMessage(_sendCounter, packet);
             var encodedMessage = tcpMessage.Encode();
-            await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length);
+            await TcpService.Send(encodedMessage);
+
             _sendCounter++;
         }
 
         public async Task<TcpMessage> Receieve()
         {
-            await EnsureClientConnected();
-
-            var stream = _tcpClient.GetStream();
+            var stream = await TcpService.Receieve();
 
             var packetLengthBytes = new byte[4];
-            if (await stream.ReadAsync(packetLengthBytes, 0, 4) != 4)
+            var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4);
+
+            if (readLenghtBytes != 4)
                 throw new InvalidOperationException("Couldn't read the packet length");
             var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
             var seqBytes = new byte[4];
-            if (await stream.ReadAsync(seqBytes, 0, 4) != 4)
+            var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4);
+
+            if (readSeqBytes != 4)
                 throw new InvalidOperationException("Couldn't read the sequence");
             var seq = BitConverter.ToInt32(seqBytes, 0);
 
@@ -87,7 +51,8 @@ namespace TelegramClient.Core.Network
             } while (readBytes != packetLength - 12);
 
             var crcBytes = new byte[4];
-            if (await stream.ReadAsync(crcBytes, 0, 4) != 4)
+            var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4);
+            if (readCrcBytes != 4)
                 throw new InvalidOperationException("Couldn't read the crc");
             var checksum = BitConverter.ToInt32(crcBytes, 0);
 

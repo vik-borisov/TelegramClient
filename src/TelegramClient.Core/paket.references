@@ -1,5 +1,5 @@
 group app
 	System.Security.Cryptography.Algorithms
-	LightInject
+	Autofac
 	BarsGroup.CodeGuard
 	CodeProject.ObjectPool
