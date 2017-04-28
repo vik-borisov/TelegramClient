@@ -2,7 +2,7 @@
 {
     using Autofac;
 
-    public class TestBase
+    public abstract class TestBase
     {
         public ContainerBuilder ContainerBuilder { get; } = new ContainerBuilder();
 

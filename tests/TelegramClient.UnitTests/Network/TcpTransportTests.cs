@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TelegramClient.UnitTests
+﻿namespace TelegramClient.UnitTests.Network
 {
     using System.Threading.Tasks;
 
@@ -21,7 +17,7 @@ namespace TelegramClient.UnitTests
             var task = Task.Delay(1);
 
             var mTcpService = TcpServiceMock.Create().BuildSend(returnTask: () => task);
-            this.RegisterTcpService(mTcpService);
+            this.RegisterMock(mTcpService);
 
             this.RegisterType<TcpTransport>();
 
@@ -50,7 +46,7 @@ namespace TelegramClient.UnitTests
                     
                 });
 
-            this.RegisterTcpService(mTcpService);
+            this.RegisterMock(mTcpService);
 
             this.RegisterType<TcpTransport>();
 
@@ -66,7 +62,7 @@ namespace TelegramClient.UnitTests
             var data = new byte[] { 123, 123 };
 
             var mTcpService = TcpServiceMock.Create().BuildReceieve(1, data);
-            this.RegisterTcpService(mTcpService);
+            this.RegisterMock(mTcpService);
 
             this.RegisterType<TcpTransport>();
 

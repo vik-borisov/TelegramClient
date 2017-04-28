@@ -2,10 +2,7 @@
 {
     using System;
     using System.IO;
-    using System.Net.Sockets;
     using System.Threading.Tasks;
-
-    using Autofac;
 
     using Moq;
 
@@ -55,16 +52,6 @@
         public static Mock<ITcpService> Create()
         {
             return new Mock<ITcpService>();
-        }
-
-        public static TestBase RegisterTcpService(this TestBase testBase, Mock<ITcpService> mock)
-        {
-            var builder = testBase.ContainerBuilder;
-
-            builder.RegisterInstance(mock);
-            builder.RegisterInstance(mock.Object);
-
-            return testBase;
         }
     }
 }
