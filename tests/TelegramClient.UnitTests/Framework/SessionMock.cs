@@ -4,10 +4,13 @@ namespace TelegramClient.UnitTests.Framework
 
     using Moq;
 
+    using TelegramClient.Core.MTProto.Crypto;
     using TelegramClient.Core.Sessions;
 
     internal static class SessionMock
     {
+        private static readonly Random Random = new Random();
+
         public static Mock<ISession> BuildGetNewMessageId(this Mock<ISession> mock, Func<long> getNewMessageIdFunc)
         {
             mock
@@ -15,6 +18,41 @@ namespace TelegramClient.UnitTests.Framework
                 .Returns(getNewMessageIdFunc);
 
             return mock;
+        }
+
+        public static Mock<ISession> BuildSession(this Mock<ISession> mock, ulong sessionId, ulong salt, int sequenceId, byte[] authKeyData)
+        {
+            mock
+                .Setup(session => session.AuthKey)
+                .Returns(new AuthKey(authKeyData));
+
+            mock
+                .Setup(session => session.Salt)
+                .Returns(salt);
+
+            mock
+                .Setup(session => session.Id)
+                .Returns(sessionId);
+
+            mock
+                .SetupSet(session => session.Sequence = It.IsAny<int>())
+                .Callback<int>(id => sequenceId = id);
+            mock
+                .SetupGet(session => session.Sequence)
+                .Returns(() => sequenceId);
+
+            return mock;
+        }
+
+        public static byte[] GenerateAuthKeyData()
+        {
+            var key = new byte[256];
+            for (var i = 0; i < 256; i++)
+            {
+                key[i] = (byte)Random.Next(255);
+            }
+
+            return key;
         }
 
         public static Mock<ISession> Create()

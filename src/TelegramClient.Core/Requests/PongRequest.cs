@@ -1,20 +1,24 @@
 ﻿using System;
 using System.IO;
-using TelegramClient.Core.Utils;
 using TelegramClient.Entities;
 
 namespace TelegramClient.Core.Requests
 {
-    public class PingRequest : TlMethod
+    public class PongRequest : TlMethod
     {
-        private readonly long _random  = TlHelpers.GenerateRandomLong();
+        public override int Constructor => 0x347773c5;
 
-        public override int Constructor => 0x7abe77ec;
+        private long _requestMessageID;
+
+        public PongRequest(long requestMessageID)
+        {
+            _requestMessageID = requestMessageID;
+        }
 
         public override void SerializeBody(BinaryWriter writer)
         {
             writer.Write(Constructor);
-            writer.Write(_random);
+            writer.Write(_requestMessageID);
         }
 
         public override void DeserializeBody(BinaryReader reader)

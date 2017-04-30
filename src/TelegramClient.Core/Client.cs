@@ -108,7 +108,7 @@ namespace TelegramClient.Core
                 {
                     Peer = peer,
                     Message = message,
-                    RandomId = Helpers.GenerateRandomLong()
+                    RandomId = TlHelpers.GenerateRandomLong()
                 });
         }
 

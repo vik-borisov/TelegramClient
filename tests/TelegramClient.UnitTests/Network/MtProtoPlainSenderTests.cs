@@ -6,6 +6,7 @@
     using Moq;
 
     using TelegramClient.Core.Network;
+    using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
     using TelegramClient.UnitTests.Framework;
 
@@ -35,6 +36,8 @@
             var mSession = SessionMock.Create().BuildGetNewMessageId(() => SendMessageId);
             var mClientSettings = ClientSettingsMock.Create().AttachSession(() => mSession.Object);
             this.RegisterMock(mClientSettings);
+
+          
 
             this.RegisterType<MtProtoPlainSender>();
 

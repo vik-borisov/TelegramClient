@@ -84,7 +84,7 @@ namespace TelegramClient.Core.Utils
 
             var partNumber = 0;
             var partsCount = fileParts.Count;
-            var fileId = BitConverter.ToInt64(Helpers.GenerateRandomBytes(8), 0);
+            var fileId = BitConverter.ToInt64(TlHelpers.GenerateRandomBytes(8), 0);
             while (fileParts.Count != 0)
             {
                 var part = fileParts.Dequeue();
