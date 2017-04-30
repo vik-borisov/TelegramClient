@@ -9,10 +9,9 @@ using TelegramClient.Entities.TL.Auth;
 
 namespace TelegramClient.Core
 {
-    using BarsGroup.CodeGuard;
-    using BarsGroup.CodeGuard.Validators;
+    using Autofac;
 
-    using LightInject;
+    using BarsGroup.CodeGuard;
 
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
@@ -135,9 +134,9 @@ namespace TelegramClient.Core
             return (TlUser)request.Response.User;
         }
 
-        private static void OnUserAuthenticated(IServiceFactory container, TlUser tlUser)
+        private static void OnUserAuthenticated(IComponentContext container, TlUser tlUser)
         {
-            var clientSettings = container.GetInstance<IClientSettings>();
+            var clientSettings = container.Resolve<IClientSettings>();
             Guard.That(clientSettings).IsNotNull();
 
             var session = clientSettings.Session;
@@ -146,7 +145,7 @@ namespace TelegramClient.Core
             session.TlUser = tlUser;
             session.SessionExpires = int.MaxValue;
 
-            var sessionStore = container.GetInstance<ISessionStore>();
+            var sessionStore = container.Resolve<ISessionStore>();
 
             sessionStore.Save(session);
         }
@@ -155,7 +154,7 @@ namespace TelegramClient.Core
         {
             Guard.That(client.Container).IsNotNull();
 
-            var clientSettings = client.Container.GetInstance<IClientSettings>();
+            var clientSettings = client.Container.Resolve<IClientSettings>();
             Guard.That(clientSettings).IsNotNull();
             Guard.That(clientSettings.Session).IsNotNull();
 

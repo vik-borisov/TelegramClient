@@ -76,8 +76,8 @@ namespace TelegramClient.Core.Network
 					plaintextWriter.Write(packet);
 
 					plaintextPacket.TryGetBuffer(out var buffer);
-					msgKey = Helpers.CalcMsgKey(buffer.Array);
-					ciphertext = AES.EncryptAes(Helpers.CalcKey(ClientSettings.Session.AuthKey.Data, msgKey, true), buffer.Array);
+					msgKey = TlHelpers.CalcMsgKey(buffer.Array);
+					ciphertext = AES.EncryptAes(TlHelpers.CalcKey(ClientSettings.Session.AuthKey.Data, msgKey, true), buffer.Array);
 				}
 			}
 
@@ -108,7 +108,7 @@ namespace TelegramClient.Core.Network
 
 				var remoteAuthKeyId = inputReader.ReadUInt64(); // TODO: check auth key id
 				var msgKey = inputReader.ReadBytes(16); // TODO: check msg_key correctness
-				var keyData = Helpers.CalcKey(ClientSettings.Session.AuthKey.Data, msgKey, false);
+				var keyData = TlHelpers.CalcKey(ClientSettings.Session.AuthKey.Data, msgKey, false);
 
 				var plaintext = AES.DecryptAes(keyData,
 					inputReader.ReadBytes((int) (inputStream.Length - inputStream.Position)));

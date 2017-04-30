@@ -5,19 +5,18 @@ using TelegramClient.Core.Utils;
 namespace TelegramClient.Core.Network
 {
     using BarsGroup.CodeGuard;
-    using BarsGroup.CodeGuard.Validators;
 
-    public class TcpMessage
+    internal class TcpMessage
     {
-        private readonly int _mesSeqNo;
+        public int SequneceNumber { get; }
 
         public byte[] Body { get; }
 
-        public TcpMessage(int mesSeqNo, byte[] body)
+        public TcpMessage(int seqNumber, byte[] body)
         {
             Guard.That(body, nameof(body)).IsNotNull();
 
-            _mesSeqNo = mesSeqNo;
+            SequneceNumber = seqNumber;
             Body = body;
         }
 
@@ -37,7 +36,7 @@ namespace TelegramClient.Core.Network
                         and 4 CRC32 bytes at the end (length, sequence number, and payload together).
                     */
                     binaryWriter.Write(Body.Length + 12);
-                    binaryWriter.Write(_mesSeqNo);
+                    binaryWriter.Write(SequneceNumber);
                     binaryWriter.Write(Body);
                     var crc32 = new Crc32();
 
@@ -55,34 +54,34 @@ namespace TelegramClient.Core.Network
             }
         }
 
-        //public static TcpMessage Decode(byte[] body)
-        //{
-        //    Guard.That(body, nameof(body)).IsNotNull();
-        //    Guard.That(body.Length, nameof(body.Length)).IsLessThan(12);
+        public static TcpMessage Decode(byte[] body)
+        {
+            Guard.That(body, nameof(body)).IsNotNull();
+            Guard.That(body.Length, nameof(body.Length)).IsGreaterThan(12);
 
-        //    using (var memoryStream = new MemoryStream(body))
-        //    {
-        //        using (var binaryReader = new BinaryReader(memoryStream))
-        //        {
-        //            var packetLength = binaryReader.ReadInt32();
+            using (var memoryStream = new MemoryStream(body))
+            {
+                using (var binaryReader = new BinaryReader(memoryStream))
+                {
+                    var packetLength = binaryReader.ReadInt32();
 
-        //            if (packetLength < 12)
-        //                throw new InvalidOperationException(string.Format("invalid packet length: {0}", packetLength));
+                    if (packetLength < 12)
+                        throw new InvalidOperationException($"invalid packet length: {packetLength}");
 
-        //            var seq = binaryReader.ReadInt32();
-        //            var packet = binaryReader.ReadBytes(packetLength - 12);
-        //            var checksum = binaryReader.ReadInt32();
+                    var seq = binaryReader.ReadInt32();
+                    var packet = binaryReader.ReadBytes(packetLength - 12);
+                    var checksum = binaryReader.ReadInt32();
 
-        //            var crc32 = new Crc32();
-        //            crc32.SlurpBlock(body, 0, packetLength - 4);
-        //            var validChecksum = crc32.Crc32Result;
+                    var crc32 = new Crc32();
+                    crc32.SlurpBlock(body, 0, packetLength - 4);
+                    var validChecksum = crc32.Crc32Result;
 
-        //            if (checksum != validChecksum)
-        //                throw new InvalidOperationException("invalid checksum! skip");
+                    if (checksum != validChecksum)
+                        throw new InvalidOperationException("invalid checksum! skip");
 
-        //            return new TcpMessage(seq, packet);
-        //        }
-        //    }
-        //}
+                    return new TcpMessage(seq, packet);
+                }
+            }
+        }
     }
 }

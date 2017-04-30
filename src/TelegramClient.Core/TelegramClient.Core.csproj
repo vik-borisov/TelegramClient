@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
   </PropertyGroup>
@@ -14,6 +14,11 @@
     <PackageProjectUrl>https://github.com/vik-borisov/TelegramClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/vik-borisov/TelegramClient</RepositoryUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="IoC\**" />
+    <EmbeddedResource Remove="IoC\**" />
+    <None Remove="IoC\**" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TelegramClient.Entities\TelegramClient.Entities.csproj" />
   </ItemGroup>

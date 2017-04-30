@@ -1,16 +1,20 @@
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("TelegramClient.UnitTests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
 namespace TelegramClient.Core
 {
-    using System;
     using System.Threading.Tasks;
 
-    using LightInject;
+    using Autofac;
 
     using TelegramClient.Entities;
     using TelegramClient.Entities.TL;
 
-    public interface ITelegramClient: IDisposable
+
+    public interface ITelegramClient
     {
-        IServiceContainer Container { get;}
+        IComponentContext Container { get;}
 
         Task ConnectAsync(bool reconnect = false);
 

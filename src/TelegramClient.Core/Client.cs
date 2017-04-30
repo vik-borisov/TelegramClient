@@ -14,8 +14,7 @@ using TelegramClient.Entities.TL.Messages;
 namespace TelegramClient.Core
 {
     using log4net;
-
-    using LightInject;
+    using Autofac;
 
     using TelegramClient.Core.Settings;
 
@@ -25,7 +24,7 @@ namespace TelegramClient.Core
 
         public IClientSettings ClientSettings { get; set; }
 
-        public IServiceContainer Container { get; set; }
+        public IComponentContext Container { get; set; }
 
         public IMtProtoSender Sender { get; set; }
 
@@ -123,18 +122,13 @@ namespace TelegramClient.Core
                 {
                     Peer = peer,
                     Message = message,
-                    RandomId = Helpers.GenerateRandomLong()
+                    RandomId = TlHelpers.GenerateRandomLong()
                 });
         }
 
         public async Task SendPingAsync()
         {
             await Sender.SendPingAsync();
-        }
-
-        public void Dispose()
-        {
-            Container?.Dispose();
         }
     }
 }

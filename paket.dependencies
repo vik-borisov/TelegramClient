@@ -4,7 +4,7 @@ group app
 
 	nuget Newtonsoft.Json 
 	nuget System.Security.Cryptography.Algorithms
-	nuget LightInject
+	nuget Autofac
 	nuget BarsGroup.CodeGuard
 	nuget log4net
 
@@ -18,6 +18,8 @@ group test
     nuget Microsoft.Extensions.Configuration.Json
     nuget Microsoft.Extensions.Configuration
 	nuget log4net
+	nuget Moq
+	nuget Autofac
 
 group build
     source https://www.nuget.org/api/v2

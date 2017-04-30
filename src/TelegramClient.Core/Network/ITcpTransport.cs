@@ -1,9 +1,8 @@
 ﻿namespace TelegramClient.Core.Network
 {
-    using System;
     using System.Threading.Tasks;
 
-    internal interface ITcpTransport: IDisposable
+    internal interface ITcpTransport
     {
         Task<TcpMessage> SendAndReceieve(byte[] packet);
 
