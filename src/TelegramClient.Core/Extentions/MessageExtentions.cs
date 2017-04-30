@@ -38,7 +38,7 @@ namespace TelegramClient.Core
         {
             return await client.SendRequestAsync<TlAbsUpdates>(new TlRequestSendMedia
             {
-                RandomId = Helpers.GenerateRandomLong(),
+                RandomId = TlHelpers.GenerateRandomLong(),
                 Background = false,
                 ClearDraft = false,
                 Media = new TlInputMediaUploadedPhoto {File = file, Caption = caption},
@@ -56,7 +56,7 @@ namespace TelegramClient.Core
         {
             return await client.SendRequestAsync<TlAbsUpdates>(new TlRequestSendMedia
             {
-                RandomId = Helpers.GenerateRandomLong(),
+                RandomId = TlHelpers.GenerateRandomLong(),
                 Background = false,
                 ClearDraft = false,
                 Media = new TlInputMediaUploadedDocument

@@ -17,6 +17,8 @@ group test
     nuget xunit.runner.visualstudio
     nuget Microsoft.Extensions.Configuration.Json
     nuget Microsoft.Extensions.Configuration
+	nuget Moq
+	nuget Autofac
 
 group build
     source https://www.nuget.org/api/v2

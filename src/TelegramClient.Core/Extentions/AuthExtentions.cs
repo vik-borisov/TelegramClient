@@ -13,7 +13,6 @@ namespace TelegramClient.Core
     using Autofac;
 
     using BarsGroup.CodeGuard;
-    using BarsGroup.CodeGuard.Validators;
 
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;

@@ -6,6 +6,6 @@
     {
         Task Send(byte[] packet);
 
-        Task<TcpMessage> Receieve();
+        Task<byte[]> Receieve();
     }
 }

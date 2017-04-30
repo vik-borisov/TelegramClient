@@ -1,12 +1,16 @@
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("TelegramClient.UnitTests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
+
 namespace TelegramClient.Core
 {
-    using System;
     using System.Threading.Tasks;
 
     using Autofac;
 
     using TelegramClient.Entities;
     using TelegramClient.Entities.TL;
+
 
     public interface ITelegramClient
     {

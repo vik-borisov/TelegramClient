@@ -4,7 +4,9 @@ using TelegramClient.Core.MTProto.Crypto;
 
 namespace TelegramClient.Core.Utils
 {
-    public class Helpers
+    using BarsGroup.CodeGuard;
+
+    internal class TlHelpers
     {
         private static readonly Random Random = new Random();
 
@@ -29,6 +31,9 @@ namespace TelegramClient.Core.Utils
 
         public static AesKeyData CalcKey(byte[] sharedKey, byte[] msgKey, bool client)
         {
+            Guard.That(sharedKey.Length, nameof(sharedKey)).IsEqual(256);
+            Guard.That(msgKey.Length, nameof(msgKey)).IsEqual(16);
+
             var x = client ? 0 : 8;
             var buffer = new byte[48];
 

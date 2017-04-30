@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.3
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{97440FD0-9E14-4AB7-80A9-E45746DB7062}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,6 +19,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{78830552-5E51-43BD-B510-7D59813B0CC9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramClient.Tests", "tests\TelegramClient.Tests\TelegramClient.Tests.csproj", "{51FD7794-A861-439A-9CA3-75C4232E9CAC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramClient.UnitTests", "tests\TelegramClient.UnitTests\TelegramClient.UnitTests.csproj", "{D258CC09-CBC8-4183-B60C-7C116A1E126F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{51FD7794-A861-439A-9CA3-75C4232E9CAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51FD7794-A861-439A-9CA3-75C4232E9CAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51FD7794-A861-439A-9CA3-75C4232E9CAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D258CC09-CBC8-4183-B60C-7C116A1E126F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D258CC09-CBC8-4183-B60C-7C116A1E126F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D258CC09-CBC8-4183-B60C-7C116A1E126F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D258CC09-CBC8-4183-B60C-7C116A1E126F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{A3B051E5-F128-4952-903C-7EFDB663D713} = {04D496F9-ECE3-4F26-ABF7-FD4511112142}
 		{0A1242A7-2282-4D0B-80DC-ED7397DD3FA7} = {04D496F9-ECE3-4F26-ABF7-FD4511112142}
 		{51FD7794-A861-439A-9CA3-75C4232E9CAC} = {78830552-5E51-43BD-B510-7D59813B0CC9}
+		{D258CC09-CBC8-4183-B60C-7C116A1E126F} = {78830552-5E51-43BD-B510-7D59813B0CC9}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

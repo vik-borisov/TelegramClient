@@ -2,7 +2,6 @@
 {
     using System;
     using System.IO;
-    using System.Threading;
 
     using TelegramClient.Core.MTProto;
     using TelegramClient.Core.MTProto.Crypto;
