@@ -102,7 +102,7 @@
             return result;
         }
 
-        public long GetNewMessageId()
+        public ulong GetNewMessageId()
         {
 
             lock (_syncObject)
@@ -125,7 +125,7 @@
                     ((seconds % 1000) << 22) |
                     _inc;
 
-            return newMessageId;
+            return (ulong) newMessageId;
         }
 
         public byte[] ToBytes()
@@ -151,7 +151,10 @@
                     writer.Write(0);
                 }
 
-                Serializers.Bytes.Write(writer, AuthKey.Data);
+                if (AuthKey != null)
+                {
+                    Serializers.Bytes.Write(writer, AuthKey.Data);
+                }
 
                 return stream.ToArray();
             }

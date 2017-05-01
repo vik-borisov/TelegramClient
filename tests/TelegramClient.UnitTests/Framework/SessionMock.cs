@@ -11,7 +11,7 @@ namespace TelegramClient.UnitTests.Framework
     {
         private static readonly Random Random = new Random();
 
-        public static Mock<ISession> BuildGetNewMessageId(this Mock<ISession> mock, Func<long> getNewMessageIdFunc)
+        public static Mock<ISession> BuildGetNewMessageId(this Mock<ISession> mock, Func<ulong> getNewMessageIdFunc)
         {
             mock
                 .Setup(service => service.GetNewMessageId())

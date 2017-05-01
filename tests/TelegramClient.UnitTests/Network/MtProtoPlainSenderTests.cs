@@ -6,6 +6,7 @@
     using Moq;
 
     using TelegramClient.Core.Network;
+    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
     using TelegramClient.UnitTests.Framework;

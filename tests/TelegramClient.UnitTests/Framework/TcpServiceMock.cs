@@ -7,6 +7,7 @@
     using Moq;
 
     using TelegramClient.Core.Network;
+    using TelegramClient.Core.Network.Interfaces;
 
     internal static class TcpServiceMock
     {
@@ -35,7 +36,7 @@
             var message = new TcpMessage(seqNumber, body);
             var memoryStream = new MemoryStream(message.Encode());
 
-            mock.BuildReceieve(() => Task.FromResult<Stream>(memoryStream));
+            mock.BuildReceieve(() => Task.FromResult((Stream)memoryStream));
 
             return mock;
         }

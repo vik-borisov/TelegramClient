@@ -25,7 +25,7 @@
 
         byte[] ToBytes();
 
-        long GetNewMessageId();
+        ulong GetNewMessageId();
 
         int GenerateSessionSeqNo(bool confirmed);
 

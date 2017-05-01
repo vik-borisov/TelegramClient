@@ -9,6 +9,7 @@ namespace TelegramClient.Core.Network
 
     using log4net;
 
+    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
@@ -17,7 +18,7 @@ namespace TelegramClient.Core.Network
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
 
-        private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<TcpMessage>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<TcpMessage>>>();
+        private readonly ConcurrentQueue<byte[]> _queue = new ConcurrentQueue<byte[]>();
 
         private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
 
@@ -48,39 +49,31 @@ namespace TelegramClient.Core.Network
 
                         try
                         {
-                            SendPacket(item.Item1).Wait();
-
-                            var recieveTask = ReceievePacket();
-                            recieveTask.Wait();
-                            var result = recieveTask.Result;
-
-                            item.Item2?.SetResult(result);
+                            SendPacket(item).Wait();
                         }
                         catch (Exception e)
                         {
                             Log.Error("Process message failed", e);
-
-                            item.Item2?.SetException(e);
                         }
                     }
                 });
         }
 
 
-        public Task<TcpMessage> SendAndReceieve(byte[] packet)
-        {
-            var tsc = new TaskCompletionSource<TcpMessage>();
+        //public Task<TcpMessage> SendWithResult(byte[] packet)
+        //{
+        //    var tsc = new TaskCompletionSource<TcpMessage>();
 
-            var task = tsc.Task;
+        //    var task = tsc.Task;
 
-            PushToQueue(packet, tsc);
+        //    PushToQueue(packet, tsc);
 
-            return task;
-        }
+        //    return task;
+        //}
 
         public void Send(byte[] packet)
         {
-            PushToQueue(packet, null);
+            PushToQueue(packet);
         }
 
         private async Task SendPacket(byte[] packet)
@@ -96,9 +89,9 @@ namespace TelegramClient.Core.Network
             SessionStore.Save(ClientSettings.Session);
         }
 
-        private void PushToQueue(byte[] packet, TaskCompletionSource<TcpMessage> tsc)
+        private void PushToQueue(byte[] packet)
         {
-            _queue.Enqueue(Tuple.Create(packet, tsc));
+            _queue.Enqueue(packet);
 
             if (!_resetEvent.IsSet)
             {
@@ -106,7 +99,7 @@ namespace TelegramClient.Core.Network
             }
         }
 
-        private async Task<TcpMessage> ReceievePacket()
+        public async Task<TcpMessage> Receieve()
         {
             var stream = await TcpService.Receieve();
 

@@ -14,12 +14,8 @@ using Xunit;
 
 namespace TelegramClient.Tests
 {
-    using System.Reflection;
-
-    using log4net;
-    using log4net.Config;
-
     using TelegramClient.Core.Exceptions;
+    using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Entities.TL.Updates;
 
     using Xunit.Abstractions;
@@ -225,12 +221,12 @@ namespace TelegramClient.Tests
 
             await client.ConnectAsync();
 
-            var m1 = SendMessageToChannel(client);
-            var m2 = SendMessageToChannel(client);
-            //var m3 = SendMessageToChannel(client);
-            //var m4 = SendMessageToChannel(client);
+            var m1 = SendMessage(client);
+            var m2 = SendMessage(client);
+            var m3 = SendMessage(client);
+            var m4 = SendMessage(client);
 
-            Task.WaitAll(m1, m2);
+            Task.WaitAll(m1, m2, m3, m4);
             Thread.Sleep(1000);
         }
 
@@ -247,11 +243,11 @@ namespace TelegramClient.Tests
 
         private static async Task SendMessageToChannel(ITelegramClient client)
         {
-            var dialogs = (TlDialogsSlice) await client.GetUserDialogsAsync();
+            var dialogs = (TlDialogs) await client.GetUserDialogsAsync();
 
             var chat = dialogs.Chats.Lists
                               .OfType<TlChannel>()
-                              .FirstOrDefault(c => c.Title == "Telegram Client Api Library");
+                              .FirstOrDefault(c => c.Title == "Виктор Борисов");
 
             await client.SendMessageAsync(
                 new TlInputPeerChannel
@@ -381,7 +377,7 @@ namespace TelegramClient.Tests
             var hash = await client.SendCodeRequestAsync(NotRegisteredNumberToSignUp);
             var code = "";
 
-            var registeredUser = await client.SignUpAsync(NotRegisteredNumberToSignUp, hash, code, "TLSharp", "User");
+            var registeredUser = await client.SignUpAsync(NotRegisteredNumberToSignUp, hash, code, "TelegramClient", "User");
             Assert.NotNull(registeredUser);
             Assert.True(client.IsUserAuthorized());
 

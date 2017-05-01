@@ -13,9 +13,14 @@ using TelegramClient.Entities.TL.Messages;
 
 namespace TelegramClient.Core
 {
+    using System.IO;
+
     using log4net;
     using Autofac;
 
+    using TelegramClient.Core.Network.Exceptions;
+    using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
     internal class Client : ITelegramClient
@@ -28,7 +33,15 @@ namespace TelegramClient.Core
 
         public IMtProtoSender Sender { get; set; }
 
+        public IConfirmationSendService ConfirmationSendService { get; set; }
+
+        public IMtProtoRecieveService ProtoRecieveService { get; set; }
+
+        public IMtProtoReciever MtProtoReciever { get; set; }
+
         public IMtProtoPlainSender MtProtoPlainSender { get; set; }
+
+        public ISessionStore SessionStore { get; set; }
 
         private List<TlDcOption> _dcOptions;
 
@@ -72,6 +85,8 @@ namespace TelegramClient.Core
                 var result = await DoAuthentication();
                 ClientSettings.Session.AuthKey = result.AuthKey;
                 ClientSettings.Session.TimeOffset = result.TimeOffset;
+
+                SessionStore.Save(ClientSettings.Session);
             }
 
             //set-up layer
@@ -85,9 +100,11 @@ namespace TelegramClient.Core
                 Query = config,
                 SystemVersion = "Win 10.0"
             };
-            var invokewithLayer = new TlRequestInvokeWithLayer {Layer = 57, Query = request};
 
-            var response = await SendRequestAsync<TlConfig>(invokewithLayer);
+            ConfirmationSendService.StartSendingConfirmation();
+            ProtoRecieveService.StartReceiving();
+
+            var response = await SendRequestAsync<TlConfig>(new TlRequestInvokeWithLayer {Layer = 57, Query = request});
             _dcOptions = response.DcOptions.Lists;
         }
 
@@ -108,8 +125,29 @@ namespace TelegramClient.Core
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
-            await Sender.SendAndProcess(methodToExecute);
-            return (T) methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);
+            BinaryReader resultReader;
+            try
+            {
+                resultReader = await SendAndRecieve(methodToExecute);
+            }
+            catch (BadServerSaltException)
+            {
+                resultReader = await SendAndRecieve(methodToExecute);
+            }
+            methodToExecute.DeserializeResponse(resultReader);
+
+            return (T)methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);
+        }
+
+        private async Task<BinaryReader> SendAndRecieve(TlMethod methodToExecute)
+        {
+            var sendTask = Sender.Send(methodToExecute);
+            var recieveTask = MtProtoReciever.Recieve(methodToExecute.MessageId);
+
+            await sendTask;
+            await recieveTask;
+
+            return recieveTask.Result;
         }
 
         public async Task<TlAbsUpdates> SendMessageAsync(TlAbsInputPeer peer, string message)
@@ -124,11 +162,6 @@ namespace TelegramClient.Core
                     Message = message,
                     RandomId = TlHelpers.GenerateRandomLong()
                 });
-        }
-
-        public async Task SendPingAsync()
-        {
-            await Sender.SendPingAsync();
         }
     }
 }

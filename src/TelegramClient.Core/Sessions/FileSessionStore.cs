@@ -1,7 +1,6 @@
 namespace TelegramClient.Core.Sessions
 {
     using System.IO;
-    using System.Threading.Tasks;
 
     using log4net;
 
@@ -9,27 +8,7 @@ namespace TelegramClient.Core.Sessions
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSessionStore));
 
-        private readonly object _syncObject = new object();
-
-        private Task _saveTask;
-
         public void Save(ISession session)
-        {
-            if (_saveTask == null)
-            {
-                lock (_syncObject)
-                {
-                    if (_saveTask == null)
-                    {
-                        _saveTask = Task.Delay(500)
-                                       .ContinueWith(_ => SaveToFile(session))
-                                       .ContinueWith( _ => _saveTask = null);
-                    }
-                }
-            }
-        }
-
-        private static void SaveToFile(ISession session)
         {
             var sessionFile = $"{session.SessionUserId}.dat";
 

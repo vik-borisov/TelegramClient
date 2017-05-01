@@ -2,7 +2,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using TelegramClient.Core.Network;
 using TelegramClient.Entities.TL;
 using TelegramClient.Entities.TL.Account;
 using TelegramClient.Entities.TL.Auth;
@@ -13,10 +12,11 @@ namespace TelegramClient.Core
 
     using BarsGroup.CodeGuard;
 
+    using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
-    using TlAuthorization = TelegramClient.Entities.TL.Auth.TlAuthorization;
+    using TlAuthorization = Entities.TL.Auth.TlAuthorization;
 
     public static class AuthExtentions
     {

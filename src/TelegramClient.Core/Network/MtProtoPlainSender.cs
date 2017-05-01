@@ -5,6 +5,7 @@ namespace TelegramClient.Core.Network
 {
     using log4net;
 
+    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Settings;
 
     internal class MtProtoPlainSender : IMtProtoPlainSender
@@ -38,7 +39,8 @@ namespace TelegramClient.Core.Network
         {
             var preparedPacket = PrepareToSend(data);
 
-            var result = await TcpTransport.SendAndReceieve(preparedPacket);
+            TcpTransport.Send(preparedPacket);
+            var result = await TcpTransport.Receieve();
 
             return ProcessReceivedMessage(result);
         }

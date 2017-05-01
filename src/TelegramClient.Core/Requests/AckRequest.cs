@@ -15,7 +15,6 @@ namespace TelegramClient.Core.Requests
         }
 
         public override bool Confirmed => false;
-        public override bool Responded { get; }
 
         public override int Constructor => 0x62d6b459;
 
