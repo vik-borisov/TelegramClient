@@ -4,20 +4,83 @@ using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core.Network
 {
+    using System.Collections.Concurrent;
+    using System.Threading;
+
+    using log4net;
+
+    using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Sessions;
+    using TelegramClient.Core.Settings;
+
+
     internal class TcpTransport : ITcpTransport
     {
-        private int _sendCounter;
+        private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
+
+        private readonly ConcurrentQueue<byte[]> _queue = new ConcurrentQueue<byte[]>();
+
+        private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
 
         public ITcpService TcpService { get; set; }
 
-        public Task Send(byte[] packet)
+        public ISessionStore SessionStore { get; set; }
+
+        public IClientSettings ClientSettings { get; set; }
+
+        public TcpTransport()
         {
-            var tcpMessage = new TcpMessage(_sendCounter, packet);
+            ThreadPool.QueueUserWorkItem(
+                state =>
+                {
+                    while (true)
+                    {
+                        if (_queue.IsEmpty)
+                        {
+                            _resetEvent.Reset();
+                            _resetEvent.Wait();
+                        }
+
+                        _queue.TryDequeue(out var item);
+
+                        try
+                        {
+                            SendPacket(item).Wait();
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error("Process message failed", e);
+                        }
+                    }
+                });
+        }
+
+        public void Send(byte[] packet)
+        {
+            PushToQueue(packet);
+        }
+
+        private async Task SendPacket(byte[] packet)
+        {
+            var mesSeqNo = ClientSettings.Session.GenerateMessageSeqNo();
+
+            Log.Debug($"Send message with seq_no {mesSeqNo}");
+
+            var tcpMessage = new TcpMessage(mesSeqNo, packet);
             var encodedMessage = tcpMessage.Encode();
+            await TcpService.Send(encodedMessage);
 
-            _sendCounter++;
+            SessionStore.Save(ClientSettings.Session);
+        }
 
-            return TcpService.Send(encodedMessage);
+        private void PushToQueue(byte[] packet)
+        {
+            _queue.Enqueue(packet);
+
+            if (!_resetEvent.IsSet)
+            {
+                _resetEvent.Set();
+            }
         }
 
         public async Task<byte[]> Receieve()
@@ -29,6 +92,7 @@ namespace TelegramClient.Core.Network
 
             if (readLenghtBytes != 4)
                 throw new InvalidOperationException("Couldn't read the packet length");
+
             var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
             var seqBytes = new byte[4];
@@ -36,7 +100,9 @@ namespace TelegramClient.Core.Network
 
             if (readSeqBytes != 4)
                 throw new InvalidOperationException("Couldn't read the sequence");
-            var seq = BitConverter.ToInt32(seqBytes, 0);
+            var mesSeqNo = BitConverter.ToInt32(seqBytes, 0);
+
+            Log.Debug($"Recieve message with seq_no {mesSeqNo}");
 
             var readBytes = 0;
             var body = new byte[packetLength - 12];
@@ -49,7 +115,8 @@ namespace TelegramClient.Core.Network
                 neededToRead -= availableBytes;
                 Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
                 readBytes += availableBytes;
-            } while (readBytes != packetLength - 12);
+            }
+            while (readBytes != packetLength - 12);
 
             var crcBytes = new byte[4];
             var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4);

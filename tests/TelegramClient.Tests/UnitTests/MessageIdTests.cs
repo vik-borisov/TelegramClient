@@ -33,16 +33,14 @@
         {
             var session = new Session();
 
-            var queue = new ConcurrentQueue<long>();
+            var queue = new ConcurrentQueue<ulong>();
 
-            for (int i = 0; i < 16; i++)
+            for (var i = 0; i < 16; i++)
             {
                 ThreadPool.QueueUserWorkItem(
                     state =>
                     {
-                        Parallel.For(
-                            0,
-                            16,
+                        Parallel.For(0,16,
                             l =>
                             {
                                 for (var j = 0; i < 100000000; i++)
@@ -74,7 +72,7 @@
             {
                 var newMessageId = session.GetNewMessageId();
 
-                Assert.Equal(0, newMessageId % 4);
+                Assert.Equal(0 , (long)newMessageId % 4);
             }
         }
     }

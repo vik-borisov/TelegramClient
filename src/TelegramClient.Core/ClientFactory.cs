@@ -6,9 +6,8 @@
 
     using BarsGroup.CodeGuard;
 
-    using CodeProject.ObjectPool;
-
     using TelegramClient.Core.Network;
+    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
@@ -52,22 +51,16 @@
 
             builder.RegisterType<FileSessionStore>().As<ISessionStore>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<Client>().As<ITelegramClient>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<MtProtoSender>().As<IMtProtoSender>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<MtProtoSendService>().As<IMtProtoSender>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<MtProtoRecieveService>().As<IMtProtoRecieveService, IMtProtoReciever>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<ConfirmationSendService>().As<IConfirmationSendService>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<ConfirmationRecieveService>().As<IConfirmationRecieveService>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<MtProtoPlainSender>().As<IMtProtoPlainSender>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<ClientSettings>().As<IClientSettings>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<TcpTransport>().As<ITcpTransport>().InstancePerDependency().PropertiesAutowired();
-            builder.RegisterType<TcpService>().As<ITcpService>().InstancePerDependency().PropertiesAutowired();
+            builder.RegisterType<TcpTransport>().As<ITcpTransport>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<TcpService>().As<ITcpService>().SingleInstance().PropertiesAutowired();
 
-            builder.Register<IObjectPool<PooledObjectWrapper<ITcpTransport>>>(
-                       context =>
-                       {
-                           var transport = context.Resolve<ITcpTransport>();
-                           return new ObjectPool<PooledObjectWrapper<ITcpTransport>>(10, () => new PooledObjectWrapper<ITcpTransport>(transport));
-                       })
-                .InstancePerDependency()
-                .PropertiesAutowired();
-
-            return builder.Build();
+           return builder.Build();
         }
 
     private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)

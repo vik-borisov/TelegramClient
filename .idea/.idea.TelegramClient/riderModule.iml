@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/TelegramClient.Entities" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/TelegramClient.Entities.Generator" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../tests/TelegramClient.Tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../tests/TelegramClient.UnitTests" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../../packages" />
       <excludeFolder url="file://$MODULE_DIR$/../../src/TelegramClient.Core/bin" />
       <excludeFolder url="file://$MODULE_DIR$/../../src/TelegramClient.Core/obj" />
@@ -16,6 +17,8 @@
       <excludeFolder url="file://$MODULE_DIR$/../../src/TelegramClient.Entities/obj" />
       <excludeFolder url="file://$MODULE_DIR$/../../tests/TelegramClient.Tests/bin" />
       <excludeFolder url="file://$MODULE_DIR$/../../tests/TelegramClient.Tests/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../tests/TelegramClient.UnitTests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../tests/TelegramClient.UnitTests/obj" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

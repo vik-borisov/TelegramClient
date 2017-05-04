@@ -6,8 +6,7 @@
     using Moq;
 
     using TelegramClient.Core.Network;
-    using TelegramClient.Core.Sessions;
-    using TelegramClient.Core.Settings;
+    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.UnitTests.Framework;
 
     using Xunit;
@@ -30,9 +29,6 @@
 
             this.RegisterMock(mTcpTransport);
 
-            var mObjectPool = ObjectPoolMock.Create<ITcpTransport>().BuildPool(mTcpTransport);
-            this.RegisterMock(mObjectPool);
-
             var mSession = SessionMock.Create().BuildGetNewMessageId(() => SendMessageId);
             var mClientSettings = ClientSettingsMock.Create().AttachSession(() => mSession.Object);
             this.RegisterMock(mClientSettings);
@@ -50,7 +46,6 @@
 
             Assert.Equal(receiveData, sendTask.Result);
             mTcpTransport.Verify(transport => transport.Send(It.IsAny<byte[]>()), Times.Once);
-            mTcpTransport.Verify(transport => transport.Receieve(), Times.Once);
         }
 
         private void AddSendHandler(Mock<ITcpTransport> mock, long messageId, byte[] sendData)

@@ -7,15 +7,14 @@ namespace TelegramClient.Core.Requests
 {
     public class AckRequest : TlMethod
     {
-        private readonly List<ulong> _msgs;
+        private readonly HashSet<ulong> _msgs;
 
-        public AckRequest(List<ulong> msgs)
+        public AckRequest(HashSet<ulong> msgs)
         {
             _msgs = msgs;
         }
 
         public override bool Confirmed => false;
-        public override bool Responded { get; }
 
         public override int Constructor => 0x62d6b459;
 

@@ -5,17 +5,12 @@
 
     using Moq;
 
-    using TelegramClient.Core.Network;
+    using TelegramClient.Core.Network.Interfaces;
 
     internal static class TcpTransportMock
     {
-        public static Mock<ITcpTransport> BuildSend(this Mock<ITcpTransport> mock, Action<byte[]> callback = null, Func<Task> returnTask = null)
+        public static Mock<ITcpTransport> BuildSend(this Mock<ITcpTransport> mock, Action<byte[]> callback = null)
         {
-            if (returnTask == null)
-            {
-                returnTask = () => Task.Delay(1);
-            }
-
             if (callback == null)
             {
                 callback = bytes => { };
@@ -23,8 +18,7 @@
 
             mock
                 .Setup(service => service.Send(It.IsAny<byte[]>()))
-                .Callback(callback)
-                .Returns(returnTask);
+                .Callback(callback);
 
             return mock;
         }

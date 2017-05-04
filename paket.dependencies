@@ -4,9 +4,9 @@ group app
 
 	nuget Newtonsoft.Json 
 	nuget System.Security.Cryptography.Algorithms
-	nuget CodeProject.ObjectPool
 	nuget Autofac
 	nuget BarsGroup.CodeGuard
+	nuget log4net
 
 group test
     source https://www.nuget.org/api/v2
@@ -17,6 +17,7 @@ group test
     nuget xunit.runner.visualstudio
     nuget Microsoft.Extensions.Configuration.Json
     nuget Microsoft.Extensions.Configuration
+	nuget log4net
 	nuget Moq
 	nuget Autofac
 

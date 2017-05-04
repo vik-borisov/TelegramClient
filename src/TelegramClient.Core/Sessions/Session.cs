@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Threading;
 
     using TelegramClient.Core.MTProto;
     using TelegramClient.Core.MTProto.Crypto;
@@ -14,6 +15,8 @@
 
         private int _inc;
 
+        private int _messageSeqNo;
+
         public string SessionUserId { get; set; }
 
         public string ServerAddress { get; set; }
@@ -24,7 +27,12 @@
 
         public ulong Id { get; set; }
 
-        public int Sequence { get; set; }
+        private int _sessionSeqNo;
+        private int SessionSeqNo
+        {
+            get => _sessionSeqNo;
+            set => _sessionSeqNo = value;
+        }
 
         public ulong Salt { get; set; }
 
@@ -63,7 +71,7 @@
                            Id = id,
                            Salt = salt,
                            TimeOffset = timeOffset,
-                           Sequence = sequence,
+                           SessionSeqNo = sequence,
                            SessionExpires = sessionExpires,
                            TlUser = tlUser,
                            SessionUserId = sessionUserId,
@@ -73,7 +81,28 @@
             }
         }
 
-        public long GetNewMessageId()
+        public int GenerateSessionSeqNo(bool confirmed)
+        {
+            if (confirmed)
+            {
+                var result =  SessionSeqNo * 2 + 1;
+                Interlocked.Increment(ref _sessionSeqNo);
+
+                return result;
+            }
+
+            return SessionSeqNo * 2;
+        }
+
+        public int GenerateMessageSeqNo()
+        {
+            var result = _messageSeqNo;
+            Interlocked.Increment(ref _messageSeqNo);
+
+            return result;
+        }
+
+        public ulong GetNewMessageId()
         {
 
             lock (_syncObject)
@@ -96,7 +125,7 @@
                     ((seconds % 1000) << 22) |
                     _inc;
 
-            return newMessageId;
+            return (ulong) newMessageId;
         }
 
         public byte[] ToBytes()
@@ -105,7 +134,7 @@
             using (var writer = new BinaryWriter(stream))
             {
                 writer.Write(Id);
-                writer.Write(Sequence);
+                writer.Write(SessionSeqNo);
                 writer.Write(Salt);
                 writer.Write(TimeOffset);
                 Serializers.String.Write(writer, ServerAddress);
@@ -122,7 +151,10 @@
                     writer.Write(0);
                 }
 
-                Serializers.Bytes.Write(writer, AuthKey.Data);
+                if (AuthKey != null)
+                {
+                    Serializers.Bytes.Write(writer, AuthKey.Data);
+                }
 
                 return stream.ToArray();
             }

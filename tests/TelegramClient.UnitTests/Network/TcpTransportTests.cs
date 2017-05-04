@@ -1,5 +1,6 @@
 ﻿namespace TelegramClient.UnitTests.Network
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Moq;
@@ -9,7 +10,7 @@
 
     using Xunit;
 
-    public class TcpTransportTests: TestBase
+    public class TcpTransportTests : TestBase
     {
         [Fact]
         public void Send_TcpServiceSendCalled_NotThrows()
@@ -19,16 +20,21 @@
             var mTcpService = TcpServiceMock.Create().BuildSend(returnTask: () => task);
             this.RegisterMock(mTcpService);
 
+            var seqNo = 1;
+
+            var mSession = SessionMock.Create().BuildGenerateMessageSeqNo(() => seqNo);
+            var mClientSettings = ClientSettingsMock.Create().AttachSession(() => mSession.Object);
+            this.RegisterMock(mClientSettings);
+
             this.RegisterType<TcpTransport>();
 
             // ---
 
             var transport = this.Resolve<TcpTransport>();
-            var sendTask = transport.Send(new byte[1]);
-
+            transport.Send(new byte[1]);
+            Thread.Sleep(1000);
             // --
 
-            Assert.Equal(task, sendTask);
             mTcpService.Verify(service => service.Send(It.IsAny<byte[]>()), Times.Once);
         }
 
@@ -43,7 +49,7 @@
                     var message = TcpMessage.Decode(bytes);
                     Assert.Equal(0, message.SequneceNumber);
                     Assert.Equal(data, message.Body);
-                    
+
                 });
 
             this.RegisterMock(mTcpService);

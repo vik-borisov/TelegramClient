@@ -15,10 +15,15 @@ using Xunit;
 namespace TelegramClient.Tests
 {
     using TelegramClient.Core.Exceptions;
+    using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Entities.TL.Updates;
 
-    public class TelegramClientTests
+    using Xunit.Abstractions;
+
+    public class TelegramClientTests: LogOutputTester
     {
+        private static readonly Random Random = new Random();
+
         private string ServerAddress { get; set; }
 
         private int ServerPort { get; set; }
@@ -43,7 +48,7 @@ namespace TelegramClient.Tests
 
         private int ApiId { get; set; }
 
-        public TelegramClientTests()
+        public TelegramClientTests(ITestOutputHelper output) : base(output)
         {
             GatherTestConfiguration();
         }
@@ -159,6 +164,7 @@ namespace TelegramClient.Tests
             }
             Assert.NotNull(user);
             Assert.True(client.IsUserAuthorized());
+            Thread.Sleep(1000);
         }
 
         private async Task SendMessage(ITelegramClient client)
@@ -176,7 +182,7 @@ namespace TelegramClient.Tests
             if (user == null)
                 throw new Exception("Number was not found in Contacts List of user: " + NumberToSendMessage);
 
-            await client.SendMessageAsync(new TlInputPeerUser { UserId = user.Id }, "TEST");
+            await client.SendMessageAsync(new TlInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next());
         }
 
         [Fact]
@@ -194,6 +200,19 @@ namespace TelegramClient.Tests
 
             Assert.IsNotType<TlDifferenceEmpty>(updates);
         }
+        
+        
+        [Fact]
+        public virtual async Task SendMessageTest()
+        {
+            var client = NewClient();
+
+            await client.ConnectAsync();
+
+            await SendMessage(client);
+
+            Thread.Sleep(1000);
+        }
 
         [Fact]
         public virtual async Task SendMessageParallelTest()
@@ -202,26 +221,15 @@ namespace TelegramClient.Tests
 
             await client.ConnectAsync();
 
-            SendMessage(client);
-            SendMessage(client);
-            SendMessage(client);
+            var m1 = SendMessage(client);
+            var m2 = SendMessage(client);
+            var m3 = SendMessage(client);
+            var m4 = SendMessage(client);
+
+            Task.WaitAll(m1, m2, m3, m4);
+            Thread.Sleep(1000);
         }
 
-        [Fact]
-        public virtual async Task SendMessageTest()
-    {
-            var client = NewClient();
-
-            await client.ConnectAsync();
-
-            var dialogs = (TlDialogs)await client.GetUserDialogsAsync();
-            var chat = dialogs.Chats.Lists
-                              .OfType<TlChannel>()
-                              .FirstOrDefault(c => c.Title == "TestGroup");
-
-            await client.SendMessageAsync(
-                new TlInputPeerChannel { ChannelId = chat.Id, AccessHash = chat.AccessHash.Value }, "TEST MSG");
-        }
 
         [Fact]
         public virtual async Task SendMessageToChannelTest()
@@ -230,13 +238,24 @@ namespace TelegramClient.Tests
 
             await client.ConnectAsync();
 
+            await SendMessageToChannel(client);
+        }
+
+        private static async Task SendMessageToChannel(ITelegramClient client)
+        {
             var dialogs = (TlDialogs) await client.GetUserDialogsAsync();
+
             var chat = dialogs.Chats.Lists
-                .OfType<TlChannel>()
-                .FirstOrDefault(c => c.Title == "TestGroup");
+                              .OfType<TlChannel>()
+                              .FirstOrDefault(c => c.Title == "Виктор Борисов");
 
             await client.SendMessageAsync(
-                new TlInputPeerChannel {ChannelId = chat.Id, AccessHash = chat.AccessHash.Value}, "TEST MSG");
+                new TlInputPeerChannel
+                {
+                    ChannelId = chat.Id,
+                    AccessHash = chat.AccessHash.Value
+                },
+                "TEST MSG " + Random.Next());
         }
 
         [Fact]
@@ -358,7 +377,7 @@ namespace TelegramClient.Tests
             var hash = await client.SendCodeRequestAsync(NotRegisteredNumberToSignUp);
             var code = "";
 
-            var registeredUser = await client.SignUpAsync(NotRegisteredNumberToSignUp, hash, code, "TLSharp", "User");
+            var registeredUser = await client.SignUpAsync(NotRegisteredNumberToSignUp, hash, code, "TelegramClient", "User");
             Assert.NotNull(registeredUser);
             Assert.True(client.IsUserAuthorized());
 

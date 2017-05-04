@@ -3,53 +3,58 @@ using System.Threading.Tasks;
 
 namespace TelegramClient.Core.Network
 {
-    using CodeProject.ObjectPool;
+    using log4net;
 
+    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Settings;
 
     internal class MtProtoPlainSender : IMtProtoPlainSender
     {
-        public IObjectPool<PooledObjectWrapper<ITcpTransport>> TcpTransportPool { get; set; }
+        private static readonly ILog Log = LogManager.GetLogger(typeof(MtProtoPlainSender));
+
+        public ITcpTransport TcpTransport { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
 
-        private async Task Send(ITcpTransport tcpTransport, byte[] data)
+        private byte[] PrepareToSend(byte[] data)
         {
+            var newMessageId = ClientSettings.Session.GetNewMessageId();
+            Log.Debug($"Send message with id : {newMessageId}");
+
             using (var memoryStream = new MemoryStream())
             {
                 using (var binaryWriter = new BinaryWriter(memoryStream))
                 {
                     binaryWriter.Write((long) 0);
-                    binaryWriter.Write(ClientSettings.Session.GetNewMessageId());
+                    binaryWriter.Write(newMessageId);
                     binaryWriter.Write(data.Length);
                     binaryWriter.Write(data);
 
-                    var packet = memoryStream.ToArray();
-
-                    await tcpTransport.Send(packet);
+                 return memoryStream.ToArray();
                 }
             }
         }
 
         public async Task<byte[]> SendAndReceive(byte[] data)
         {
-            using (var wrapper = TcpTransportPool.GetObject())
-            {
-                await Send(wrapper.InternalResource, data);
-                return await Receive(wrapper.InternalResource);
-            }
+            var preparedPacket = PrepareToSend(data);
+
+            TcpTransport.Send(preparedPacket);
+            var result = await TcpTransport.Receieve();
+
+            return ProcessReceivedMessage(result);
         }
 
-        private async Task<byte[]> Receive(ITcpTransport tcpTransport)
+        private byte[] ProcessReceivedMessage(byte[] recievedMessage)
         {
-            var result = await tcpTransport.Receieve();
-
-            using (var memoryStream = new MemoryStream(result))
+            using (var memoryStream = new MemoryStream(recievedMessage))
             using (var binaryReader = new BinaryReader(memoryStream))
             {
                 var authKeyid = binaryReader.ReadInt64();
                 var messageId = binaryReader.ReadInt64();
                 var messageLength = binaryReader.ReadInt32();
+
+                Log.Debug($"Recieve message with id : {messageId}");
 
                 var response = binaryReader.ReadBytes(messageLength);
 

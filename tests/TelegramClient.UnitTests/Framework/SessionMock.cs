@@ -11,7 +11,7 @@ namespace TelegramClient.UnitTests.Framework
     {
         private static readonly Random Random = new Random();
 
-        public static Mock<ISession> BuildGetNewMessageId(this Mock<ISession> mock, Func<long> getNewMessageIdFunc)
+        public static Mock<ISession> BuildGetNewMessageId(this Mock<ISession> mock, Func<ulong> getNewMessageIdFunc)
         {
             mock
                 .Setup(service => service.GetNewMessageId())
@@ -20,7 +20,16 @@ namespace TelegramClient.UnitTests.Framework
             return mock;
         }
 
-        public static Mock<ISession> BuildSession(this Mock<ISession> mock, ulong sessionId, ulong salt, int sequenceId, byte[] authKeyData)
+        public static Mock<ISession> BuildGenerateMessageSeqNo(this Mock<ISession> mock, Func<int> generateMessageSeqNoFunc)
+        {
+            mock
+                .Setup(service => service.GenerateMessageSeqNo())
+                .Returns(generateMessageSeqNoFunc);
+
+            return mock;
+        }
+
+        public static Mock<ISession> BuildSession(this Mock<ISession> mock, ulong sessionId, ulong salt, byte[] authKeyData)
         {
             mock
                 .Setup(session => session.AuthKey)
@@ -33,13 +42,6 @@ namespace TelegramClient.UnitTests.Framework
             mock
                 .Setup(session => session.Id)
                 .Returns(sessionId);
-
-            mock
-                .SetupSet(session => session.Sequence = It.IsAny<int>())
-                .Callback<int>(id => sequenceId = id);
-            mock
-                .SetupGet(session => session.Sequence)
-                .Returns(() => sequenceId);
 
             return mock;
         }

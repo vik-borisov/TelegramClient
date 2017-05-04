@@ -9,6 +9,8 @@ namespace TelegramClient.Core
 {
     using BarsGroup.CodeGuard;
 
+    using TelegramClient.Core.Network.Exceptions;
+
     public static class UploadExtentions
     {
         public static async Task<TlFile> GetFile(this ITelegramClient client, TlAbsInputFileLocation location, int filePartSize, int offset = 0)

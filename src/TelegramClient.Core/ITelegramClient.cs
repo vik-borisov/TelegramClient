@@ -23,7 +23,5 @@ namespace TelegramClient.Core
         Task<TlAbsUpdates> SendMessageAsync(TlAbsInputPeer peer, string message);
 
         Task ReconnectToDcAsync(int dcId);
-
-        Task SendPingAsync();
     }
 }

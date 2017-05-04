@@ -13,27 +13,47 @@ using TelegramClient.Entities.TL.Messages;
 
 namespace TelegramClient.Core
 {
+    using System.IO;
+
+    using log4net;
     using Autofac;
 
+    using TelegramClient.Core.Network.Exceptions;
+    using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
     internal class Client : ITelegramClient
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(Client));
+
         public IClientSettings ClientSettings { get; set; }
 
         public IComponentContext Container { get; set; }
 
         public IMtProtoSender Sender { get; set; }
 
+        public IConfirmationSendService ConfirmationSendService { get; set; }
+
+        public IMtProtoRecieveService ProtoRecieveService { get; set; }
+
+        public IMtProtoReciever MtProtoReciever { get; set; }
+
         public IMtProtoPlainSender MtProtoPlainSender { get; set; }
+
+        public ISessionStore SessionStore { get; set; }
 
         private List<TlDcOption> _dcOptions;
 
         private async Task<Step3Response> DoAuthentication()
         {
+            Log.Info("Try do authentication");
+
             var step1 = new Step1PqRequest();
             var step1Result = await MtProtoPlainSender.SendAndReceive(step1.ToBytes());
             var step1Response = step1.FromBytes(step1Result);
+
+            Log.Debug("First step is done");
 
             var step2 = new Step2DhExchange();
             var step2Result = await MtProtoPlainSender.SendAndReceive(step2.ToBytes(
@@ -43,6 +63,8 @@ namespace TelegramClient.Core
                                   step1Response.Pq));
             var step2Response = step2.FromBytes(step2Result);
 
+            Log.Debug("Second step is done");
+
             var step3 = new Step3CompleteDhExchange();
             var step3Result = await MtProtoPlainSender.SendAndReceive(step3.ToBytes(
                 step2Response.Nonce,
@@ -50,6 +72,9 @@ namespace TelegramClient.Core
                 step2Response.NewNonce,
                 step2Response.EncryptedAnswer));
             var step3Response = step3.FromBytes(step3Result);
+
+            Log.Debug("Third step is done");
+
             return step3Response;
         }
 
@@ -60,6 +85,8 @@ namespace TelegramClient.Core
                 var result = await DoAuthentication();
                 ClientSettings.Session.AuthKey = result.AuthKey;
                 ClientSettings.Session.TimeOffset = result.TimeOffset;
+
+                SessionStore.Save(ClientSettings.Session);
             }
 
             //set-up layer
@@ -73,9 +100,11 @@ namespace TelegramClient.Core
                 Query = config,
                 SystemVersion = "Win 10.0"
             };
-            var invokewithLayer = new TlRequestInvokeWithLayer {Layer = 57, Query = request};
 
-            var response = await SendRequestAsync<TlConfig>(invokewithLayer);
+            ConfirmationSendService.StartSendingConfirmation();
+            ProtoRecieveService.StartReceiving();
+
+            var response = await SendRequestAsync<TlConfig>(new TlRequestInvokeWithLayer {Layer = 57, Query = request});
             _dcOptions = response.DcOptions.Lists;
         }
 
@@ -94,8 +123,31 @@ namespace TelegramClient.Core
 
         public async Task<T> SendRequestAsync<T>(TlMethod methodToExecute)
         {
-            await Sender.SendAndRecive(methodToExecute);
-            return (T) methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);
+            Log.Debug($"Send message of the constructor {methodToExecute}");
+
+            BinaryReader resultReader;
+            try
+            {
+                resultReader = await SendAndRecieve(methodToExecute);
+            }
+            catch (BadServerSaltException)
+            {
+                resultReader = await SendAndRecieve(methodToExecute);
+            }
+            methodToExecute.DeserializeResponse(resultReader);
+
+            return (T)methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);
+        }
+
+        private async Task<BinaryReader> SendAndRecieve(TlMethod methodToExecute)
+        {
+            var sendTask = Sender.Send(methodToExecute);
+            var recieveTask = MtProtoReciever.Recieve(methodToExecute.MessageId);
+
+            await sendTask;
+            await recieveTask;
+
+            return recieveTask.Result;
         }
 
         public async Task<TlAbsUpdates> SendMessageAsync(TlAbsInputPeer peer, string message)
@@ -110,11 +162,6 @@ namespace TelegramClient.Core
                     Message = message,
                     RandomId = TlHelpers.GenerateRandomLong()
                 });
-        }
-
-        public async Task SendPingAsync()
-        {
-            await Sender.SendPingAsync();
         }
     }
 }
