@@ -7,8 +7,6 @@
 
     using TelegramClient.Core.Network;
     using TelegramClient.Core.Network.Interfaces;
-    using TelegramClient.Core.Sessions;
-    using TelegramClient.Core.Settings;
     using TelegramClient.UnitTests.Framework;
 
     using Xunit;
@@ -27,7 +25,7 @@
 
             var mTcpTransport = TcpTransportMock.Create();
             AddSendHandler(mTcpTransport, SendMessageId, sendData);
-           // AddReceiveHandler(mTcpTransport, AuthKeyId, ReciveMessageId, receiveData);
+            AddReceiveHandler(mTcpTransport, AuthKeyId, ReciveMessageId, receiveData);
 
             this.RegisterMock(mTcpTransport);
 
@@ -69,24 +67,24 @@
                     });
         }
 
-        //private void AddReceiveHandler(Mock<ITcpTransport> mock, long authKeyId, long messageId, byte[] reciveData)
-        //{
-        //    mock
-        //        .BuildReceieve(() =>
-        //            {
-        //                using (var memoryStream = new MemoryStream())
-        //                {
-        //                    using (var binaryWriter = new BinaryWriter(memoryStream))
-        //                    {
-        //                        binaryWriter.Write(authKeyId);
-        //                        binaryWriter.Write(messageId);
-        //                        binaryWriter.Write(reciveData.Length);
-        //                        binaryWriter.Write(reciveData);
+        private void AddReceiveHandler(Mock<ITcpTransport> mock, long authKeyId, long messageId, byte[] reciveData)
+        {
+            mock
+                .BuildReceieve(() =>
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            using (var binaryWriter = new BinaryWriter(memoryStream))
+                            {
+                                binaryWriter.Write(authKeyId);
+                                binaryWriter.Write(messageId);
+                                binaryWriter.Write(reciveData.Length);
+                                binaryWriter.Write(reciveData);
 
-        //                        return Task.FromResult(memoryStream.ToArray());
-        //                    }
-        //                }
-        //            });
-        //}
+                                return Task.FromResult(memoryStream.ToArray());
+                            }
+                        }
+                    });
+        }
     }
 }

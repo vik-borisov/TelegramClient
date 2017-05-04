@@ -5,7 +5,6 @@
 
     using Moq;
 
-    using TelegramClient.Core.Network;
     using TelegramClient.Core.Network.Interfaces;
 
     internal static class TcpTransportMock
@@ -24,14 +23,14 @@
             return mock;
         }
 
-        //public static Mock<ITcpTransport> BuildReceieve(this Mock<ITcpTransport> mock, Func<Task<byte[]>> returns)
-        //{
-        //    mock
-        //        .Setup(service => service.SendAndReceieve())
-        //        .Returns(returns);
+        public static Mock<ITcpTransport> BuildReceieve(this Mock<ITcpTransport> mock, Func<Task<byte[]>> returns)
+        {
+            mock
+                .Setup(service => service.Receieve())
+                .Returns(returns);
 
-        //    return mock;
-        //}
+            return mock;
+        }
 
         public static Mock<ITcpTransport> Create()
         {

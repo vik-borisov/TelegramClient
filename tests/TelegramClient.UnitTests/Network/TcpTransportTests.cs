@@ -1,79 +1,85 @@
-﻿//namespace TelegramClient.UnitTests.Network
-//{
-//    using System.Threading.Tasks;
+﻿namespace TelegramClient.UnitTests.Network
+{
+    using System.Threading;
+    using System.Threading.Tasks;
 
-//    using Moq;
+    using Moq;
 
-//    using TelegramClient.Core.Network;
-//    using TelegramClient.UnitTests.Framework;
+    using TelegramClient.Core.Network;
+    using TelegramClient.UnitTests.Framework;
 
-//    using Xunit;
+    using Xunit;
 
-//    public class TcpTransportTests: TestBase
-//    {
-//        [Fact]
-//        public void Send_TcpServiceSendCalled_NotThrows()
-//        {
-//            var task = Task.Delay(1);
+    public class TcpTransportTests : TestBase
+    {
+        [Fact]
+        public void Send_TcpServiceSendCalled_NotThrows()
+        {
+            var task = Task.Delay(1);
 
-//            var mTcpService = TcpServiceMock.Create().BuildSend(returnTask: () => task);
-//            this.RegisterMock(mTcpService);
+            var mTcpService = TcpServiceMock.Create().BuildSend(returnTask: () => task);
+            this.RegisterMock(mTcpService);
 
-//            this.RegisterType<TcpTransport>();
+            var seqNo = 1;
 
-//            // ---
+            var mSession = SessionMock.Create().BuildGenerateMessageSeqNo(() => seqNo);
+            var mClientSettings = ClientSettingsMock.Create().AttachSession(() => mSession.Object);
+            this.RegisterMock(mClientSettings);
 
-//            var transport = this.Resolve<TcpTransport>();
-//            var sendTask = transport.Send(new byte[1]);
+            this.RegisterType<TcpTransport>();
 
-//            // --
+            // ---
 
-//            Assert.Equal(task, sendTask);
-//            mTcpService.Verify(service => service.Send(It.IsAny<byte[]>()), Times.Once);
-//        }
+            var transport = this.Resolve<TcpTransport>();
+            transport.Send(new byte[1]);
+            Thread.Sleep(1000);
+            // --
 
-//        [Fact]
-//        public void Send_ValidTcpMessage_NotThrows()
-//        {
-//            var data = new byte[] { 124, 123 };
+            mTcpService.Verify(service => service.Send(It.IsAny<byte[]>()), Times.Once);
+        }
 
-//            var mTcpService = TcpServiceMock.Create().BuildSend(
-//                bytes =>
-//                {
-//                    var message = TcpMessage.Decode(bytes);
-//                    Assert.Equal(0, message.SequneceNumber);
-//                    Assert.Equal(data, message.Body);
-                    
-//                });
+        [Fact]
+        public void Send_ValidTcpMessage_NotThrows()
+        {
+            var data = new byte[] { 124, 123 };
 
-//            this.RegisterMock(mTcpService);
+            var mTcpService = TcpServiceMock.Create().BuildSend(
+                bytes =>
+                {
+                    var message = TcpMessage.Decode(bytes);
+                    Assert.Equal(0, message.SequneceNumber);
+                    Assert.Equal(data, message.Body);
 
-//            this.RegisterType<TcpTransport>();
+                });
 
-//            // ---
+            this.RegisterMock(mTcpService);
 
-//            var transport = this.Resolve<TcpTransport>();
-//            transport.Send(data);
-//        }
+            this.RegisterType<TcpTransport>();
 
-//        [Fact]
-//        public void Receieve_TcpServiceReceieveCalled_NotThrows()
-//        {
-//            var data = new byte[] { 123, 123 };
+            // ---
 
-//            var mTcpService = TcpServiceMock.Create().BuildReceieve(1, data);
-//            this.RegisterMock(mTcpService);
+            var transport = this.Resolve<TcpTransport>();
+            transport.Send(data);
+        }
 
-//            this.RegisterType<TcpTransport>();
+        [Fact]
+        public void Receieve_TcpServiceReceieveCalled_NotThrows()
+        {
+            var data = new byte[] { 123, 123 };
 
-//            // ---
+            var mTcpService = TcpServiceMock.Create().BuildReceieve(1, data);
+            this.RegisterMock(mTcpService);
 
-//            var transport = this.Resolve<TcpTransport>();
-//            var sendTask = transport.Receieve();
+            this.RegisterType<TcpTransport>();
 
-//            // --
-//            mTcpService.Verify(service => service.Receieve(), Times.Once);
-//            Assert.Equal(data, sendTask.Result);
-//        }
-//    }
-//}
+            // ---
+
+            var transport = this.Resolve<TcpTransport>();
+            var sendTask = transport.Receieve();
+
+            // --
+            mTcpService.Verify(service => service.Receieve(), Times.Once);
+            Assert.Equal(data, sendTask.Result);
+        }
+    }
+}

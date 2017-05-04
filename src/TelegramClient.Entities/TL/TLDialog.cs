@@ -47,7 +47,6 @@ namespace TelegramClient.Entities.TL
 
         public override void SerializeBody(BinaryWriter bw)
         {
-            bw.Write(Constructor);
             ComputeFlags();
             bw.Write(Flags);
             ObjectUtils.SerializeObject(Peer, bw);

@@ -22,18 +22,14 @@ namespace TelegramClient.Core.Network
 
         private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
 
-        private readonly IClientSettings _clientSettings;
-
         public ITcpService TcpService { get; set; }
 
         public ISessionStore SessionStore { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
 
-        public TcpTransport(IClientSettings clientSettings)
+        public TcpTransport()
         {
-            _clientSettings = clientSettings;
-
             ThreadPool.QueueUserWorkItem(
                 state =>
                 {
@@ -59,18 +55,6 @@ namespace TelegramClient.Core.Network
                 });
         }
 
-
-        //public Task<TcpMessage> SendWithResult(byte[] packet)
-        //{
-        //    var tsc = new TaskCompletionSource<TcpMessage>();
-
-        //    var task = tsc.Task;
-
-        //    PushToQueue(packet, tsc);
-
-        //    return task;
-        //}
-
         public void Send(byte[] packet)
         {
             PushToQueue(packet);
@@ -78,7 +62,7 @@ namespace TelegramClient.Core.Network
 
         private async Task SendPacket(byte[] packet)
         {
-            var mesSeqNo = _clientSettings.Session.GenerateMessageSeqNo();
+            var mesSeqNo = ClientSettings.Session.GenerateMessageSeqNo();
 
             Log.Debug($"Send message with seq_no {mesSeqNo}");
 
@@ -99,7 +83,7 @@ namespace TelegramClient.Core.Network
             }
         }
 
-        public async Task<TcpMessage> Receieve()
+        public async Task<byte[]> Receieve()
         {
             var stream = await TcpService.Receieve();
 
@@ -152,7 +136,7 @@ namespace TelegramClient.Core.Network
             if (checksum != validChecksum)
                 throw new InvalidOperationException("invalid checksum! skip");
 
-            return new TcpMessage(mesSeqNo, body);
+            return body;
         }
     }
 }

@@ -20,7 +20,16 @@ namespace TelegramClient.UnitTests.Framework
             return mock;
         }
 
-        public static Mock<ISession> BuildSession(this Mock<ISession> mock, ulong sessionId, ulong salt, Func<int> generateMessageSeqNoFun, byte[] authKeyData)
+        public static Mock<ISession> BuildGenerateMessageSeqNo(this Mock<ISession> mock, Func<int> generateMessageSeqNoFunc)
+        {
+            mock
+                .Setup(service => service.GenerateMessageSeqNo())
+                .Returns(generateMessageSeqNoFunc);
+
+            return mock;
+        }
+
+        public static Mock<ISession> BuildSession(this Mock<ISession> mock, ulong sessionId, ulong salt, byte[] authKeyData)
         {
             mock
                 .Setup(session => session.AuthKey)
@@ -33,10 +42,6 @@ namespace TelegramClient.UnitTests.Framework
             mock
                 .Setup(session => session.Id)
                 .Returns(sessionId);
-
-            mock
-                .Setup(session => session.GenerateMessageSeqNo())
-                .Returns(generateMessageSeqNoFun);
 
             return mock;
         }

@@ -33,6 +33,7 @@
                             _resetEvent.Reset();
                             _resetEvent.Wait();
                         }
+
                         var msgs = new HashSet<ulong>();
                         while (!_waitSendConfirmation.IsEmpty)
                         {
@@ -44,7 +45,7 @@
                         {
                             Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
 
-                            MtProtoSender.Send(new AckRequest(msgs));
+                            MtProtoSender.Send(new AckRequest(msgs)).Wait();
                         }
                         catch (Exception e)
                         {

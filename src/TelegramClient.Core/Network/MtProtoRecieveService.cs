@@ -24,6 +24,8 @@ namespace TelegramClient.Core.Network
 
         private readonly ConcurrentDictionary<ulong, TaskCompletionSource<BinaryReader>> _resultCallbacks = new ConcurrentDictionary<ulong, TaskCompletionSource<BinaryReader>>();
 
+        private CancellationTokenSource _recievingCTS;
+
         public ITcpTransport TcpTransport { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
@@ -32,17 +34,24 @@ namespace TelegramClient.Core.Network
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
+
         public void StartReceiving()
         {
-            ThreadPool.QueueUserWorkItem(
-                state =>
+            if (_recievingCTS != null && _recievingCTS.IsCancellationRequested)
+            {
+                return;
+            }
+
+            _recievingCTS = new CancellationTokenSource();
+
+            Task.Run(() =>
                 {
-                    while (true)
+                    while (!_recievingCTS.Token.IsCancellationRequested)
                     {
                         try
                         {
                             var recieveTask = TcpTransport.Receieve();
-                            recieveTask.Wait();
+                            recieveTask.Wait(_recievingCTS.Token);
                             var result = recieveTask.Result;
                             ProcessReceivedMessage(result);
                         }
@@ -51,7 +60,12 @@ namespace TelegramClient.Core.Network
                             Log.Error("Recieve message failed", e);
                         }
                     }
-                });
+                }, _recievingCTS.Token);
+        }
+
+        public void StopRecieving()
+        {
+            _recievingCTS?.Cancel();
         }
 
         public Task<BinaryReader> Recieve(ulong requestId)
@@ -62,9 +76,9 @@ namespace TelegramClient.Core.Network
             return tcs.Task;
         }
 
-        private void ProcessReceivedMessage(TcpMessage message)
+        private void ProcessReceivedMessage(byte[] message)
         {
-            var result = DecodeMessage(message.Body);
+            var result = DecodeMessage(message);
 
             Log.Debug($"Recieve message with remote id: {result.Item2}");
 
@@ -114,7 +128,7 @@ namespace TelegramClient.Core.Network
             using (var inputReader = new BinaryReader(inputStream))
             {
                 if (inputReader.BaseStream.Length < 8)
-                    throw new InvalidOperationException($"Can't decode packet");
+                    throw new InvalidOperationException("Can\'t decode packet");
 
                 var remoteAuthKeyId = inputReader.ReadUInt64(); // TODO: check auth key id
                 var msgKey = inputReader.ReadBytes(16); // TODO: check msg_key correctness
@@ -375,7 +389,7 @@ namespace TelegramClient.Core.Network
             var requestSequence = messageReader.ReadInt32();
             var errorCode = messageReader.ReadInt32();
 
-            Exception exception = null;
+            Exception exception;
             switch (errorCode)
             {
                 case 16:

@@ -26,13 +26,9 @@ namespace TelegramClient.Core.Network
 
 	    private byte[] PrepareToSend(TlMethod request)
 	    {
-	        var bytes = BinaryHelper.WriteBytes(request.SerializeBody);
-	        return PrepareToSend(bytes, request);
-	    }
+		    var packet = BinaryHelper.WriteBytes(request.SerializeBody);
 
-	    private byte[] PrepareToSend(byte[] packet, TlMethod request)
-		{
-			request.MessageId = ClientSettings.Session.GetNewMessageId();
+            request.MessageId = ClientSettings.Session.GetNewMessageId();
 
             Log.Debug($"Send message with Id = {request.MessageId}");
 
@@ -76,18 +72,6 @@ namespace TelegramClient.Core.Network
 
             await ConfirmationRecieveService.WaitForConfirm(request.MessageId);
 	    }
-
-	    //public async Task SendPingAsync()
-	    //{
-	    //    var pingRequest = new PingRequest();
-	    //    using (var memory = new MemoryStream())
-	    //    using (var writer = new BinaryWriter(memory))
-	    //    {
-	    //        pingRequest.SerializeBody(writer);
-	    //        var preparedData =  PrepareToSend(memory.ToArray(), pingRequest);
-	    //        TcpTransport.Send(preparedData);
-     //       }
-     //   }
 
 	    private MemoryStream MakeMemory(int len)
 		{
