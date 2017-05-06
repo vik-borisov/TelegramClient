@@ -18,6 +18,6 @@ Check-Exit-Code
 &".\.paket\paket.exe" "restore"
 Check-Exit-Code
 
-&".\packages\build\FAKE\tools\FAKE.exe" "build.fsx" "version=$version" "apikey=$apikey" 
+&".\packages\FAKE\tools\FAKE.exe" "build.fsx" "version=$version" "apikey=$apikey" 
 
 Check-Exit-Code
