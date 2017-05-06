@@ -1,4 +1,4 @@
-﻿namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Tcp
 {
     using System;
     using System.IO;
@@ -38,16 +38,16 @@
             {
                 var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
 
+                 _resetEvent.WaitOne();
                 if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                 {
-                    _resetEvent.WaitOne();
                     if (_tcpClient != null)
                     {
                         _tcpClient.Dispose();
                         _tcpClient = null;
                     }
-                    _resetEvent.Set();
                 }
+                _resetEvent.Set();
             }
         }
 

@@ -1,18 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
-using TelegramClient.Core.Utils;
-
-namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Tcp
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using log4net;
 
     using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
-
+    using TelegramClient.Core.Utils;
 
     internal class TcpTransport : ITcpTransport
     {

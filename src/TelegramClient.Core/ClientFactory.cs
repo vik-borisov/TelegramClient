@@ -1,13 +1,21 @@
 ﻿namespace TelegramClient.Core
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
 
     using Autofac;
 
     using BarsGroup.CodeGuard;
 
     using TelegramClient.Core.Network;
+    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Recieve;
+    using TelegramClient.Core.Network.Recieve.Interfaces;
+    using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
+    using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
@@ -52,13 +60,22 @@
             builder.RegisterType<FileSessionStore>().As<ISessionStore>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<Client>().As<ITelegramClient>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<MtProtoSendService>().As<IMtProtoSender>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<MtProtoRecieveService>().As<IMtProtoRecieveService, IMtProtoReciever>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<ConfirmationSendService>().As<IConfirmationSendService>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<ConfirmationRecieveService>().As<IConfirmationRecieveService>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<MtProtoPlainSender>().As<IMtProtoPlainSender>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<ClientSettings>().As<IClientSettings>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<TcpTransport>().As<ITcpTransport>().SingleInstance().PropertiesAutowired();
             builder.RegisterType<TcpService>().As<ITcpService>().SingleInstance().PropertiesAutowired();
+
+            builder.RegisterType<RecievingService>().As<IRecievingService>().SingleInstance().PropertiesAutowired();
+            builder.RegisterType<ResponseResultService>().As<IResponseResultGetter, IResponseResultSetter>().SingleInstance().PropertiesAutowired();
+
+            builder.RegisterAssemblyTypes(typeof(ClientFactory).GetTypeInfo().Assembly)
+                   .Where(t => t.IsInstanceOfType(typeof(IRecieveHandler)))
+                   .As<IRecieveHandler>()
+                   .SingleInstance()
+                   .PropertiesAutowired();
+            builder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<uint, IRecieveHandler>>(handlers => handlers.ToDictionary(handler => handler.ResponceCode));
 
            return builder.Build();
         }

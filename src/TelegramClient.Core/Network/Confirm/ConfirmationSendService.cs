@@ -1,4 +1,4 @@
-﻿namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Confirm
 {
     using System;
     using System.Collections.Concurrent;

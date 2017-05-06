@@ -5,7 +5,7 @@
 
     using Moq;
 
-    using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Tcp;
 
     internal static class TcpTransportMock
     {

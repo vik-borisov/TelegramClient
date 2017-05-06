@@ -1,10 +1,11 @@
-﻿using System;
-using System.IO;
-using TelegramClient.Core.Utils;
-
-namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Tcp
 {
+    using System;
+    using System.IO;
+
     using BarsGroup.CodeGuard;
+
+    using TelegramClient.Core.Utils;
 
     internal class TcpMessage
     {
@@ -19,7 +20,6 @@ namespace TelegramClient.Core.Network
             SequneceNumber = seqNumber;
             Body = body;
         }
-
 
         public byte[] Encode()
         {

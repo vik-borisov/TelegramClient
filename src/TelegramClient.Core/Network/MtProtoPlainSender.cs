@@ -5,7 +5,9 @@ namespace TelegramClient.Core.Network
 {
     using log4net;
 
+    using TelegramClient.Core.Helpers;
     using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Settings;
 
     internal class MtProtoPlainSender : IMtProtoPlainSender
@@ -21,18 +23,14 @@ namespace TelegramClient.Core.Network
             var newMessageId = ClientSettings.Session.GetNewMessageId();
             Log.Debug($"Send message with id : {newMessageId}");
 
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var binaryWriter = new BinaryWriter(memoryStream))
+            return BinaryHelper.WriteBytes(
+                writer =>
                 {
-                    binaryWriter.Write((long) 0);
-                    binaryWriter.Write(newMessageId);
-                    binaryWriter.Write(data.Length);
-                    binaryWriter.Write(data);
-
-                 return memoryStream.ToArray();
-                }
-            }
+                    writer.Write((long)0);
+                    writer.Write(newMessageId);
+                    writer.Write(data.Length);
+                    writer.Write(data);
+                });
         }
 
         public async Task<byte[]> SendAndReceive(byte[] data)

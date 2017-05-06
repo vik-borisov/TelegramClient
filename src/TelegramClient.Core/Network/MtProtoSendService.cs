@@ -11,7 +11,9 @@ namespace TelegramClient.Core.Network
     using log4net;
 
     using TelegramClient.Core.Helpers;
+    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Settings;
 
     internal class MtProtoSendService : IMtProtoSender

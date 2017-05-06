@@ -10,6 +10,7 @@
     using TelegramClient.Core.MTProto.Crypto;
     using TelegramClient.Core.Network;
     using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Requests;
     using TelegramClient.Core.Settings;
     using TelegramClient.Core.Utils;

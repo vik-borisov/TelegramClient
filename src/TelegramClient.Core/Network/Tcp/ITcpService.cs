@@ -1,7 +1,6 @@
-﻿namespace TelegramClient.Core.Network.Interfaces
+﻿namespace TelegramClient.Core.Network.Tcp
 {
     using System.IO;
-    using System.Net.Sockets;
     using System.Threading.Tasks;
 
     internal interface ITcpService

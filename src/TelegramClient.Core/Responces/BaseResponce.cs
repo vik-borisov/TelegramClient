@@ -20,17 +20,7 @@
             writer.Write(_requestMessageId);
             SerializeBody(writer);
         }
-
+            
         public abstract void SerializeBody(BinaryWriter writer);
-
-        public virtual void DeserializeBody(BinaryReader reader)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void DeserializeResponse(BinaryReader stream)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
