@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d5cd707f-63ac-4c56-972f-02eaf54f754e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.paket/paket.bootstrapper.exe" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.paket/.gitignore" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/paket.dependencies" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/.idea.TelegramClient/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/.idea.TelegramClient/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="d5cd707f-63ac-4c56-972f-02eaf54f754e" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -431,7 +426,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7145000" />
+    <option name="totallyTimeSpent" value="7317000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -443,7 +438,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32911393" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" x="0" y="364" width="1908" height="312" />
