@@ -20,7 +20,6 @@
 
         public IEnumerable<byte[]> HandleResponce(BinaryReader reader)
         {
-            var code = reader.ReadUInt32();
             var requestId = reader.ReadUInt64();
 
             Log.Debug($"Handle pong for request = {requestId}");

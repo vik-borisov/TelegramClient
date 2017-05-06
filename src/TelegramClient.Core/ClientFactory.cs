@@ -71,7 +71,7 @@
             builder.RegisterType<ResponseResultService>().As<IResponseResultGetter, IResponseResultSetter>().SingleInstance().PropertiesAutowired();
 
             builder.RegisterAssemblyTypes(typeof(ClientFactory).GetTypeInfo().Assembly)
-                   .Where(t => t.IsInstanceOfType(typeof(IRecieveHandler)))
+                   .Where(typeof(IRecieveHandler).IsAssignableFrom)
                    .As<IRecieveHandler>()
                    .SingleInstance()
                    .PropertiesAutowired();

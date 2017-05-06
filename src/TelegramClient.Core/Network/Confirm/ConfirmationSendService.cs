@@ -45,7 +45,7 @@
                         {
                             Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
 
-                            MtProtoSender.Send(new AckRequest(msgs)).Wait();
+                            MtProtoSender.Send(new AckRequest(msgs));
                         }
                         catch (Exception e)
                         {

@@ -31,23 +31,27 @@
                     _tcpClient = new TcpClient();
                     await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
 
-                    _resetEvent.Set();
                 }
+                _resetEvent.Set();
             }
             else
             {
                 var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
 
-                 _resetEvent.WaitOne();
                 if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                 {
-                    if (_tcpClient != null)
+                    _resetEvent.WaitOne();
+                    if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                     {
-                        _tcpClient.Dispose();
-                        _tcpClient = null;
+                        if (_tcpClient != null)
+                        {
+                            _tcpClient.Dispose();
+                            _tcpClient = null;
+                        }
                     }
+                    _resetEvent.Set();
                 }
-                _resetEvent.Set();
+
             }
         }
 

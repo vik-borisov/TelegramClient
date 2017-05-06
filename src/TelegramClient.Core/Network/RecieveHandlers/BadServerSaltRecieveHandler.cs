@@ -8,7 +8,6 @@
 
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
-    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
     using TelegramClient.Core.Settings;
 
@@ -24,7 +23,6 @@
 
         public IEnumerable<byte[]> HandleResponce(BinaryReader reader)
         {
-            var code = reader.ReadUInt32();
             var badMsgId = reader.ReadUInt64();
             var badMsgSeqNo = reader.ReadInt32();
             var errorCode = reader.ReadInt32();

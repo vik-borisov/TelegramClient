@@ -20,14 +20,12 @@
         {
             Log.Debug($"Recived Gzip message");
 
-            var code = reader.ReadUInt32();
             using (var decompressStream = new MemoryStream())
             {
                 using (var stream = new MemoryStream(Serializers.Bytes.Read(reader)))
                 using (var zipStream = new GZipStream(stream, CompressionMode.Decompress))
                 {
                     zipStream.CopyTo(decompressStream);
-
                 }
 
                 decompressStream.Position = 0;

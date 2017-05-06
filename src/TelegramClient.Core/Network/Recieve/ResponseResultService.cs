@@ -7,7 +7,10 @@
 
     using log4net;
 
+    using Newtonsoft.Json;
+
     using TelegramClient.Core.Network.Recieve.Interfaces;
+    using TelegramClient.Entities;
 
     internal class ResponseResultService : IResponseResultGetter,
                                            IResponseResultSetter
@@ -24,17 +27,16 @@
             return tcs.Task;
         }
 
-        public void ReturnResult(ulong requestId, byte[] reader)
+        public void ReturnResult(ulong requestId, byte[] bytes)
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
-                var stream = new MemoryStream(reader);
-                var binaryReader = new BinaryReader(stream);
+                var binaryReader = new BinaryReader(new MemoryStream(bytes));
                 callback.SetResult(binaryReader);
             }
             else
             {
-                Log.Debug($"Request with Id {requestId} wasn't not handled");
+                Log.Error($"Callback for request with Id {requestId}");
             }
         }
 
@@ -43,10 +45,11 @@
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
                 callback.SetException(exception);
+                Log.Error($"Request was processed with error", exception);
             }
             else
             {
-                Log.Debug($"Request with Id {requestId} wasn't not handled");
+                Log.Error($"Callback for request with Id {requestId} wasn't found");
             }
         }
     }

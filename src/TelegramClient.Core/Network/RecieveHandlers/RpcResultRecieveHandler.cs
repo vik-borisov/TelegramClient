@@ -30,7 +30,6 @@
         {
             Log.Debug("Handle RpcResult");
 
-            var code = reader.ReadUInt32();
             var requestId = reader.ReadUInt64();
 
             Log.Debug($"Process RpcResult  with request id = '{requestId}'");
@@ -88,7 +87,7 @@
             var errorCode = reader.ReadInt32();
             var errorMessage = Serializers.String.Read(reader);
 
-            Log.Info($"Recieve error from server: {errorMessage}");
+            Log.Warn($"Recieve error from server: {errorMessage}");
 
             Exception exception;
             if (errorMessage.StartsWith("FLOOD_WAIT_"))

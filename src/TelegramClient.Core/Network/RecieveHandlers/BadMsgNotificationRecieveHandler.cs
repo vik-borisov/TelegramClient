@@ -23,7 +23,6 @@
         {
             Log.Debug("Handle a bad message notification");
 
-            var code = reader.ReadUInt32();
             var requestId = reader.ReadUInt64();
             var requestSequence = reader.ReadInt32();
             var errorCode = reader.ReadInt32();

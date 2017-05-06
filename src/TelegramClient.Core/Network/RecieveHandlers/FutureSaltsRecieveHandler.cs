@@ -16,7 +16,6 @@
 
         public IEnumerable<byte[]> HandleResponce(BinaryReader reader)
         {
-            var code = reader.ReadUInt32();
             var requestId = reader.ReadUInt64();
 
             Log.Debug($"Handle Future Salts for request {requestId}");

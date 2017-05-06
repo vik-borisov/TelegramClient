@@ -40,7 +40,8 @@ namespace TelegramClient.Core.Network.Recieve
 
             _recievingCts = new CancellationTokenSource();
 
-            Task.Run(() =>
+            Task.Run(
+                () =>
                 {
                     while (!_recievingCts.Token.IsCancellationRequested)
                     {
@@ -48,15 +49,23 @@ namespace TelegramClient.Core.Network.Recieve
                         {
                             var recieveTask = TcpTransport.Receieve();
                             recieveTask.Wait(_recievingCts.Token);
-                            var result = recieveTask.Result;
-                            ProcessReceivedMessage(result);
+                            var recieveData = recieveTask.Result;
+
+                            var decodedData = DecodeMessage(recieveData);
+
+                            Log.Debug($"Recieve message with remote id: {decodedData.Item2}");
+
+                            ProcessReceivedMessage(decodedData.Item1);
+
+                            ConfirmationSendService.AddForSend(decodedData.Item2);
                         }
                         catch (Exception e)
                         {
                             Log.Error("Recieve message failed", e);
                         }
                     }
-                }, _recievingCts.Token);
+                },
+                _recievingCts.Token);
         }
 
         public void StopRecieving()
@@ -64,35 +73,7 @@ namespace TelegramClient.Core.Network.Recieve
             _recievingCts?.Cancel();
         }
 
-        private void ProcessReceivedMessage(byte[] message)
-        {
-            var result = DecodeMessage(message);
-
-            Log.Debug($"Recieve message with remote id: {result.Item2}");
-
-            BinaryHelper.ReadBytes(result.Item1,
-                reader =>
-                {
-                    var code = reader.ReadUInt32();
-
-                    Log.Debug($"Try handle response with code = {code}");
-
-                    if (RecieveHandlersMap.TryGetValue(code, out var handler))
-                    {
-                        Log.Debug($"Handler found - {handler}");
-
-                        handler.HandleResponce(reader);
-                    }
-                    else
-                    {
-                        Log.Debug($"Cannot handle response with code = {code}");
-                    }
-                });
-
-            ConfirmationSendService.AddForSend(result.Item2);
-        }
-
-        private Tuple<byte[], ulong, int> DecodeMessage(byte[] body)
+        private Tuple<byte[], ulong> DecodeMessage(byte[] body)
         {
             byte[] message;
             ulong remoteMessageId;
@@ -102,13 +83,16 @@ namespace TelegramClient.Core.Network.Recieve
             using (var inputReader = new BinaryReader(inputStream))
             {
                 if (inputReader.BaseStream.Length < 8)
+                {
                     throw new InvalidOperationException("Can\'t decode packet");
+                }
 
                 var remoteAuthKeyId = inputReader.ReadUInt64(); // TODO: check auth key id
                 var msgKey = inputReader.ReadBytes(16); // TODO: check msg_key correctness
                 var keyData = TlHelpers.CalcKey(ClientSettings.Session.AuthKey.Data, msgKey, false);
 
-                var plaintext = AES.DecryptAes(keyData,
+                var plaintext = AES.DecryptAes(
+                    keyData,
                     inputReader.ReadBytes((int)(inputStream.Length - inputStream.Position)));
 
                 using (var plaintextStream = new MemoryStream(plaintext))
@@ -123,7 +107,69 @@ namespace TelegramClient.Core.Network.Recieve
                 }
             }
 
-            return new Tuple<byte[], ulong, int>(message, remoteMessageId, remoteSequence);
+            return Tuple.Create(message, remoteMessageId);
+        }
+
+        private void ProcessByRecieveHandler(BinaryReader reader, IRecieveHandler handler)
+        {
+            Log.Debug($"Handler found - {handler}");
+
+            foreach (var processMessage in handler.HandleResponce(reader))
+            {
+                try
+                {
+                    ProcessReceivedMessage(processMessage);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Cannot process message", ex);
+                }
+            }
+        }
+
+        private void ProcessContainerMessage(BinaryReader reader)
+        {
+            Log.Debug("Handle container");
+
+            var size = reader.ReadInt32();
+
+            for (var i = 0; i < size; i++)
+            {
+                var innerMessageId = reader.ReadUInt64();
+                var innerSequence = reader.ReadInt32();
+                var innerLength = reader.ReadInt32();
+
+                Log.Debug($"Process responce with inner id = '{innerMessageId}' into container");
+
+                ProcessReceivedMessage(reader.ReadBytes(innerLength));
+
+                ConfirmationSendService.AddForSend(innerMessageId);
+            }
+        }
+
+        private void ProcessReceivedMessage(byte[] message)
+        {
+            BinaryHelper.ReadBytes(
+                message,
+                reader =>
+                {
+                    var code = reader.ReadUInt32();
+
+                    Log.Debug($"Try handle response with code = {code}");
+
+                    switch (code)
+                    {
+                        case var c when RecieveHandlersMap.TryGetValue(c, out var handler):
+                            ProcessByRecieveHandler(reader, handler);
+                            break;
+                        case 0x73f1f8dc:
+                            ProcessContainerMessage(reader);
+                            break;
+                        default:
+                            Log.Error($"Cannot handle response with code = {code}");
+                            break;
+                    }
+                });
         }
     }
 }
