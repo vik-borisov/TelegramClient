@@ -18,8 +18,10 @@ namespace TelegramClient.Core
     using log4net;
     using Autofac;
 
+    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
@@ -35,9 +37,9 @@ namespace TelegramClient.Core
 
         public IConfirmationSendService ConfirmationSendService { get; set; }
 
-        public IMtProtoRecieveService ProtoRecieveService { get; set; }
+        public IRecievingService ProtoRecieveService { get; set; }
 
-        public IMtProtoReciever MtProtoReciever { get; set; }
+        public IResponseResultGetter ResponseResultGetter { get; set; }
 
         public IMtProtoPlainSender MtProtoPlainSender { get; set; }
 
@@ -142,7 +144,7 @@ namespace TelegramClient.Core
         private async Task<BinaryReader> SendAndRecieve(TlMethod methodToExecute)
         {
             var sendTask = Sender.Send(methodToExecute);
-            var recieveTask = MtProtoReciever.Recieve(methodToExecute.MessageId);
+            var recieveTask = ResponseResultGetter.Recieve(methodToExecute.MessageId);
 
             await sendTask;
             await recieveTask;

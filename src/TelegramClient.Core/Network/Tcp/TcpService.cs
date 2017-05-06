@@ -1,4 +1,4 @@
-﻿namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Tcp
 {
     using System;
     using System.IO;
@@ -31,8 +31,8 @@
                     _tcpClient = new TcpClient();
                     await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
 
-                    _resetEvent.Set();
                 }
+                _resetEvent.Set();
             }
             else
             {
@@ -41,13 +41,17 @@
                 if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                 {
                     _resetEvent.WaitOne();
-                    if (_tcpClient != null)
+                    if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                     {
-                        _tcpClient.Dispose();
-                        _tcpClient = null;
+                        if (_tcpClient != null)
+                        {
+                            _tcpClient.Dispose();
+                            _tcpClient = null;
+                        }
                     }
                     _resetEvent.Set();
                 }
+
             }
         }
 

@@ -5,7 +5,7 @@
 
     using Moq;
 
-    using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Confirm;
 
     internal static class ConfirmationRecieveServiceMock
     {

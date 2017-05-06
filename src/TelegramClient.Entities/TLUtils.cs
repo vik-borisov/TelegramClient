@@ -3,19 +3,6 @@ using System.Text;
 
 namespace TelegramClient.Entities
 {
-    public class IntegerUtil
-    {
-        public static int Deserialize(BinaryReader reader)
-        {
-            return reader.ReadInt32();
-        }
-
-        public static void Serialize(int src, BinaryWriter writer)
-        {
-            writer.Write(src);
-        }
-    }
-
     public class BytesUtil
     {
         private static byte[] Read(BinaryReader binaryReader)
@@ -117,45 +104,6 @@ namespace TelegramClient.Entities
             var falseCNumber = -1132882121;
             var trueCNumber = -1720552011;
             writer.Write(src ? trueCNumber : falseCNumber);
-        }
-    }
-
-    public class UIntUtil
-    {
-        public static uint Deserialize(BinaryReader reader)
-        {
-            return reader.ReadUInt32();
-        }
-
-        public static void Serialize(uint src, BinaryWriter writer)
-        {
-            writer.Write(src);
-        }
-    }
-
-    public class DoubleUtil
-    {
-        public static double Deserialize(BinaryReader reader)
-        {
-            return reader.ReadDouble();
-        }
-
-        public static void Serialize(double src, BinaryWriter writer)
-        {
-            writer.Write(src);
-        }
-    }
-
-    public class LongUtil
-    {
-        public static long Deserialize(BinaryReader reader)
-        {
-            return reader.ReadInt64();
-        }
-
-        public static void Serialize(long src, BinaryWriter writer)
-        {
-            writer.Write(src);
         }
     }
 }

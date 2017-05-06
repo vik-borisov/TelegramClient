@@ -6,6 +6,7 @@
     using Moq;
 
     using TelegramClient.Core.Network;
+    using TelegramClient.Core.Network.Tcp;
     using TelegramClient.UnitTests.Framework;
 
     using Xunit;

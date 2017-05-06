@@ -1,6 +1,0 @@
-group test
-	Autofac
-	Microsoft.NET.Test.Sdk
-	xunit
-	xunit.runner.visualstudio
-	Moq

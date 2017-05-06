@@ -1,4 +1,4 @@
-﻿namespace TelegramClient.Core.Network.Interfaces
+﻿namespace TelegramClient.Core.Network.Tcp
 {
     using System.Threading.Tasks;
 

@@ -1,5 +1,0 @@
-group app
-	System.Security.Cryptography.Algorithms
-	Autofac
-	BarsGroup.CodeGuard
-	log4net

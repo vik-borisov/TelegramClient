@@ -1,4 +1,4 @@
-﻿namespace TelegramClient.Core.Network.Interfaces
+﻿namespace TelegramClient.Core.Network.Confirm
 {
     internal interface IConfirmationSendService
     {

@@ -38,7 +38,7 @@ namespace TelegramClient.Entities
                     var constructor = br.ReadInt32();
                     var type = TlContext.GetType(constructor);
                     var obj = Activator.CreateInstance(type);
-                    type.GetMethod("DeserializeBody").Invoke(obj, new object[] {br});
+                    type.GetTypeInfo().GetMethod("DeserializeBody").Invoke(obj, new object[] {br});
                     Lists.Add((T) Convert.ChangeType(obj, type));
                 }
         }

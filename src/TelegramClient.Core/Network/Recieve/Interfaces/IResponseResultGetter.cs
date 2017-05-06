@@ -1,9 +1,9 @@
-namespace TelegramClient.Core.Network.Interfaces
+﻿namespace TelegramClient.Core.Network.Recieve.Interfaces
 {
     using System.IO;
     using System.Threading.Tasks;
 
-    internal interface IMtProtoReciever
+    internal interface IResponseResultGetter
     {
         Task<BinaryReader> Recieve(ulong requestId);
     }

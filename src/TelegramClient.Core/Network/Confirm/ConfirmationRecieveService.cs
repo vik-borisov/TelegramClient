@@ -1,10 +1,8 @@
-namespace TelegramClient.Core.Network
+namespace TelegramClient.Core.Network.Confirm
 {
     using System;
     using System.Collections.Concurrent;
     using System.Threading.Tasks;
-
-    using TelegramClient.Core.Network.Interfaces;
 
     internal class ConfirmationRecieveService : IConfirmationRecieveService
     {
