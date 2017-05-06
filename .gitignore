@@ -220,3 +220,4 @@ FakesAssemblies/
 _Pvt_Extensions
 /packages/
 /.fake/
+/.idea/
