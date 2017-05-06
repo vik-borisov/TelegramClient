@@ -64,8 +64,7 @@ namespace TelegramClient.Core.Network.Recieve
                             Log.Error("Recieve message failed", e);
                         }
                     }
-                },
-                _recievingCts.Token);
+                });
         }
 
         public void StopRecieving()

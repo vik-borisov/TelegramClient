@@ -43,7 +43,7 @@
                         Parallel.For(0,16,
                             l =>
                             {
-                                for (var j = 0; i < 100000000; i++)
+                                for (var j = 0; j < 100000000; j++)
                                 {
                                     queue.Enqueue(session.GetNewMessageId());
                                 }

@@ -149,7 +149,7 @@ namespace TelegramClient.Tests
             {
                 user = await client.MakeAuthAsync(NumberToAuthenticate, hash, code);
             }
-            catch (CloudPasswordNeededException ex)
+            catch (CloudPasswordNeededException)
             {
                 var password = await client.GetPasswordSetting();
                 var passwordStr = PasswordToAuthenticate;
