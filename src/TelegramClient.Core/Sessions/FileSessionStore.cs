@@ -4,7 +4,10 @@ namespace TelegramClient.Core.Sessions
 
     using log4net;
 
-    public class FileSessionStore : ISessionStore
+    using TelegramClient.Core.IoC;
+
+    [SingleInstance(typeof(ISessionStore))]
+    internal class FileSessionStore : ISessionStore
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSessionStore));
 

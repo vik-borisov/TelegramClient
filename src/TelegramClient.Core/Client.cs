@@ -18,6 +18,8 @@ namespace TelegramClient.Core
     using log4net;
     using Autofac;
 
+    using TelegramClient.Core.ApiServies;
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Interfaces;
@@ -25,6 +27,7 @@ namespace TelegramClient.Core
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
+    [SingleInstance(typeof(ITelegramClient))]
     internal class Client : ITelegramClient
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(Client));
@@ -44,6 +47,8 @@ namespace TelegramClient.Core
         public IMtProtoPlainSender MtProtoPlainSender { get; set; }
 
         public ISessionStore SessionStore { get; set; }
+
+        public IUpdatesApiService Updates { get; set; }
 
         private List<TlDcOption> _dcOptions;
 

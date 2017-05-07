@@ -186,7 +186,7 @@ namespace TelegramClient.Tests
         }
 
         [Fact]
-        public virtual async Task GetUpdatesTest()
+        public virtual async Task GetManualUpdatesTest()
         {
             var client = NewClient();
 
@@ -200,8 +200,26 @@ namespace TelegramClient.Tests
 
             Assert.IsNotType<TlDifferenceEmpty>(updates);
         }
-        
-        
+
+        [Fact]
+        public virtual async Task GetAutoUpdatesTest()
+        {
+            var client = NewClient();
+
+            client.Updates.RecieveUpdates += update =>
+            {
+
+            };
+
+            await client.ConnectAsync();
+
+            await SendMessage(client);
+            await SendMessage(client);
+            await SendMessage(client);
+
+            Thread.Sleep(2000);
+        }
+
         [Fact]
         public virtual async Task SendMessageTest()
         {

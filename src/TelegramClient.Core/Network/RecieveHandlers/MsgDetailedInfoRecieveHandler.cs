@@ -1,24 +1,24 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
 
     using log4net;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 
+    [SingleInstance(typeof(IRecieveHandler))]
     internal class MsgDetailedInfoRecieveHandler : IRecieveHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PingRecieveHandler));
 
-        public uint ResponceCode { get; } = 0x276d3ec6;
+        public uint[] HandleCodes { get; } = { 0x276d3ec6 };
 
-        public IEnumerable<byte[]> HandleResponce(BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             Log.Debug("Handle MsgDetailedInfo");
 
-            return Enumerable.Empty<byte[]>();
+            return null;
         }
     }
 }

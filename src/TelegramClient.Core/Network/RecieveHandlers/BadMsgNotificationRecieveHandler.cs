@@ -1,31 +1,29 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
 
     using log4net;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
-    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 
+    [SingleInstance(typeof(IRecieveHandler))]
     internal class BadMsgNotificationRecieveHandler : IRecieveHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BadMsgNotificationRecieveHandler));
 
-        public uint ResponceCode { get; } = 0xa7eff811;
+        public uint[] HandleCodes { get; } = { 0xa7eff811 };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
-        public IEnumerable<byte[]> HandleResponce(BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
-            Log.Debug("Handle a bad message notification");
-
             var requestId = reader.ReadUInt64();
             var requestSequence = reader.ReadInt32();
             var errorCode = reader.ReadInt32();
+
 
             Exception exception;
             switch (errorCode)
@@ -77,9 +75,11 @@
                     break;
             }
 
+            Log.Error($"Handle a bad message notification for request id = {requestId}", exception);
+
             ConfirmationRecieveService.RequestWithException(requestId, exception);
 
-            return Enumerable.Empty<byte[]>();
+            return null;
         }
     }
 }

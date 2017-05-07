@@ -8,6 +8,7 @@ namespace TelegramClient.Core
 
     using Autofac;
 
+    using TelegramClient.Core.ApiServies;
     using TelegramClient.Entities;
     using TelegramClient.Entities.TL;
 
@@ -23,5 +24,7 @@ namespace TelegramClient.Core
         Task<TlAbsUpdates> SendMessageAsync(TlAbsInputPeer peer, string message);
 
         Task ReconnectToDcAsync(int dcId);
+
+        IUpdatesApiService Updates { get; set; }
     }
 }

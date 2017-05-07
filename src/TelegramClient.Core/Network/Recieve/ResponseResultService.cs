@@ -9,9 +9,11 @@
 
     using Newtonsoft.Json;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Entities;
 
+    [SingleInstance(typeof(IResponseResultGetter), typeof(IResponseResultSetter))]
     internal class ResponseResultService : IResponseResultGetter,
                                            IResponseResultSetter
     {

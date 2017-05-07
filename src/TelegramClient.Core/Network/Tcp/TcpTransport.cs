@@ -7,11 +7,13 @@
 
     using log4net;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
     using TelegramClient.Core.Utils;
 
+    [SingleInstance(typeof(ITcpTransport))]
     internal class TcpTransport : ITcpTransport
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));

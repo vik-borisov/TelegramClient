@@ -8,9 +8,11 @@
 
     using log4net;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Requests;
 
+    [SingleInstance(typeof(IConfirmationSendService))]
     internal class ConfirmationSendService : IConfirmationSendService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ConfirmationSendService));

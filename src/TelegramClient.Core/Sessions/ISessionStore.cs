@@ -1,6 +1,6 @@
 namespace TelegramClient.Core.Sessions
 {
-    public interface ISessionStore
+    internal interface ISessionStore
     {
         void Save(ISession session);
 

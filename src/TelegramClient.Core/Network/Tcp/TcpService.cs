@@ -7,9 +7,11 @@
     using System.Threading;
     using System.Threading.Tasks;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Settings;
 
+    [SingleInstance(typeof(ITcpService))]
     internal class TcpService: IDisposable,
                                ITcpService
     {

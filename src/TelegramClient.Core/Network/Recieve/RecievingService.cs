@@ -9,6 +9,7 @@ namespace TelegramClient.Core.Network.Recieve
     using log4net;
 
     using TelegramClient.Core.Helpers;
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto.Crypto;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Recieve.Interfaces;
@@ -17,6 +18,7 @@ namespace TelegramClient.Core.Network.Recieve
     using TelegramClient.Core.Settings;
     using TelegramClient.Core.Utils;
 
+    [SingleInstance(typeof(IRecievingService))]
     internal class RecievingService : IRecievingService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RecievingService));
@@ -76,7 +78,6 @@ namespace TelegramClient.Core.Network.Recieve
         {
             byte[] message;
             ulong remoteMessageId;
-            int remoteSequence;
 
             using (var inputStream = new MemoryStream(body))
             using (var inputReader = new BinaryReader(inputStream))
@@ -100,7 +101,7 @@ namespace TelegramClient.Core.Network.Recieve
                     var remoteSalt = plaintextReader.ReadUInt64();
                     var remoteSessionId = plaintextReader.ReadUInt64();
                     remoteMessageId = plaintextReader.ReadUInt64();
-                    remoteSequence = plaintextReader.ReadInt32();
+                    plaintextReader.ReadInt32();
                     var msgLen = plaintextReader.ReadInt32();
                     message = plaintextReader.ReadBytes(msgLen);
                 }
@@ -109,20 +110,23 @@ namespace TelegramClient.Core.Network.Recieve
             return Tuple.Create(message, remoteMessageId);
         }
 
-        private void ProcessByRecieveHandler(BinaryReader reader, IRecieveHandler handler)
+        private void ProcessByRecieveHandler(uint code, BinaryReader reader, IRecieveHandler handler)
         {
             Log.Debug($"Handler found - {handler}");
 
-            foreach (var processMessage in handler.HandleResponce(reader))
+            var postProcessedMessage = handler.HandleResponce(code, reader);
+            if (postProcessedMessage == null)
             {
-                try
-                {
-                    ProcessReceivedMessage(processMessage);
-                }
-                catch (Exception ex)
-                {
-                    Log.Error("Cannot process message", ex);
-                }
+                return;
+            }
+
+            try
+            {
+                ProcessReceivedMessage(postProcessedMessage);
+            }
+            catch (Exception ex)
+            {
+                Log.Error("Cannot process message", ex);
             }
         }
 
@@ -159,7 +163,7 @@ namespace TelegramClient.Core.Network.Recieve
                     switch (code)
                     {
                         case var c when RecieveHandlersMap.TryGetValue(c, out var handler):
-                            ProcessByRecieveHandler(reader, handler);
+                            ProcessByRecieveHandler(code, reader, handler);
                             break;
                         case 0x73f1f8dc:
                             ProcessContainerMessage(reader);

@@ -31,7 +31,7 @@
             var authKeyData = SessionMock.GenerateAuthKeyData();
             const ulong sessionId = 123456;
             const ulong salt = 654321;
-            var rpcResponceCode = 0xf35c6d01;
+            uint[] rpcResponceCode = {0xf35c6d01};
 
             var sendUser = new TlDialog
             {
@@ -54,10 +54,10 @@
             this.RegisterMock(mConfrimSendService);
 
             var mRecieveHandler = RecieveHandlerMock.Create().BuildRecieveHandler(rpcResponceCode).BuildHandleResponce(
-                reader =>
+                (code, reader) =>
                 {
                     Assert.Equal(RequestMessageId, reader.ReadUInt64());
-                    return  Enumerable.Empty<byte[]>();
+                    return  null;
                 });
             this.RegisterMock(mRecieveHandler);
             this.RegisterAdapterForHandler();
@@ -76,7 +76,7 @@
             Thread.Sleep(500);
 
             // --
-            mRecieveHandler.Verify(recieveService => recieveService.HandleResponce(It.IsAny<BinaryReader>()), Times.Once);
+            mRecieveHandler.Verify(recieveService => recieveService.HandleResponce(It.IsAny<uint>(), It.IsAny<BinaryReader>()), Times.Once);
             mConfrimSendService.Verify(recieveService => recieveService.AddForSend(It.IsAny<ulong>()), Times.Once);
         }
 

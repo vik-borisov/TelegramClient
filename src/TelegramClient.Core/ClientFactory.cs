@@ -9,6 +9,7 @@
 
     using BarsGroup.CodeGuard;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
@@ -57,25 +58,26 @@
         {
             var builder = new ContainerBuilder();
 
-            builder.RegisterType<FileSessionStore>().As<ISessionStore>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<Client>().As<ITelegramClient>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<MtProtoSendService>().As<IMtProtoSender>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<ConfirmationSendService>().As<IConfirmationSendService>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<ConfirmationRecieveService>().As<IConfirmationRecieveService>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<MtProtoPlainSender>().As<IMtProtoPlainSender>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<ClientSettings>().As<IClientSettings>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<TcpTransport>().As<ITcpTransport>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<TcpService>().As<ITcpService>().SingleInstance().PropertiesAutowired();
-
-            builder.RegisterType<RecievingService>().As<IRecievingService>().SingleInstance().PropertiesAutowired();
-            builder.RegisterType<ResponseResultService>().As<IResponseResultGetter, IResponseResultSetter>().SingleInstance().PropertiesAutowired();
+            builder.RegisterAttibuteRegistration(typeof(ClientFactory).GetTypeInfo().Assembly);
 
             builder.RegisterAssemblyTypes(typeof(ClientFactory).GetTypeInfo().Assembly)
                    .Where(typeof(IRecieveHandler).IsAssignableFrom)
                    .As<IRecieveHandler>()
                    .SingleInstance()
                    .PropertiesAutowired();
-            builder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<uint, IRecieveHandler>>(handlers => handlers.ToDictionary(handler => handler.ResponceCode));
+            builder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<uint, IRecieveHandler>>(handlers =>
+            {
+                var handlerMap = new Dictionary<uint, IRecieveHandler>();
+                foreach (var handler in handlers.ToArray())
+                {
+                    foreach (var handleCode in handler.HandleCodes)
+                    {
+                        handlerMap[handleCode] = handler;
+                    }
+                }
+
+                return handlerMap;
+            });
 
            return builder.Build();
         }
