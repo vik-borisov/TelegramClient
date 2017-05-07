@@ -1,8 +1,10 @@
 ﻿namespace TelegramClient.Core.Settings
 {
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Sessions;
 
-    public class ClientSettings : IClientSettings
+    [SingleInstance(typeof(IClientSettings))]
+    internal class ClientSettings : IClientSettings
     {
         public int AppId { get; set; }
 

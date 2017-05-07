@@ -1,22 +1,22 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
-    using System.Collections.Generic;
     using System.IO;
     using System.IO.Compression;
-    using System.Linq;
 
     using log4net;
 
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 
+    [SingleInstance(typeof(IRecieveHandler))]
     internal class HandleGzipPackedRecieveHandler : IRecieveHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(HandleGzipPackedRecieveHandler));
 
-        public uint ResponceCode { get; } = 0x3072cfa1;
+        public uint[] HandleCodes { get; } = { 0x3072cfa1 };
 
-        public IEnumerable<byte[]> HandleResponce(BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             Log.Debug($"Recived Gzip message");
 
@@ -29,7 +29,7 @@
                 }
 
                 decompressStream.Position = 0;
-                yield return decompressStream.ToArray();
+                return decompressStream.ToArray();
             }
         }
     }

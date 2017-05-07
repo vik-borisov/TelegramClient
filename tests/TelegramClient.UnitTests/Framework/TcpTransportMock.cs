@@ -30,7 +30,19 @@
 
         public static void RegisterAdapterForHandler(this TestBase testBase)
         {
-            testBase.ContainerBuilder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<uint, IRecieveHandler>>(handlers => handlers.ToDictionary(handler => handler.ResponceCode));
+            testBase.ContainerBuilder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<uint, IRecieveHandler>>(handlers =>
+            {
+                var handlerMap = new Dictionary<uint, IRecieveHandler>();
+                foreach (var handler in handlers.ToArray())
+                {
+                    foreach (var handleCode in handler.HandleCodes)
+                    {
+                        handlerMap[handleCode] = handler;
+                    }
+                }
+
+                return handlerMap;
+            });
         }
 
         public static Mock<ITcpTransport> BuildReceieve(this Mock<ITcpTransport> mock, Func<Task<byte[]>> returns)

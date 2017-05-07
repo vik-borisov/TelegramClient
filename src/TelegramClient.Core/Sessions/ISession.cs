@@ -3,7 +3,7 @@
     using global::TelegramClient.Core.MTProto.Crypto;
     using global::TelegramClient.Entities.TL;
 
-    public interface ISession
+    internal interface ISession
     {
         string SessionUserId { get; set; }
 

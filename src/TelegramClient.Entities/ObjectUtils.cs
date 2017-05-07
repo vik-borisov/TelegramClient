@@ -4,16 +4,21 @@ using System.Reflection;
 
 namespace TelegramClient.Entities
 {
-    public class ObjectUtils
+    public static class ObjectUtils
     {
         public static object DeserializeObject(BinaryReader reader)
         {
-            var constructor = reader.ReadInt32();
+            var constructor = reader.ReadUInt32();
+            return DeserializeObject(reader, constructor);
+        }
+
+        public static object DeserializeObject(BinaryReader reader, uint code)
+        {
             object obj;
             TypeInfo t;
             try
             {
-                t = TlContext.GetType(constructor).GetTypeInfo();
+                t = TlContext.GetType((int)code).GetTypeInfo();
                 obj = Activator.CreateInstance(t.AsType());
             }
             catch (Exception ex)
@@ -22,12 +27,12 @@ namespace TelegramClient.Entities
             }
             if (t.IsSubclassOf(typeof(TlMethod)))
             {
-                ((TlMethod) obj).DeserializeResponse(reader);
+                ((TlMethod)obj).DeserializeResponse(reader);
                 return obj;
             }
             if (t.IsSubclassOf(typeof(TlObject)))
             {
-                ((TlObject) obj).DeserializeBody(reader);
+                ((TlObject)obj).DeserializeBody(reader);
                 return obj;
             }
             throw new NotImplementedException("Weird Type : " + t.Namespace + " | " + t.Name);

@@ -11,19 +11,19 @@ namespace TelegramClient.UnitTests.Framework
 
     internal static class RecieveHandlerMock
     {
-        public static Mock<IRecieveHandler> BuildRecieveHandler(this Mock<IRecieveHandler> mock, uint code)
+        public static Mock<IRecieveHandler> BuildRecieveHandler(this Mock<IRecieveHandler> mock, uint[] code)
         {
             mock
-                .Setup(recieveHandler => recieveHandler.ResponceCode)
+                .Setup(recieveHandler => recieveHandler.HandleCodes)
                 .Returns(code);
 
             return mock;
         }
 
-        public static Mock<IRecieveHandler> BuildHandleResponce(this Mock<IRecieveHandler> mock, Func<BinaryReader, IEnumerable<byte[]>> callback)
+        public static Mock<IRecieveHandler> BuildHandleResponce(this Mock<IRecieveHandler> mock, Func<uint, BinaryReader, byte[]> callback)
         {
             mock
-                .Setup(recieveHandler => recieveHandler.HandleResponce(It.IsAny<BinaryReader>()))
+                .Setup(recieveHandler => recieveHandler.HandleResponce(It.IsAny<uint>(), It.IsAny<BinaryReader>()))
                 .Returns(callback);
 
             return mock;

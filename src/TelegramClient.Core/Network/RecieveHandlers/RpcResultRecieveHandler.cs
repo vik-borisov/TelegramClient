@@ -1,32 +1,32 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.IO.Compression;
-    using System.Linq;
     using System.Text.RegularExpressions;
 
     using log4net;
 
     using TelegramClient.Core.Exceptions;
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 
+    [SingleInstance(typeof(IRecieveHandler))]
     internal class RpcResultRecieveHandler : IRecieveHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RpcResultRecieveHandler));
 
-        public uint ResponceCode { get; } = 0xf35c6d01;
+        public uint[] HandleCodes { get; } = { 0xf35c6d01 };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
         public IResponseResultSetter ResponseResultSetter { get; set; }
 
-        public IEnumerable<byte[]> HandleResponce(BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             Log.Debug("Handle RpcResult");
 
@@ -53,7 +53,7 @@
                     break;
             }
 
-            return Enumerable.Empty<byte[]>();
+            return null;
         }
 
         private void HandleZipPacket(BinaryReader reader, ulong requestId)

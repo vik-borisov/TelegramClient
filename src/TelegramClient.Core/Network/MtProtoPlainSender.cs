@@ -6,10 +6,12 @@ namespace TelegramClient.Core.Network
     using log4net;
 
     using TelegramClient.Core.Helpers;
+    using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Settings;
 
+    [SingleInstance(typeof(IMtProtoPlainSender))]
     internal class MtProtoPlainSender : IMtProtoPlainSender
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MtProtoPlainSender));
