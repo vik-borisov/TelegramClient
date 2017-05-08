@@ -71,6 +71,7 @@ namespace TelegramClient.Core.Network
 					return ciphertextPacket.ToArray();
 				}
 			}
+
 		}
 
 		public Tuple<Task, ulong> Send(TlMethod request)

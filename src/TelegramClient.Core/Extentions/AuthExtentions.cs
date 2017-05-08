@@ -146,6 +146,7 @@ namespace TelegramClient.Core
             session.SessionExpires = int.MaxValue;
 
             var sessionStore = container.Resolve<ISessionStore>();
+
             sessionStore.Save();
         }
 
