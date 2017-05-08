@@ -8,7 +8,6 @@
     using log4net;
 
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
     using TelegramClient.Core.Utils;
@@ -21,6 +20,8 @@
         private readonly ConcurrentQueue<byte[]> _queue = new ConcurrentQueue<byte[]>();
 
         private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
+
+        private int _messageSeqNo;
 
         public ITcpService TcpService { get; set; }
 
@@ -62,7 +63,7 @@
 
         private async Task SendPacket(byte[] packet)
         {
-            var mesSeqNo = ClientSettings.Session.GenerateMessageSeqNo();
+            var mesSeqNo = _messageSeqNo++;
 
             Log.Debug($"Send message with seq_no {mesSeqNo}");
 
@@ -70,7 +71,7 @@
             var encodedMessage = tcpMessage.Encode();
             await TcpService.Send(encodedMessage);
 
-            SessionStore.Save(ClientSettings.Session);
+            SessionStore.Save();
         }
 
         private void PushToQueue(byte[] packet)

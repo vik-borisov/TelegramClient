@@ -1,5 +1,6 @@
 ﻿namespace TelegramClient.UnitTests.Network
 {
+    using System;
     using System.Threading.Tasks;
 
     using Autofac;
@@ -32,8 +33,7 @@
             ulong salt = 5432111;
             var seqNo = 123;
             var mSession = SessionMock.Create()
-                .BuildGetNewMessageId(() => SendMessageId)
-                .BuildGenerateMessageSeqNo(() => seqNo)
+                .BuildGenerateMessageSeqNo(confirm => Tuple.Create(SendMessageId, seqNo))
                 .BuildSession(sessionId, salt, authKey);
             
             var request = new PingRequest();
@@ -59,8 +59,9 @@
             // ---
 
             var mtProtoPlainSender = this.Resolve<MtProtoSendService>();
-            await mtProtoPlainSender.Send(request);
+            var sendResult =  mtProtoPlainSender.Send(request);
 
+            await sendResult.Item1;
             // --
 
             mTcpTransport.Verify(transport => transport.Send(It.IsAny<byte[]>()), Times.Once);
@@ -98,7 +99,6 @@
                             {
                                 Assert.Equal(session.Salt, reader.ReadUInt64());
                                 Assert.Equal(session.Id, reader.ReadUInt64());
-                                Assert.Equal(request.MessageId, reader.ReadUInt64());
                                 Assert.Equal(0, reader.ReadInt32());
 
                                 var packetLength = reader.ReadInt32();

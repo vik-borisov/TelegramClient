@@ -93,7 +93,7 @@ namespace TelegramClient.Core
                 ClientSettings.Session.AuthKey = result.AuthKey;
                 ClientSettings.Session.TimeOffset = result.TimeOffset;
 
-                SessionStore.Save(ClientSettings.Session);
+                SessionStore.Save();
             }
 
             //set-up layer
@@ -149,9 +149,9 @@ namespace TelegramClient.Core
         private async Task<BinaryReader> SendAndRecieve(TlMethod methodToExecute)
         {
             var sendTask = Sender.Send(methodToExecute);
-            var recieveTask = ResponseResultGetter.Recieve(methodToExecute.MessageId);
+            var recieveTask = ResponseResultGetter.Recieve(sendTask.Item2);
 
-            await sendTask;
+            await sendTask.Item1;
             await recieveTask;
 
             return recieveTask.Result;

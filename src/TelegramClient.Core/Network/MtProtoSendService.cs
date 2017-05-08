@@ -6,7 +6,8 @@ using TelegramClient.Entities;
 
 namespace TelegramClient.Core.Network
 {
-    using System.Threading.Tasks;
+	using System;
+	using System.Threading.Tasks;
 
     using log4net;
 
@@ -28,13 +29,14 @@ namespace TelegramClient.Core.Network
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
-	    private byte[] PrepareToSend(TlMethod request)
+	    private byte[] PrepareToSend(TlMethod request, out ulong mesId)
 	    {
 		    var packet = BinaryHelper.WriteBytes(request.SerializeBody);
 
-            request.MessageId = ClientSettings.Session.GetNewMessageId();
+		    var genResult = ClientSettings.Session.GenerateMesIdAndSeqNo(request.Confirmed);
+		    mesId = genResult.Item1;
 
-            Log.Debug($"Send message with Id = {request.MessageId}");
+            Log.Debug($"Send message with Id = {mesId} and seqNo = {genResult.Item2}");
 
 			byte[] msgKey;
 			byte[] ciphertext;
@@ -44,8 +46,8 @@ namespace TelegramClient.Core.Network
 				{
 					plaintextWriter.Write(ClientSettings.Session.Salt);
 					plaintextWriter.Write(ClientSettings.Session.Id);
-					plaintextWriter.Write(request.MessageId);
-					plaintextWriter.Write(ClientSettings.Session.GenerateSessionSeqNo(request.Confirmed));
+					plaintextWriter.Write(mesId);
+					plaintextWriter.Write(genResult.Item2);
 					plaintextWriter.Write(packet.Length);
 					plaintextWriter.Write(packet);
 
@@ -66,18 +68,21 @@ namespace TelegramClient.Core.Network
 					return ciphertextPacket.ToArray();
 				}
 			}
+
 		}
 
-	    public async Task Send(TlMethod request)
-	    {
-	        var preparedData = PrepareToSend(request);
+		public Tuple<Task, ulong> Send(TlMethod request)
+		{
+			var preparedData = PrepareToSend(request, out var mesId);
 
-	        TcpTransport.Send(preparedData);
+			TcpTransport.Send(preparedData);
 
-            await ConfirmationRecieveService.WaitForConfirm(request.MessageId);
-	    }
+			var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
 
-	    private MemoryStream MakeMemory(int len)
+			return Tuple.Create(waitTask, mesId);
+		}
+
+		private MemoryStream MakeMemory(int len)
 		{
 			return new MemoryStream(new byte[len], 0, len, true, true);
 		}

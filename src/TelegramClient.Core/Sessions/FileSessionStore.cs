@@ -5,41 +5,75 @@ namespace TelegramClient.Core.Sessions
     using log4net;
 
     using TelegramClient.Core.IoC;
+    using TelegramClient.Core.Settings;
 
     [SingleInstance(typeof(ISessionStore))]
     internal class FileSessionStore : ISessionStore
     {
+        private readonly IClientSettings _clientSettings;
+
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSessionStore));
 
-        public void Save(ISession session)
+        private FileStream _fileStream;
+
+        private readonly object _syncObject = new object();
+
+        public FileSessionStore(IClientSettings clientSettings)
         {
-            var sessionFile = $"{session.SessionUserId}.dat";
+            _clientSettings = clientSettings;
+        }
 
-            Log.Debug($"Save session into file '{sessionFile}'");
+        private void EnsureStreamOpen(string sessionUserId)
+        {
+            var sessionFile = $"{sessionUserId}.dat";
 
-            using (var stream = new FileStream(sessionFile, FileMode.OpenOrCreate))
+            if (_fileStream == null)
             {
-                var result = session.ToBytes();
-                stream.Write(result, 0, result.Length);
+                lock (_syncObject)
+                {
+                    if (_fileStream == null)
+                    {
+                        _fileStream = new FileStream(sessionFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    }
+                }
+
+            }
+        }
+
+        public void Save()
+        {
+            Log.Debug($"Save session into ");
+
+            EnsureStreamOpen(_clientSettings.Session.SessionUserId);
+
+            var result = _clientSettings.Session.ToBytes();
+            lock (_syncObject)
+            {
+                _fileStream.Seek(0, SeekOrigin.Begin);
+                _fileStream.Write(result, 0, result.Length);
             }
         }
 
         public ISession Load(string sessionUserId)
         {
-            var sessionFileName = $"{sessionUserId}.dat";
+            Log.Debug($"Load session for userID = {sessionUserId}");
 
-            Log.Debug($"Load session from file '{sessionFileName}'");
+            EnsureStreamOpen(sessionUserId);
 
-            if (!File.Exists(sessionFileName))
-                return null;
-
-            using (var stream = new FileStream(sessionFileName, FileMode.Open))
+            var buffer = new byte[2048];
+            lock (_syncObject)
             {
-                var buffer = new byte[2048];
-                stream.Read(buffer, 0, 2048);
+                _fileStream.Seek(0, SeekOrigin.Begin);
 
-                return Session.FromBytes(buffer, sessionUserId);
+                if (!_fileStream.CanRead)
+                {
+                    return null;
+                }
+
+                _fileStream.Read(buffer, 0, 2048);
             }
+
+            return Session.FromBytes(buffer, sessionUserId);
         }
     }
 }

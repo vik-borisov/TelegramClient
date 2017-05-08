@@ -1,11 +1,12 @@
 namespace TelegramClient.Core.Network.Interfaces
 {
+    using System;
     using System.Threading.Tasks;
 
     using TelegramClient.Entities;
 
     internal interface IMtProtoSender
     {
-        Task Send(TlMethod request);
+        Tuple<Task, ulong> Send(TlMethod request);
     }
 }

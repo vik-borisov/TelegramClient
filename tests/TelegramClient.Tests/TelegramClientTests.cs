@@ -167,7 +167,7 @@ namespace TelegramClient.Tests
             Thread.Sleep(1000);
         }
 
-        private async Task SendMessage(ITelegramClient client)
+        private async Task<TlUser> GetUser(ITelegramClient client)
         {
             var normalizedNumber = NumberToSendMessage.StartsWith("+")
                                        ? NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1)
@@ -175,13 +175,13 @@ namespace TelegramClient.Tests
 
             var result = await client.GetContactsAsync();
 
-            var user = result.Users.Lists
+            return result.Users.Lists
                              .OfType<TlUser>()
                              .FirstOrDefault(x => x.Phone == normalizedNumber);
+        }
 
-            if (user == null)
-                throw new Exception("Number was not found in Contacts List of user: " + NumberToSendMessage);
-
+        private async Task SendMessage(ITelegramClient client, TlUser user)
+        {
             await client.SendMessageAsync(new TlInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next());
         }
 
@@ -194,7 +194,8 @@ namespace TelegramClient.Tests
 
             var currentState = await client.GetCurrentState();
 
-            await SendMessage(client);
+            var user = await GetUser(client);
+            await SendMessage(client, user);
 
             var updates = await client.GetUpdates(currentState);
 
@@ -212,10 +213,11 @@ namespace TelegramClient.Tests
             };
 
             await client.ConnectAsync();
-
-            await SendMessage(client);
-            await SendMessage(client);
-            await SendMessage(client);
+            var user = await GetUser(client);
+            await SendMessage(client, user);
+            await SendMessage(client, user);
+            await SendMessage(client, user);
+            await SendMessage(client, user);
 
             Thread.Sleep(2000);
         }
@@ -227,7 +229,8 @@ namespace TelegramClient.Tests
 
             await client.ConnectAsync();
 
-            await SendMessage(client);
+            var user = await GetUser(client);
+            await SendMessage(client, user);
 
             Thread.Sleep(1000);
         }
@@ -238,13 +241,18 @@ namespace TelegramClient.Tests
             var client = NewClient();
 
             await client.ConnectAsync();
+            var user = await GetUser(client);
 
-            var m1 = SendMessage(client);
-            var m2 = SendMessage(client);
-            var m3 = SendMessage(client);
-            var m4 = SendMessage(client);
+            var m2 = SendMessage(client, user);
+            var m1 = SendMessage(client, user);
+            var m3 = SendMessage(client, user);
+            var m4 = SendMessage(client, user);
+            var m5 = SendMessage(client, user);
+            var m6 = SendMessage(client, user);
+            var m7 = SendMessage(client, user);
+            var m8 = SendMessage(client, user);
 
-            Task.WaitAll(m1, m2, m3, m4);
+            Task.WaitAll(m1, m2, m3, m4, m5, m6, m7, m8);
             Thread.Sleep(1000);
         }
 

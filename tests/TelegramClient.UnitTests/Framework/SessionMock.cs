@@ -11,19 +11,19 @@ namespace TelegramClient.UnitTests.Framework
     {
         private static readonly Random Random = new Random();
 
-        public static Mock<ISession> BuildGetNewMessageId(this Mock<ISession> mock, Func<ulong> getNewMessageIdFunc)
+        public static Mock<ISession> BuildGenerateMesId(this Mock<ISession> mock, Func<ulong> getNewMessageIdFunc)
         {
             mock
-                .Setup(service => service.GetNewMessageId())
+                .Setup(service => service.GenerateMesId())
                 .Returns(getNewMessageIdFunc);
 
             return mock;
         }
 
-        public static Mock<ISession> BuildGenerateMessageSeqNo(this Mock<ISession> mock, Func<int> generateMessageSeqNoFunc)
+        public static Mock<ISession> BuildGenerateMessageSeqNo(this Mock<ISession> mock, Func<bool, Tuple<ulong, int>> generateMessageSeqNoFunc)
         {
             mock
-                .Setup(service => service.GenerateMessageSeqNo())
+                .Setup(service => service.GenerateMesIdAndSeqNo(It.IsAny<bool>()))
                 .Returns(generateMessageSeqNoFunc);
 
             return mock;

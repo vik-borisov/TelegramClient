@@ -1,5 +1,7 @@
-﻿namespace TelegramClient.Core.Sessions
+namespace TelegramClient.Core.Sessions
 {
+    using System;
+
     using global::TelegramClient.Core.MTProto.Crypto;
     using global::TelegramClient.Entities.TL;
 
@@ -25,10 +27,8 @@
 
         byte[] ToBytes();
 
-        ulong GetNewMessageId();
+        Tuple<ulong, int> GenerateMesIdAndSeqNo(bool confirmed);
 
-        int GenerateSessionSeqNo(bool confirmed);
-
-        int GenerateMessageSeqNo();
+        ulong GenerateMesId();
     }
 }

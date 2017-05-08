@@ -6,11 +6,6 @@ namespace TelegramClient.Entities
     {
         public abstract void DeserializeResponse(BinaryReader stream);
 
-        #region MTPROTO
-
-        public ulong MessageId { get; set; }
         public virtual bool Confirmed { get; } = true;
-
-        #endregion
     }
 }
