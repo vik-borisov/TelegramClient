@@ -17,10 +17,10 @@ namespace TelegramClient.UnitTests.Framework
             return mock;
         }
 
-        public static Mock<ISessionStore> BuildSave(this Mock<ISessionStore> mock, Action<ISession> callbackFunc)
+        public static Mock<ISessionStore> BuildSave(this Mock<ISessionStore> mock, Action callbackFunc)
         {
             mock
-                .Setup(store => store.Save(It.IsAny<ISession>()))
+                .Setup(store => store.Save())
                 .Callback(callbackFunc);
 
             return mock;

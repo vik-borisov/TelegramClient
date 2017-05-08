@@ -22,7 +22,7 @@ namespace TelegramClient.Core.Network
 
         private byte[] PrepareToSend(byte[] data)
         {
-            var newMessageId = ClientSettings.Session.GetNewMessageId();
+            var newMessageId = ClientSettings.Session.GenerateMesId();
             Log.Debug($"Send message with id : {newMessageId}");
 
             return BinaryHelper.WriteBytes(

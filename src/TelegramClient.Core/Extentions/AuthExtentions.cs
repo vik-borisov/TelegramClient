@@ -147,7 +147,7 @@ namespace TelegramClient.Core
 
             var sessionStore = container.Resolve<ISessionStore>();
 
-            sessionStore.Save(session);
+            sessionStore.Save();
         }
 
         public static bool IsUserAuthorized(this ITelegramClient client)

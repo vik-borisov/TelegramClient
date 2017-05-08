@@ -29,7 +29,7 @@
 
             this.RegisterMock(mTcpTransport);
 
-            var mSession = SessionMock.Create().BuildGetNewMessageId(() => SendMessageId);
+            var mSession = SessionMock.Create().BuildGenerateMesId(() => SendMessageId);
             var mClientSettings = ClientSettingsMock.Create().AttachSession(() => mSession.Object);
             this.RegisterMock(mClientSettings);
 

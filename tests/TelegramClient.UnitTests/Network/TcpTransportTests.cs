@@ -1,5 +1,6 @@
 ﻿namespace TelegramClient.UnitTests.Network
 {
+    using System;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -17,13 +18,15 @@
         public void Send_TcpServiceSendCalled_NotThrows()
         {
             var task = Task.Delay(1);
+            const ulong SendMessageId = 1234;
 
             var mTcpService = TcpServiceMock.Create().BuildSend(returnTask: () => task);
             this.RegisterMock(mTcpService);
 
             var seqNo = 1;
 
-            var mSession = SessionMock.Create().BuildGenerateMessageSeqNo(() => seqNo);
+            var mSession = SessionMock.Create()
+                                      .BuildGenerateMessageSeqNo(confirm => Tuple.Create(SendMessageId, seqNo));
             var mClientSettings = ClientSettingsMock.Create().AttachSession(() => mSession.Object);
             this.RegisterMock(mClientSettings);
 
