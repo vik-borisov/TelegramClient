@@ -10,7 +10,6 @@ namespace TelegramClient.Core.Sessions
     [SingleInstance(typeof(ISessionStore))]
     internal class FileSessionStore : ISessionStore
     {
-        private readonly IClientSettings _clientSettings;
 
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSessionStore));
 
@@ -18,10 +17,7 @@ namespace TelegramClient.Core.Sessions
 
         private readonly object _syncObject = new object();
 
-        public FileSessionStore(IClientSettings clientSettings)
-        {
-            _clientSettings = clientSettings;
-        }
+        public IClientSettings ClientSettings { get; set; }
 
         private void EnsureStreamOpen(string sessionUserId)
         {
@@ -33,10 +29,10 @@ namespace TelegramClient.Core.Sessions
                 {
                     if (_fileStream == null)
                     {
+                        //TODO: reuse stream with a different session size
                         _fileStream = new FileStream(sessionFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
                     }
                 }
-
             }
         }
 
@@ -44,9 +40,9 @@ namespace TelegramClient.Core.Sessions
         {
             Log.Debug($"Save session into ");
 
-            EnsureStreamOpen(_clientSettings.Session.SessionUserId);
+            EnsureStreamOpen(ClientSettings.Session.SessionUserId);
 
-            var result = _clientSettings.Session.ToBytes();
+            var result = ClientSettings.Session.ToBytes();
             lock (_syncObject)
             {
                 _fileStream.Seek(0, SeekOrigin.Begin);
@@ -65,7 +61,7 @@ namespace TelegramClient.Core.Sessions
             {
                 _fileStream.Seek(0, SeekOrigin.Begin);
 
-                if (!_fileStream.CanRead)
+                if (_fileStream.Length == 0)
                 {
                     return null;
                 }

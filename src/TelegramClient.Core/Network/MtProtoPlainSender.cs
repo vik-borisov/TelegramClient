@@ -22,7 +22,7 @@ namespace TelegramClient.Core.Network
 
         private byte[] PrepareToSend(byte[] data)
         {
-            var newMessageId = ClientSettings.Session.GenerateMesId();
+            var newMessageId = ClientSettings.Session.GenerateMsgId();
             Log.Debug($"Send message with id : {newMessageId}");
 
             return BinaryHelper.WriteBytes(
@@ -39,7 +39,8 @@ namespace TelegramClient.Core.Network
         {
             var preparedPacket = PrepareToSend(data);
 
-            TcpTransport.Send(preparedPacket);
+            await TcpTransport.Send(preparedPacket);
+
             var result = await TcpTransport.Receieve();
 
             return ProcessReceivedMessage(result);

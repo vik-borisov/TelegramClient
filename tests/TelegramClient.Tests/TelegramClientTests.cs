@@ -243,8 +243,8 @@ namespace TelegramClient.Tests
             await client.ConnectAsync();
             var user = await GetUser(client);
 
-            var m2 = SendMessage(client, user);
             var m1 = SendMessage(client, user);
+            var m2 = SendMessage(client, user);
             var m3 = SendMessage(client, user);
             var m4 = SendMessage(client, user);
             var m5 = SendMessage(client, user);
