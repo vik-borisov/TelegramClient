@@ -12,7 +12,7 @@
     {
         private readonly object _syncObject = new object();
 
-        private int _inc;
+        private int _msgIdInc;
 
         public string SessionUserId { get; set; }
 
@@ -80,32 +80,31 @@
                        : SessionSeqNo * 2;
         }
 
-        public Tuple<ulong, int> GenerateMesIdAndSeqNo(bool confirmed)
+        public Tuple<ulong, int> GenerateMsgIdAndSeqNo(bool confirmed)
         {
             lock (_syncObject)
             {
-                return Tuple.Create(GenerateMesId(), GenerateSeqNo(confirmed));
+                return Tuple.Create(GenerateMsgId(), GenerateSeqNo(confirmed));
             }
         }
 
-        public ulong GenerateMesId()
+        public ulong GenerateMsgId()
         {
-            if (_inc >= 4194303 - 4)
+            if (_msgIdInc >= 4194303 - 4)
             {
-                _inc = 0;
+                _msgIdInc = 0;
             }
             else
             {
-                _inc += 4;
+                _msgIdInc += 4;
             }
 
             var seconds = (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
 
-
             var newMessageId =
                 ((seconds / 1000 + TimeOffset) << 32) |
                 ((seconds % 1000) << 22) |
-                _inc;
+                _msgIdInc;
 
             return (ulong)newMessageId;
         }

@@ -91,13 +91,15 @@
                 return rand;
             }
 
-            return store.Load(sessionUserId) ?? new Session
-                                                {
-                                                    Id = GenerateSessionId(),
-                                                    SessionUserId = sessionUserId,
-                                                    ServerAddress = serverAddress,
-                                                    Port = serverPort
-            };
+            var session = store.Load(sessionUserId) ?? new Session
+                                                       {
+                                                           Id = GenerateSessionId(),
+                                                           SessionUserId = sessionUserId
+                                                       };
+            session.ServerAddress = serverAddress;
+            session.Port = serverPort;
+
+            return session;
         }
     }
 }

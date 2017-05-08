@@ -4,7 +4,7 @@
 
     internal interface ITcpTransport
     {
-        void Send(byte[] packet);
+        Task Send(byte[] packet);
 
         Task<byte[]> Receieve();
     }

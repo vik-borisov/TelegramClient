@@ -9,7 +9,6 @@
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Sessions;
-    using TelegramClient.Core.Settings;
     using TelegramClient.Core.Utils;
 
     [SingleInstance(typeof(ITcpTransport))]
@@ -17,17 +16,13 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
 
-        private readonly ConcurrentQueue<byte[]> _queue = new ConcurrentQueue<byte[]>();
+        private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>>();
 
         private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
 
         private int _messageSeqNo;
 
         public ITcpService TcpService { get; set; }
-
-        public ISessionStore SessionStore { get; set; }
-
-        public IClientSettings ClientSettings { get; set; }
 
         public TcpTransport()
         {
@@ -46,7 +41,8 @@
 
                         try
                         {
-                            SendPacket(item).Wait();
+                            SendPacket(item.Item1).Wait();
+                            item.Item2.SetResult(true);
                         }
                         catch (Exception e)
                         {
@@ -56,9 +52,13 @@
                 });
         }
 
-        public void Send(byte[] packet)
+        public Task Send(byte[] packet)
         {
-            PushToQueue(packet);
+            var tcs = new TaskCompletionSource<bool>();
+
+            PushToQueue(packet, tcs);
+
+            return tcs.Task;
         }
 
         private async Task SendPacket(byte[] packet)
@@ -70,13 +70,11 @@
             var tcpMessage = new TcpMessage(mesSeqNo, packet);
             var encodedMessage = tcpMessage.Encode();
             await TcpService.Send(encodedMessage);
-
-            SessionStore.Save();
         }
 
-        private void PushToQueue(byte[] packet)
+        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
         {
-            _queue.Enqueue(packet);
+            _queue.Enqueue(Tuple.Create(packet, tcs) );
 
             if (!_resetEvent.IsSet)
             {

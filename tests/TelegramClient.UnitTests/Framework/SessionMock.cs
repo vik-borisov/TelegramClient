@@ -14,7 +14,7 @@ namespace TelegramClient.UnitTests.Framework
         public static Mock<ISession> BuildGenerateMesId(this Mock<ISession> mock, Func<ulong> getNewMessageIdFunc)
         {
             mock
-                .Setup(service => service.GenerateMesId())
+                .Setup(service => service.GenerateMsgId())
                 .Returns(getNewMessageIdFunc);
 
             return mock;
@@ -23,7 +23,7 @@ namespace TelegramClient.UnitTests.Framework
         public static Mock<ISession> BuildGenerateMessageSeqNo(this Mock<ISession> mock, Func<bool, Tuple<ulong, int>> generateMessageSeqNoFunc)
         {
             mock
-                .Setup(service => service.GenerateMesIdAndSeqNo(It.IsAny<bool>()))
+                .Setup(service => service.GenerateMsgIdAndSeqNo(It.IsAny<bool>()))
                 .Returns(generateMessageSeqNoFunc);
 
             return mock;

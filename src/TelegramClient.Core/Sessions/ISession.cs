@@ -27,8 +27,8 @@ namespace TelegramClient.Core.Sessions
 
         byte[] ToBytes();
 
-        Tuple<ulong, int> GenerateMesIdAndSeqNo(bool confirmed);
+        Tuple<ulong, int> GenerateMsgIdAndSeqNo(bool confirmed);
 
-        ulong GenerateMesId();
+        ulong GenerateMsgId();
     }
 }

@@ -16,7 +16,8 @@ namespace TelegramClient.Core.Network
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Network.Tcp;
-    using TelegramClient.Core.Settings;
+	using TelegramClient.Core.Sessions;
+	using TelegramClient.Core.Settings;
 
 	[SingleInstance(typeof(IMtProtoSender))]
     internal class MtProtoSendService : IMtProtoSender
@@ -29,11 +30,13 @@ namespace TelegramClient.Core.Network
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
+		public ISessionStore SessionStore { get; set; }
+
 	    private byte[] PrepareToSend(TlMethod request, out ulong mesId)
 	    {
 		    var packet = BinaryHelper.WriteBytes(request.SerializeBody);
 
-		    var genResult = ClientSettings.Session.GenerateMesIdAndSeqNo(request.Confirmed);
+		    var genResult = ClientSettings.Session.GenerateMsgIdAndSeqNo(request.Confirmed);
 		    mesId = genResult.Item1;
 
             Log.Debug($"Send message with Id = {mesId} and seqNo = {genResult.Item2}");
@@ -68,14 +71,15 @@ namespace TelegramClient.Core.Network
 					return ciphertextPacket.ToArray();
 				}
 			}
-
 		}
 
 		public Tuple<Task, ulong> Send(TlMethod request)
 		{
 			var preparedData = PrepareToSend(request, out var mesId);
 
-			TcpTransport.Send(preparedData);
+			TcpTransport.Send(preparedData).Wait();
+
+			SessionStore.Save();
 
 			var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
 
