@@ -4,25 +4,11 @@
 [![NuGet version](https://badge.fury.io/nu/telegramclientapi.svg)](https://badge.fury.io/nu/telegramclientapi)
 [![Join the chat at https://gitter.im/DotNetTelegramClientApi](https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg)](https://gitter.im/DotNetTelegramClientApi/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 
-_Unofficial_ Telegram (http://telegram.org) client library implemented in C#. Latest TL scheme supported, thanks to Afshin Arani
+_Unofficial_ Telegram (http://telegram.org) client library implemented in C#. Latest TL scheme supported
 
 It's a perfect fit for any developer who would like to send data directly to Telegram users or write own custom Telegram client.
 
 :star2: If you :heart: library, please star it! :star2:
-
-# Table of contents?
-
-- [How do I add this to my project?](#how-do-i-add-this-to-my-project)
-- [Dependencies](#dependencies)
-- [Starter Guide](#starter-guide)
-  - [Quick configuration](#quick-configuration)
-  - [First requests](#first-requests)
-  - [Working with files](#working-with-files)
-- [Available Methods](#available-methods)
-- [Contributing](#contributing)
-- [FAQ](#faq)
-- [Donations](#donations)
-- [License](#license)
 
 # How do I add this to my project?
 
@@ -32,183 +18,13 @@ Install via NuGet
 	> Install-Package TelegramClientApi
 ```
 
-or build from source
+## [Quick Start](../wiki/Quick-Start)
 
-1. Clone TelegramClient from GitHub
-1. Compile source with VS2017
-1. Add reference to ```TelegramClient.Core.dll``` to your awesome project.
+## [Available Methods](../wiki/Supported-methods)
 
-# Starter Guide
+## [Roadmap](../milestones)
 
-## Quick Configuration
-Telegram API isn't that easy to start. You need to do some configuration first.
-
-1. Create a [developer account](https://my.telegram.org/) in Telegram. 
-1. Goto [API development tools](https://my.telegram.org/apps) and copy **API_ID**, **API_HASH**, **SERVER_ADDRESS**, **SERVER_PORT** from your account. You'll need it later.
-
-## First requests
-To start work, create an instance of TelegramClient and establish connection
-
-```csharp 
-   var client = new ClientFactory.BuildClient(ApiId, ApiHash, ServerAddress, ServerPort);
-   await client.ConnectAsync();
-```
-Now you can work with Telegram API, but ->
-> Only a small portion of the API methods are available to unauthorized users. ([full description](https://core.telegram.org/api/auth)) 
-
-For authentication you need to run following code
-```csharp
-  var hash = await client.SendCodeRequestAsync("<user_number>");
-  var code = "<code_from_telegram>"; // you can change code in debugger
-
-  var user = await client.MakeAuthAsync("<user_number>", hash, code);
-``` 
-
-Full code you can see at [AuthUser test](https://github.com/vik-borisov/TelegramClient/blob/master/TelegramClient.Tests/TelegramClientTests.cs#L70)
-
-When user is authenticated, TelegramClient creates special file called _session.dat_. In this file TelegramClient store all information needed for user session. So you need to authenticate user every time the _session.dat_ file is corrupted or removed.
-
-You can call any method on authenticated user. For example, let's send message to a friend by his phone number:
-
-```csharp
-  //get available contacts
-  var result = await client.GetContactsAsync();
-
-  //find recipient in contacts
-  var user = result.users.lists
-	  .Where(x => x.GetType() == typeof (TLUser))
-	  .Cast<TLUser>()
-	  .FirstOrDefault(x => x.phone == "<recipient_phone>");
-	
-  //send message
-  await client.SendMessageAsync(new TLInputPeerUser() {user_id = user.id}, "OUR_MESSAGE");
-```
-
-Full code you can see at [SendMessage test](https://github.com/vik-borisov/TelegramClient/blob/master/TelegramClient.Tests/TelegramClientTests.cs#L87)
-
-To send message to channel you could use the following code:
-```csharp
-  //get user dialogs
-  var dialogs = await client.GetUserDialogsAsync();
-
-  //find channel by title
-  var chat = dialogs.chats.lists
-    .Where(c => c.GetType() == typeof(TLChannel))
-    .Cast<TLChannel>()
-    .FirstOrDefault(c => c.title == "<channel_title>");
-
-  //send message
-  await client.SendMessageAsync(new TLInputPeerChannel() { channel_id = chat.id, access_hash = chat.access_hash.Value }, "OUR_MESSAGE");
-```
-Full code you can see at [SendMessageToChannel test](https://github.com/vik-borisov/TelegramClient/blob/master/TelegramClient.Tests/TelegramClientTests.cs#L107)
-## Working with files
-Telegram separate files to two categories -> big file and small file. File is Big if its size more than 10 Mb. TelegramClient tries to hide this complexity from you, thats why we provide one method to upload files **UploadFile**.
-
-```csharp
-	var fileResult = await client.UploadFile("cat.jpg", new StreamReader("data/cat.jpg"));
-```
-
-TelegramClient provides two wrappers for sending photo and document
-
-```csharp
-	await client.SendUploadedPhoto(new TLInputPeerUser() { user_id = user.id }, fileResult, "kitty");
-	await client.SendUploadedDocument(
-                new TLInputPeerUser() { user_id = user.id },
-                fileResult,
-                "some zips", //caption
-                "application/zip", //mime-type
-                new TLVector<TLAbsDocumentAttribute>()); //document attributes, such as file name
-```
-Full code you can see at [SendPhotoToContactTest](https://github.com/vik-borisov/TelegramClient/blob/master/TelegramClient.Tests/TelegramClientTests.cs#L125) and [SendBigFileToContactTest](https://github.com/vik-borisov/TelegramClient/blob/master/TelegramClient.Tests/TelegramClientTests.cs#L143)
-
-To download file you should call **GetFile** method
-```csharp
-	await client.GetFile(
-                new TLInputDocumentFileLocation()
-                {
-                    access_hash = document.access_hash,
-                    id = document.id,
-                    version = document.version
-                },
-                document.size); //size of fileChunk you want to retrieve
-```
-
-Full code you can see at [DownloadFileFromContactTest](https://github.com/vik-borisov/TelegramClient/blob/master/TelegramClient.Tests/TelegramClientTests.cs#L167)
-
-# Available Methods
-
-For your convenience TelegramClient have wrappers for several Telegram API methods. You could add your own, see details below.
-
-1. IsPhoneRegisteredAsync
-1. SendCodeRequestAsync
-1. MakeAuthAsync
-1. SignUpAsync
-1. GetContactsAsync
-1. SendMessageAsync
-1. SendTypingAsync
-1. GetUserDialogsAsync
-1. SendUploadedPhoto
-1. SendUploadedDocument
-1. GetFile
-1. UploadFile
-1. SendPingAsync
-1. GetHistoryAsync
-
-**What if you can't find needed method at the list?**
-
-Don't panic. You can call any method with help of `SendRequestAsync` function. For example, send user typing method: 
-
-```csharp
-
-  //Create request 
-  var req = new TLRequestSetTyping()
-  {
-    action = new TLSendMessageTypingAction(),
-    peer = peer
-  };
-
-  //run request, and deserialize response to Boolean
-  return await SendRequestAsync<Boolean>(req);
-``` 
-
-**Where you can find a list of requests and its params?**
-
-The only way is [Telegram API docs](https://core.telegram.org/methods). Yes, it's outdated. But there is no other source.
-Latest scheme in JSON format you can find [here](https://gist.github.com/aarani/b22b7cda024973dff68e1672794b0298)
-
-# Contributing
-
-Contributing is highly appreciated! Donations required 
-## What things can I Implement (Project Roadmap)?
-
-### Release 1.0.0
-
-* [DONE] Add PHONE_MIGRATE handling
-* [DONE] Add FILE_MIGRATE handling
-* Add Updates handling
-* [DONE] Add NuGet package
-* [DONE] Add wrappers for media uploading and downloading
-* Store user session as JSON
-
-# FAQ
-
-#### What API layer is supported?
-The latest one - 57. Thanks to Afshin Arani for his TLGenerator
-
-#### I get a xxxMigrationException or a MIGRATE_X error!
-
-TelegramClient library should automatically handle these errors. If you see such errors, please open a new Github issue with the details (include a stacktrace, etc.).
-
-#### I get an exception: System.IO.EndOfStreamException: Unable to read beyond the end of the stream. All test methos except that AuthenticationWorks and TestConnection return same error. I did every thing including setting api id and hash, and setting server address.-
-
-You should create a Telegram session. See [configuration guide](#sending-messages-set-up)
-
-#### Why do I get a FloodException/FLOOD_WAIT error?
-It's likely [Telegram restrictions](https://core.telegram.org/api/errors#420-flood), or a bug in TelegramClient (if you feel it's the latter, please open a Github issue). You can know the time to wait by accessing the FloodException::TimeToWait property.
-
-#### Why does TelegramClient lacks feature XXXX?
-
-Now TelegramClient is basic realization of Telegram protocol, you can be a contributor or a sponsor to speed-up developemnt of any feature.
+## [FAQ](..wiki/FAQ)
 
 #### Nothing helps
 Ask your question at gitter or create an issue in project bug tracker.
@@ -220,27 +36,3 @@ Ask your question at gitter or create an issue in project bug tracker.
 * Your code that runs in to this exception
 
 Without information listen above your issue will be closed. 
-
-# Donations
-Thanks for donations! It's highly appreciated.
-
-List of donators:
-* [mtbitcoin](https://github.com/mtbitcoin)
-
-# Contributors
-* [Afshin Arani](http://aarani.ir) - TLGenerator, and a lot of other usefull things
-* [Knocte](https://github.com/knocte)
-
-# License
-
-**Please, provide link to an author when you using library**
-
-The MIT License
-
-Copyright (c) 2015 Ilya Pirozhenko http://www.sochix.ru/
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
