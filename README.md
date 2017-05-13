@@ -20,11 +20,11 @@ Install via NuGet
 
 ## [Quick Start](https://github.com/vik-borisov/TelegramClient/wiki/Quick-Start)
 
-## [Available Methods]((https://github.com/vik-borisov/TelegramClient/wiki/Supported-methods)
+## [Available Methods](https://github.com/vik-borisov/TelegramClient/wiki/Supported-methods)
 
-## [Roadmap]((https://github.com/vik-borisov/TelegramClient/milestones)
+## [Roadmap](https://github.com/vik-borisov/TelegramClient/milestones)
 
-## [FAQ]((https://github.com/vik-borisov/TelegramClient/wikiwiki/FAQ)
+## [FAQ](https://github.com/vik-borisov/TelegramClient/wikiwiki/FAQ)
 
 #### Nothing helps
 Ask your question at gitter or create an issue in project bug tracker.
