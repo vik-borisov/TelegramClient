@@ -18,13 +18,13 @@ Install via NuGet
 	> Install-Package TelegramClientApi
 ```
 
-## [Quick Start](../wiki/Quick-Start)
+## [Quick Start](https://github.com/vik-borisov/TelegramClient/wiki/Quick-Start)
 
-## [Available Methods](../wiki/Supported-methods)
+## [Available Methods]((https://github.com/vik-borisov/TelegramClient/wiki/Supported-methods)
 
-## [Roadmap](../milestones)
+## [Roadmap]((https://github.com/vik-borisov/TelegramClient/milestones)
 
-## [FAQ](..wiki/FAQ)
+## [FAQ]((https://github.com/vik-borisov/TelegramClient/wikiwiki/FAQ)
 
 #### Nothing helps
 Ask your question at gitter or create an issue in project bug tracker.
