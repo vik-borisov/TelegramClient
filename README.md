@@ -24,7 +24,7 @@ Install via NuGet
 
 ## [Roadmap](https://github.com/vik-borisov/TelegramClient/milestones)
 
-## [FAQ](https://github.com/vik-borisov/TelegramClient/wikiwiki/FAQ)
+## [FAQ](https://github.com/vik-borisov/TelegramClient/wiki/FAQ)
 
 #### Nothing helps
 Ask your question at gitter or create an issue in project bug tracker.
