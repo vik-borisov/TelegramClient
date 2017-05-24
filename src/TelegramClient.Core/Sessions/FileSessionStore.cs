@@ -45,8 +45,9 @@ namespace TelegramClient.Core.Sessions
             var result = ClientSettings.Session.ToBytes();
             lock (_syncObject)
             {
-                _fileStream.Seek(0, SeekOrigin.Begin);
+                _fileStream.Position = 0;
                 _fileStream.Write(result, 0, result.Length);
+                _fileStream.Flush();
             }
         }
 
@@ -59,7 +60,7 @@ namespace TelegramClient.Core.Sessions
             var buffer = new byte[2048];
             lock (_syncObject)
             {
-                _fileStream.Seek(0, SeekOrigin.Begin);
+                _fileStream.Position = 0;
 
                 if (_fileStream.Length == 0)
                 {
