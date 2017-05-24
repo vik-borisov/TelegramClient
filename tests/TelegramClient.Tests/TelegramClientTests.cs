@@ -344,7 +344,7 @@ namespace TelegramClient.Tests
                 .FirstOrDefault(x => x.Phone == NumberToSendMessage);
 
             var inputPeer = new TlInputPeerUser {UserId = user.Id};
-            var res = await client.SendRequestAsync<TlMessagesSlice>(new TlRequestGetHistory {Peer = inputPeer});
+            var res = await client.SendRequestAsync<TlMessages>(new TlRequestGetHistory {Peer = inputPeer});
             var document = res.Messages.Lists
                 .OfType<TlMessage>()
                 .Where(m => m.Media != null)

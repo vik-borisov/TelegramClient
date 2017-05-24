@@ -38,22 +38,24 @@
             }
             else
             {
-                var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
-
-                if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
+                if (!_tcpClient.Connected)
                 {
                     _resetEvent.WaitOne();
+                    var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
+
                     if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                     {
-                        if (_tcpClient != null)
+                        if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                         {
-                            _tcpClient.Dispose();
-                            _tcpClient = null;
+                            if (_tcpClient != null)
+                            {
+                                _tcpClient.Dispose();
+                                _tcpClient = null;
+                            }
                         }
+                        _resetEvent.Set();
                     }
-                    _resetEvent.Set();
                 }
-
             }
         }
 
