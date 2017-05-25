@@ -13,9 +13,9 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MsgsAckRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0x62d6b459 };
+        public int[] HandleCodes { get; } = { 0x62d6b459 };
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public byte[] HandleResponce(int code, BinaryReader reader)
         {
             Log.Debug("Handle a messages ack");
 

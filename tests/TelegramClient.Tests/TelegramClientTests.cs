@@ -231,8 +231,6 @@ namespace TelegramClient.Tests
 
             var user = await GetUser(client);
             await SendMessage(client, user);
-
-            Thread.Sleep(1000);
         }
 
         [Fact]
@@ -253,7 +251,6 @@ namespace TelegramClient.Tests
             var m8 = SendMessage(client, user);
 
             Task.WaitAll(m1, m2, m3, m4, m5, m6, m7, m8);
-            Thread.Sleep(1000);
         }
 
 

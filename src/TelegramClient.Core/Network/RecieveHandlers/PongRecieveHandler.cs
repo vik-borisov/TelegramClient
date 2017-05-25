@@ -13,11 +13,11 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PongRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0x347773c5 };
+        public int[] HandleCodes { get; } = { 0x347773c5 };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public byte[] HandleResponce(int code, BinaryReader reader)
         {
             var requestId = reader.ReadUInt64();
 

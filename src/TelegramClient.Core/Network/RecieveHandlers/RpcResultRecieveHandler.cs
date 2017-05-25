@@ -20,13 +20,13 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RpcResultRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0xf35c6d01 };
+        public int[] HandleCodes { get; } = { -212046591 };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
         public IResponseResultSetter ResponseResultSetter { get; set; }
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public byte[] HandleResponce(int code, BinaryReader reader)
         {
             Log.Debug("Handle RpcResult");
 

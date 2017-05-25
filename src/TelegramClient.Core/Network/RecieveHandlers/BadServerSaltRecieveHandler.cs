@@ -15,13 +15,13 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BadServerSaltRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0xedab447b };
+        public int[] HandleCodes { get; } = { -307542917 };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public byte[] HandleResponce(int code, BinaryReader reader)
         {
             var badMsgId = reader.ReadUInt64();
             var badMsgSeqNo = reader.ReadInt32();

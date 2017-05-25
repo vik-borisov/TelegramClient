@@ -12,9 +12,9 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(NewSessionCreatedRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0x9ec20908 };
+        public int[] HandleCodes { get; } = { -1631450872 };
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public byte[] HandleResponce(int code, BinaryReader reader)
         {
             Log.Debug("Handle a new session was created");
 

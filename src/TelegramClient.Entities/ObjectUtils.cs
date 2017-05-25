@@ -8,11 +8,11 @@ namespace TelegramClient.Entities
     {
         public static object DeserializeObject(BinaryReader reader)
         {
-            var constructor = reader.ReadUInt32();
+            var constructor = reader.ReadInt32();
             return DeserializeObject(reader, constructor);
         }
 
-        public static object DeserializeObject(BinaryReader reader, uint code)
+        public static object DeserializeObject(BinaryReader reader, int code)
         {
             object obj;
             TypeInfo t;
