@@ -6,11 +6,12 @@
 
     using log4net;
 
+    using OpenTl.Schema;
+    using OpenTl.Schema.Serialization;
+
     using TelegramClient.Core.ApiServies;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
-    using TelegramClient.Entities;
-    using TelegramClient.Entities.TL;
 
     [SingleInstance(typeof(IRecieveHandler))]
     internal class UpdatesRecieveHandler: IRecieveHandler
@@ -25,11 +26,11 @@
         {
             Guard.That(reader).IsNotNull();
 
-            var message = ObjectUtils.DeserializeObject(reader, code);
+            var message = Serializer.DeserializeObject(reader);
 
             Log.Debug($"Recieve Updates - {message}");
 
-            var updates = message as TlAbsUpdates;
+            var updates = message as IUpdates;
             Guard.That(updates).IsNotNull();
 
             UpdateRaiser.OnUpdateRecieve(updates);

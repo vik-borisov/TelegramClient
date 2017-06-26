@@ -3,7 +3,8 @@ namespace TelegramClient.Core.Sessions
     using System;
 
     using global::TelegramClient.Core.MTProto.Crypto;
-    using global::TelegramClient.Entities.TL;
+
+    using OpenTl.Schema;
 
     internal interface ISession
     {
@@ -23,7 +24,7 @@ namespace TelegramClient.Core.Sessions
 
         int SessionExpires { get; set; }
 
-        TlUser TlUser { get; set; }
+        TUser User { get; set; }
 
         byte[] ToBytes();
 

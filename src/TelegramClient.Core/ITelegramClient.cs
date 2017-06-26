@@ -8,9 +8,9 @@ namespace TelegramClient.Core
 
     using Autofac;
 
+    using OpenTl.Schema;
+
     using TelegramClient.Core.ApiServies;
-    using TelegramClient.Entities;
-    using TelegramClient.Entities.TL;
 
 
     public interface ITelegramClient
@@ -19,9 +19,9 @@ namespace TelegramClient.Core
 
         Task ConnectAsync(bool reconnect = false);
 
-        Task<T> SendRequestAsync<T>(TlMethod methodToExecute);
+        Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> requestToExecute);
 
-        Task<TlAbsUpdates> SendMessageAsync(TlAbsInputPeer peer, string message);
+        Task<IUpdates> SendMessageAsync(TInputPeerUser peer, string message);
 
         Task ReconnectToDcAsync(int dcId);
 

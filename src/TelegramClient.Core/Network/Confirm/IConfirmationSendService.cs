@@ -4,6 +4,6 @@
     {
         void StartSendingConfirmation();
 
-        void AddForSend(ulong messageId);
+        void AddForSend(long messageId);
     }
 }

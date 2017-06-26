@@ -8,16 +8,17 @@
 
     using log4net;
 
+    using OpenTl.Schema;
+
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Interfaces;
-    using TelegramClient.Core.Requests;
 
     [SingleInstance(typeof(IConfirmationSendService))]
     internal class ConfirmationSendService : IConfirmationSendService
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ConfirmationSendService));
 
-        private readonly ConcurrentQueue<ulong> _waitSendConfirmation = new ConcurrentQueue<ulong>();
+        private readonly ConcurrentQueue<long> _waitSendConfirmation = new ConcurrentQueue<long>();
         private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
 
 
@@ -36,7 +37,7 @@
                             _resetEvent.Wait();
                         }
 
-                        var msgs = new HashSet<ulong>();
+                        var msgs = new HashSet<long>();
                         while (!_waitSendConfirmation.IsEmpty)
                         {
                             _waitSendConfirmation.TryDequeue(out var item);
@@ -47,7 +48,12 @@
                         {
                             Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
 
-                            MtProtoSender.Send(new AckRequest(msgs));
+                            var message = new TMsgsAck()
+                                          {
+                                              MsgIds = new TVector<long>(msgs.ToArray())
+                                          };
+                            
+                            MtProtoSender.Send(message);
                         }
                         catch (Exception e)
                         {
@@ -57,7 +63,7 @@
                 });
         }
 
-        public void AddForSend(ulong messageId)
+        public void AddForSend(long messageId)
         {
             _waitSendConfirmation.Enqueue(messageId);
 

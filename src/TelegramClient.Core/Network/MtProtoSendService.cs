@@ -2,7 +2,6 @@
 
 using TelegramClient.Core.MTProto.Crypto;
 using TelegramClient.Core.Utils;
-using TelegramClient.Entities;
 
 namespace TelegramClient.Core.Network
 {
@@ -11,7 +10,10 @@ namespace TelegramClient.Core.Network
 
     using log4net;
 
-    using TelegramClient.Core.Helpers;
+	using OpenTl.Schema;
+	using OpenTl.Schema.Serialization;
+
+	using TelegramClient.Core.Helpers;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
@@ -32,11 +34,11 @@ namespace TelegramClient.Core.Network
 
 		public ISessionStore SessionStore { get; set; }
 
-	    private byte[] PrepareToSend(TlMethod request, out ulong mesId)
-	    {
-		    var packet = BinaryHelper.WriteBytes(request.SerializeBody);
+	    private byte[] PrepareToSend(IObject obj, out ulong mesId)
+		{
+			var packet = Serializer.SerializeObject(obj).ToArray();
 
-		    var genResult = ClientSettings.Session.GenerateMsgIdAndSeqNo(request.Confirmed);
+		    var genResult = ClientSettings.Session.GenerateMsgIdAndSeqNo(obj is IRequest);
 		    mesId = genResult.Item1;
 
             Log.Debug($"Send message with Id = {mesId} and seqNo = {genResult.Item2}");
@@ -74,9 +76,9 @@ namespace TelegramClient.Core.Network
 
 		}
 
-		public Tuple<Task, ulong> Send(TlMethod request)
+		public Tuple<Task, ulong> Send(IObject obj)
 		{
-			var preparedData = PrepareToSend(request, out var mesId);
+			var preparedData = PrepareToSend(obj, out var mesId);
 
 			TcpTransport.Send(preparedData).Wait();
 

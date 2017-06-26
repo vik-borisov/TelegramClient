@@ -4,11 +4,12 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using TelegramClient.Entities.TL;
-using TelegramClient.Entities.TL.Upload;
 
 namespace TelegramClient.Core.Utils
 {
+    using OpenTl.Schema;
+    using OpenTl.Schema.Upload;
+
     public static class UploadHelper
     {
         private static string GetFileHash(byte[] data)
@@ -30,7 +31,7 @@ namespace TelegramClient.Core.Utils
             return md5Checksum;
         }
 
-        public static async Task<TlAbsInputFile> UploadFile(this ITelegramClient client, string name,
+        public static async Task<IInputFile> UploadFile(this ITelegramClient client, string name,
             StreamReader reader)
         {
             const long tenMb = 10 * 1024 * 1024;
@@ -76,7 +77,7 @@ namespace TelegramClient.Core.Utils
             return fileParts;
         }
 
-        private static async Task<TlAbsInputFile> UploadFile(string name, StreamReader reader,
+        private static async Task<IInputFile> UploadFile(string name, StreamReader reader,
                                                              ITelegramClient client, bool isBigFileUpload)
         {
             var file = GetFile(reader);
@@ -90,7 +91,7 @@ namespace TelegramClient.Core.Utils
                 var part = fileParts.Dequeue();
 
                 if (isBigFileUpload)
-                    await client.SendRequestAsync<bool>(new TlRequestSaveBigFilePart
+                    await client.SendRequestAsync<bool>(new RequestSaveBigFilePart
                     {
                         FileId = fileId,
                         FilePart = partNumber,
@@ -98,7 +99,7 @@ namespace TelegramClient.Core.Utils
                         FileTotalParts = partsCount
                     });
                 else
-                    await client.SendRequestAsync<bool>(new TlRequestSaveFilePart
+                    await client.SendRequestAsync<bool>(new RequestSaveFilePart
                     {
                         FileId = fileId,
                         FilePart = partNumber,
@@ -108,13 +109,13 @@ namespace TelegramClient.Core.Utils
             }
 
             if (isBigFileUpload)
-                return new TlInputFileBig
+                return new TInputFileBig
                 {
                     Id = fileId,
                     Name = name,
                     Parts = partsCount
                 };
-            return new TlInputFile
+            return new TInputFile
             {
                 Id = fileId,
                 Name = name,

@@ -74,10 +74,10 @@ namespace TelegramClient.Core.Network.Recieve
             _recievingCts?.Cancel();
         }
 
-        private Tuple<byte[], ulong> DecodeMessage(byte[] body)
+        private Tuple<byte[], long> DecodeMessage(byte[] body)
         {
             byte[] message;
-            ulong remoteMessageId;
+            long remoteMessageId;
 
             using (var inputStream = new MemoryStream(body))
             using (var inputReader = new BinaryReader(inputStream))
@@ -100,7 +100,7 @@ namespace TelegramClient.Core.Network.Recieve
                 {
                     var remoteSalt = plaintextReader.ReadUInt64();
                     var remoteSessionId = plaintextReader.ReadUInt64();
-                    remoteMessageId = plaintextReader.ReadUInt64();
+                    remoteMessageId = plaintextReader.ReadInt64();
                     plaintextReader.ReadInt32();
                     var msgLen = plaintextReader.ReadInt32();
                     message = plaintextReader.ReadBytes(msgLen);
@@ -138,7 +138,7 @@ namespace TelegramClient.Core.Network.Recieve
 
             for (var i = 0; i < size; i++)
             {
-                var innerMessageId = reader.ReadUInt64();
+                var innerMessageId = reader.ReadInt64();
                 var innerSequence = reader.ReadInt32();
                 var innerLength = reader.ReadInt32();
 

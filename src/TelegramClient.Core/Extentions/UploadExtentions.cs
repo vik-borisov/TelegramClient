@@ -1,23 +1,23 @@
 ﻿using System.Threading.Tasks;
 using TelegramClient.Core.Network;
-using TelegramClient.Entities.TL;
-using TelegramClient.Entities.TL.Auth;
-using TelegramClient.Entities.TL.Upload;
-using TlAuthorization = TelegramClient.Entities.TL.TlAuthorization;
 
 namespace TelegramClient.Core
 {
     using BarsGroup.CodeGuard;
 
+    using OpenTl.Schema;
+    using OpenTl.Schema.Auth;
+    using OpenTl.Schema.Upload;
+
     using TelegramClient.Core.Network.Exceptions;
 
     public static class UploadExtentions
     {
-        public static async Task<TlFile> GetFile(this ITelegramClient client, TlAbsInputFileLocation location, int filePartSize, int offset = 0)
+        public static async Task<IFile> GetFile(this ITelegramClient client, IInputFileLocation location, int filePartSize, int offset = 0)
         {
             try
             {
-                return await client.SendRequestAsync<TlFile>(new TlRequestGetFile
+                return await client.SendRequestAsync(new RequestGetFile
                 {
                     Location = location,
                     Limit = filePartSize,
@@ -26,8 +26,7 @@ namespace TelegramClient.Core
             }
             catch (FileMigrationException ex)
             {
-                var exportedAuth =
-                    await client.SendRequestAsync<TlExportedAuthorization>(new TlRequestExportAuthorization {DcId = ex.Dc});
+                var exportedAuth = (TExportedAuthorization) await client.SendRequestAsync(new RequestExportAuthorization {DcId = ex.Dc});
 
                 var clientSettings = client.GetSettings();
                 Guard.That(clientSettings).IsNotNull();
@@ -39,7 +38,7 @@ namespace TelegramClient.Core
                 var serverPort = clientSettings.Session.Port;
 
                 await client.ReconnectToDcAsync(ex.Dc);
-                await client.SendRequestAsync<TlAuthorization>(new TlRequestImportAuthorization
+                await client.SendRequestAsync(new RequestImportAuthorization
                 {
                     Bytes = exportedAuth.Bytes,
                     Id = exportedAuth.Id

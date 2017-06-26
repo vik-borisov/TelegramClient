@@ -2,25 +2,25 @@
 {
     using System.Threading.Tasks;
 
-    using TelegramClient.Entities.TL.Updates;
+    using OpenTl.Schema.Updates;
 
     public static class UpdateExtentions
     {
-        public static async Task<TlState> GetCurrentState(this ITelegramClient telegramClient)
+        public static async Task<IState> GetCurrentState(this ITelegramClient telegramClient)
         {
-            return await telegramClient.SendRequestAsync<TlState>(new TlRequestGetState());
+            return await telegramClient.SendRequestAsync(new RequestGetState());
         }
 
-        public static async Task<TlAbsDifference> GetUpdates(this ITelegramClient telegramClient, TlState currentState)
+        public static async Task<IDifference> GetUpdates(this ITelegramClient telegramClient, TState currentState)
         {
-            var getDiffRequest = new TlRequestGetDifference
+            var getDiffRequest = new RequestGetDifference
                                  {
                                      Pts = currentState.Pts,
                                      Qts = currentState.Qts,
                                      Date = currentState.Date
                                  };
 
-            return await telegramClient.SendRequestAsync<TlAbsDifference>(getDiffRequest);
+            return await telegramClient.SendRequestAsync(getDiffRequest);
         }
     }
 }

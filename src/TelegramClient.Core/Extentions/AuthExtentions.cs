@@ -2,9 +2,6 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using TelegramClient.Entities.TL;
-using TelegramClient.Entities.TL.Account;
-using TelegramClient.Entities.TL.Auth;
 
 namespace TelegramClient.Core
 {
@@ -12,90 +9,85 @@ namespace TelegramClient.Core
 
     using BarsGroup.CodeGuard;
 
+    using OpenTl.Schema;
+    using OpenTl.Schema.Account;
+    using OpenTl.Schema.Auth;
+
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 
-    using TlAuthorization = Entities.TL.Auth.TlAuthorization;
+    using TAuthorization = OpenTl.Schema.Auth.TAuthorization;
 
     public static class AuthExtentions
     {
-        public static async Task<bool> IsPhoneRegisteredAsync(this ITelegramClient client, string phoneNumber)
+        public static async Task<ICheckedPhone> IsPhoneRegisteredAsync(this ITelegramClient client, string phoneNumber)
         {
             Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
 
-            var authCheckPhoneRequest = new TlRequestCheckPhone { PhoneNumber = phoneNumber };
-            var completed = false;
-            while (!completed)
-            {    try
+            var authCheckPhoneRequest = new RequestCheckPhone
+                                        {
+                                            PhoneNumber = phoneNumber
+                                        };
+            while (true)
+            {
+                try
                 {
-                    await client.SendRequestAsync<TlRequestCheckPhone>(authCheckPhoneRequest);
-                    completed = true;
+                    return await client.SendRequestAsync(authCheckPhoneRequest);
                 }
                 catch (PhoneMigrationException e)
                 {
                     await client.ReconnectToDcAsync(e.Dc);
                 }
             }
-
-            return authCheckPhoneRequest.Response.PhoneRegistered;
         }
 
-        public static async Task<string> SendCodeRequestAsync(this ITelegramClient client, string phoneNumber)
+        public static async Task<ISentCode> SendCodeRequestAsync(this ITelegramClient client, string phoneNumber)
         {
             Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
 
-            var completed = false;
             var clientSettings = client.GetSettings();
 
-            var request = new TlRequestSendCode { PhoneNumber = phoneNumber, ApiId = clientSettings.AppId, ApiHash = clientSettings.AppHash };
-            while (!completed)
+            var request = new RequestSendCode { PhoneNumber = phoneNumber, ApiId = clientSettings.AppId, ApiHash = clientSettings.AppHash };
+            while (true)
             {
                 try
                 {
-                    await client.SendRequestAsync<TlSentCode>(request);
-
-                    completed = true;
+                    return await client.SendRequestAsync(request);
                 }
                 catch (PhoneMigrationException ex)
                 {
                     await client.ReconnectToDcAsync(ex.Dc);
                 }
             }
-
-            return request.Response.PhoneCodeHash;
         }
 
-        public static async Task<TlUser> MakeAuthAsync(this ITelegramClient client, string phoneNumber, string phoneCodeHash, string code)
+        public static async Task<TUser> MakeAuthAsync(this ITelegramClient client, string phoneNumber, string phoneCodeHash, string code)
         {
             Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
             Guard.That(phoneCodeHash, nameof(phoneCodeHash)).IsNotNullOrWhiteSpace();
             Guard.That(code, nameof(code)).IsNotNullOrWhiteSpace();
 
-            var request = new TlRequestSignIn
+            var request = new RequestSignIn
             {
                 PhoneNumber = phoneNumber,
                 PhoneCodeHash = phoneCodeHash,
                 PhoneCode = code
             };
 
-            await client.SendRequestAsync<TlAuthorization>(request);
+            var result = (TAuthorization) await client.SendRequestAsync(request);
 
-            OnUserAuthenticated(client.Container, (TlUser)request.Response.User);
+            OnUserAuthenticated(client.Container, (TUser)result.User);
 
-            return (TlUser)request.Response.User;
+            return (TUser)result.User;
         }
 
-        public static async Task<TlPassword> GetPasswordSetting(this ITelegramClient client)
+        public static async Task<IPassword> GetPasswordSetting(this ITelegramClient client)
         {
-            var request = new TlRequestGetPassword();
-
-            await client.SendRequestAsync<TlPassword>(request);
-
-            return (TlPassword)request.Response;
+            return await client.SendRequestAsync(new RequestGetPassword());
         }
 
-        public static async Task<TlUser> MakeAuthWithPasswordAsync(this ITelegramClient client, TlPassword password, string passwordStr)
+        public static async Task<TUser> MakeAuthWithPasswordAsync(this ITelegramClient client, TPassword password, string passwordStr)
         {
             var passwordBytes = Encoding.UTF8.GetBytes(passwordStr);
             var rv = password.CurrentSalt.Concat(passwordBytes).Concat(password.CurrentSalt);
@@ -106,20 +98,20 @@ namespace TelegramClient.Core
                 passwordHash = sha.ComputeHash(rv.ToArray());
             }
 
-            var request = new TlRequestCheckPassword { PasswordHash = passwordHash };
-            await client.SendRequestAsync<TlAuthorization>(request);
+            var request = new RequestCheckPassword { PasswordHash = passwordHash };
+            var result = (TAuthorization) await client.SendRequestAsync(request);
 
-            OnUserAuthenticated(client.Container, (TlUser)request.Response.User);
+            OnUserAuthenticated(client.Container, (TUser)result.User);
 
-            return (TlUser)request.Response.User;
+            return (TUser)result.User;
         }
 
-        public static async Task<TlUser> SignUpAsync(this ITelegramClient client, string phoneNumber, string phoneCodeHash, string code, string firstName,
+        public static async Task<TUser> SignUpAsync(this ITelegramClient client, string phoneNumber, string phoneCodeHash, string code, string firstName,
             string lastName)
         {
             Guard.That(client.Container).IsNotNull();
 
-            var request = new TlRequestSignUp
+            var request = new RequestSignUp
             {
                 PhoneNumber = phoneNumber,
                 PhoneCode = code,
@@ -127,14 +119,14 @@ namespace TelegramClient.Core
                 FirstName = firstName,
                 LastName = lastName
             };
-            await client.SendRequestAsync<TlAuthorization>(request);
+           var result =  (TAuthorization) await client.SendRequestAsync(request) ;
 
-            OnUserAuthenticated(client.Container, (TlUser)request.Response.User);
+            OnUserAuthenticated(client.Container, (TUser)result.User);
 
-            return (TlUser)request.Response.User;
+            return (TUser)result.User;
         }
 
-        private static void OnUserAuthenticated(IComponentContext container, TlUser tlUser)
+        private static void OnUserAuthenticated(IComponentContext container, TUser tlUser)
         {
             var clientSettings = container.Resolve<IClientSettings>();
             Guard.That(clientSettings).IsNotNull();
@@ -142,7 +134,7 @@ namespace TelegramClient.Core
             var session = clientSettings.Session;
             Guard.That(session).IsNotNull();
 
-            session.TlUser = tlUser;
+            session.User = tlUser;
             session.SessionExpires = int.MaxValue;
 
             var sessionStore = container.Resolve<ISessionStore>();
@@ -158,7 +150,7 @@ namespace TelegramClient.Core
             Guard.That(clientSettings).IsNotNull();
             Guard.That(clientSettings.Session).IsNotNull();
 
-            return clientSettings.Session.TlUser != null;
+            return clientSettings.Session.User != null;
         }
     }
 }

@@ -3,10 +3,10 @@ namespace TelegramClient.Core.Network.Interfaces
     using System;
     using System.Threading.Tasks;
 
-    using TelegramClient.Entities;
+    using OpenTl.Schema;
 
     internal interface IMtProtoSender
     {
-        Tuple<Task, ulong> Send(TlMethod request);
+        Tuple<Task, ulong> Send(IObject obj);
     }
 }
