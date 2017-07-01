@@ -25,7 +25,7 @@ namespace TelegramClient.Entities.Generator
         private static readonly List<string> InterfacesList = new List<string>();
         private static readonly List<string> ClassesList = new List<string>();
 
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var absStyle = File.ReadAllText("ConstructorAbs.tmp");
             var normalStyle = File.ReadAllText("Constructor.tmp");

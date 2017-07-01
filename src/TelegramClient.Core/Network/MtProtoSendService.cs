@@ -74,11 +74,11 @@ namespace TelegramClient.Core.Network
 
 		}
 
-		public Tuple<Task, ulong> Send(TlMethod request)
+		public async Task<Tuple<Task, ulong>> Send(TlMethod request)
 		{
 			var preparedData = PrepareToSend(request, out var mesId);
 
-			TcpTransport.Send(preparedData).Wait();
+			await TcpTransport.Send(preparedData);
 
 			SessionStore.Save();
 
