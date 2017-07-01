@@ -31,7 +31,7 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IConfirmationSendService ConfirmationSendService { get; set; }
 
-        public Dictionary<int, IRecieveHandler> RecieveHandlersMap { get; set; }
+        public Dictionary<uint, IRecieveHandler> RecieveHandlersMap { get; set; }
 
         public void StartReceiving()
         {
@@ -110,7 +110,7 @@ namespace TelegramClient.Core.Network.Recieve
             return Tuple.Create(message, remoteMessageId);
         }
 
-        private void ProcessByRecieveHandler(int code, BinaryReader reader, IRecieveHandler handler)
+        private void ProcessByRecieveHandler(uint code, BinaryReader reader, IRecieveHandler handler)
         {
             Log.Debug($"Handler found - {handler}");
 
@@ -156,7 +156,7 @@ namespace TelegramClient.Core.Network.Recieve
                 message,
                 reader =>
                 {
-                    var code = reader.ReadInt32();
+                    var code = reader.ReadUInt32();
 
                     Log.Debug($"Try handle response with code = {code}");
 

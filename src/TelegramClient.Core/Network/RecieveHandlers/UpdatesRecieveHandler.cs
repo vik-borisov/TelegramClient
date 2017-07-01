@@ -18,11 +18,11 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdatesRecieveHandler));
 
-        public int[] HandleCodes { get; } = { -1857044719, -484987010, 0x2b2fbd4e, 0x78d4dec1, 0x725b04c3, 0x74ae4240 };
+        public uint[] HandleCodes { get; } = { 0x914fbf11, 0x11f1331c, 0xe317af7e, 0x16812688, 0x78d4dec1, 0x725b04c3, 0x74ae4240 };
 
         public IUpdatesApiServiceRaiser UpdateRaiser { get; set; }
 
-        public byte[] HandleResponce(int code, BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             Guard.That(reader).IsNotNull();
 

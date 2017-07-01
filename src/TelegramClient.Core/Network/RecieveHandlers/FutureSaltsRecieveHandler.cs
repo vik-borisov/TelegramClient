@@ -13,9 +13,9 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(FutureSaltsRecieveHandler));
 
-        public int[] HandleCodes { get; } = { -1370486635 };
+        public uint[] HandleCodes { get; } = { 0xae500895 };
 
-        public byte[] HandleResponce(int code, BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             var requestId = reader.ReadUInt64();
 

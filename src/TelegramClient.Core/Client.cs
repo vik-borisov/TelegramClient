@@ -156,7 +156,7 @@ namespace TelegramClient.Core
             return recieveTask.Result;
         }
 
-        public async Task<IUpdates> SendMessageAsync(TInputPeerUser peer, string message)
+        public async Task<IUpdates> SendMessageAsync(IInputPeer peer, string message)
         {
             if (!this.IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");

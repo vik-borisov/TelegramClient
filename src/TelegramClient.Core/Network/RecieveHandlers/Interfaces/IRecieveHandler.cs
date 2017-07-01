@@ -4,8 +4,8 @@
 
     public interface IRecieveHandler
     {
-        int[] HandleCodes { get; }
+        uint[] HandleCodes { get; }
 
-        byte[] HandleResponce(int code, BinaryReader reader);
+        byte[] HandleResponce(uint code, BinaryReader reader);
     }
 }

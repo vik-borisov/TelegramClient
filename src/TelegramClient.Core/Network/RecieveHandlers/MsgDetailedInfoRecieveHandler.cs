@@ -12,9 +12,9 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PingRecieveHandler));
 
-        public int[] HandleCodes { get; } = { 0x276d3ec6 };
+        public uint[] HandleCodes { get; } = { 0x276d3ec6 };
 
-        public byte[] HandleResponce(int code, BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             Log.Debug("Handle MsgDetailedInfo");
 

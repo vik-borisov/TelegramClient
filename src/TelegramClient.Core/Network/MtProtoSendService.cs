@@ -36,7 +36,7 @@ namespace TelegramClient.Core.Network
 
 	    private byte[] PrepareToSend(IObject obj, out ulong mesId)
 		{
-			var packet = Serializer.SerializeObject(obj).ToArray();
+			var packet = Serializer.SerializeObject(obj);
 
 		    var genResult = ClientSettings.Session.GenerateMsgIdAndSeqNo(obj is IRequest);
 		    mesId = genResult.Item1;

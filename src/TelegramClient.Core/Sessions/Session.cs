@@ -126,7 +126,7 @@
                 {
                     writer.Write(1);
                     writer.Write(SessionExpires);
-                    var data = Serializer.SerializeObject(User).ToArray();
+                    var data = Serializer.SerializeObject(User);
                     writer.Write(data);
                 }
                 else

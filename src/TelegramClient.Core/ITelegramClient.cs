@@ -21,7 +21,7 @@ namespace TelegramClient.Core
 
         Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> requestToExecute);
 
-        Task<IUpdates> SendMessageAsync(TInputPeerUser peer, string message);
+        Task<IUpdates> SendMessageAsync(IInputPeer peer, string message);
 
         Task ReconnectToDcAsync(int dcId);
 

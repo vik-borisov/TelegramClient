@@ -11,7 +11,7 @@
             return await telegramClient.SendRequestAsync(new RequestGetState());
         }
 
-        public static async Task<IDifference> GetUpdates(this ITelegramClient telegramClient, TState currentState)
+        public static async Task<IDifference> GetUpdates(this ITelegramClient telegramClient, IState currentState)
         {
             var getDiffRequest = new RequestGetDifference
                                  {
