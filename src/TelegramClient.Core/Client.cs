@@ -147,7 +147,7 @@ namespace TelegramClient.Core
 
         private async Task<BinaryReader> SendAndRecieve(IRequest methodToExecute)
         {
-            var sendTask = Sender.Send(methodToExecute);
+            var sendTask = await Sender.Send(methodToExecute);
             var recieveTask = ResponseResultGetter.Recieve(sendTask.Item2);
 
             await sendTask.Item1;
