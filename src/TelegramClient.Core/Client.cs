@@ -142,7 +142,7 @@ namespace TelegramClient.Core
                 resultReader = await SendAndRecieve(methodToExecute);
             }
 
-            return (TResult) Serializer.DeserializeObject(resultReader);
+            return (TResult) Serializer.Deserialize(resultReader, typeof(TResult).GetTypeInfo());
         }
 
         private async Task<BinaryReader> SendAndRecieve(IRequest methodToExecute)
