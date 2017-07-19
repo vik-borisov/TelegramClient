@@ -111,7 +111,7 @@ namespace TelegramClient.Core
             ConfirmationSendService.StartSendingConfirmation();
             ProtoRecieveService.StartReceiving();
 
-            var response = (TConfig) await SendRequestAsync(new RequestInvokeWithLayer {Layer = 66, Query = request});
+            var response = (TConfig) await SendRequestAsync(new RequestInvokeWithLayer {Layer = SchemaInfo.SchemaVersion, Query = request});
             _dcOptions = response.DcOptions.Items.Cast<TDcOption>().ToArray();
         }
 

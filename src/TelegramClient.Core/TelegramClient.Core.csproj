@@ -27,6 +27,7 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>10.0.2</Version>
     </PackageReference>
+    <PackageReference Include="OpenTl.Schema" Version="0.68.10" />
     <PackageReference Include="System.Security.Cryptography.Algorithms">
       <Version>4.3.0</Version>
     </PackageReference>
@@ -37,11 +38,5 @@
   <ItemGroup>
     <Folder Include="ApiServies" />
     <Folder Include="IoC" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\OpenTl.Schema\src\OpenTl.Schema\OpenTl.Schema.csproj">
-      <Project>{FC31C7DF-8078-48B3-9B15-3E5E46EE9B03}</Project>
-      <Name>OpenTl.Schema</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>

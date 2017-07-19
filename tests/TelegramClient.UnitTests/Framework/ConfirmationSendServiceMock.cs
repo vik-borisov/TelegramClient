@@ -11,7 +11,7 @@
     {
         public static Mock<IConfirmationSendService> BuildAddForSend(this Mock<IConfirmationSendService> mock, Action<ulong> addForSendFunc)
         {
-            mock.Setup(service => service.AddForSend(It.IsAny<ulong>()))
+            mock.Setup(service => service.AddForSend(It.IsAny<long>()))
                 .Callback(addForSendFunc);
 
             return mock;
