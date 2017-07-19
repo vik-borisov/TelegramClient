@@ -14,7 +14,6 @@ Target "Clean" (fun _ ->
 
 Target "Build" (fun _ -> 
    XMLHelper.XmlPokeInnerText "./src/TelegramClient.Core/TelegramClient.Core.csproj" "/Project/PropertyGroup/Version" version
-   XMLHelper.XmlPokeInnerText "./src/TelegramClient.Entities/TelegramClient.Entities.csproj" "/Project/PropertyGroup/Version" version
 
    DotNetCli.Restore (fun p -> p)
 
@@ -30,11 +29,6 @@ Target "Build" (fun _ ->
    { p with
       OutputPath = buildDir
       Project = "./src/TelegramClient.Core/TelegramClient.Core.csproj"
-   })
-   DotNetCli.Pack (fun p -> 
-   { p with
-      OutputPath = buildDir
-      Project = "./src/TelegramClient.Entities/TelegramClient.Entities.csproj"
    })
 )
 
