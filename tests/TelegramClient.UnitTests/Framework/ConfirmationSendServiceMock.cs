@@ -9,7 +9,7 @@
 
     internal static class ConfirmationSendServiceMock
     {
-        public static Mock<IConfirmationSendService> BuildAddForSend(this Mock<IConfirmationSendService> mock, Action<ulong> addForSendFunc)
+        public static Mock<IConfirmationSendService> BuildAddForSend(this Mock<IConfirmationSendService> mock, Action<long> addForSendFunc)
         {
             mock.Setup(service => service.AddForSend(It.IsAny<long>()))
                 .Callback(addForSendFunc);

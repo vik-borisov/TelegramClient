@@ -13,8 +13,23 @@ namespace TelegramClient.Core
 
     public static class UploadExtentions
     {
-        public static async Task<IFile> GetFile(this ITelegramClient client, IInputFileLocation location, int filePartSize, int offset = 0)
+        private static readonly int DownloadPhotoPartSize = 64 * 1024; // 64kb for photo
+        
+        private static readonly int DownloadDocumentPartSize =  128 * 1024; // 128kb for document
+        
+        
+        public static async Task<IFile> GetFile(this ITelegramClient client, IInputFileLocation location, int fileSize, int offset = 0)
         {
+            int filePartSize;
+            if (location is TInputDocumentFileLocation)
+            {
+                filePartSize = DownloadDocumentPartSize;
+            }
+            else
+            {
+                filePartSize = DownloadPhotoPartSize;
+            }
+            
             try
             {
                 return await client.SendRequestAsync(new RequestGetFile
@@ -43,7 +58,7 @@ namespace TelegramClient.Core
                     Bytes = exportedAuth.Bytes,
                     Id = exportedAuth.Id
                 });
-               var result = await client.GetFile(location, filePartSize, offset);
+               var result = await client.GetFile(location, fileSize, offset);
 
                 clientSettings.Session.AuthKey = authKey;
                 clientSettings.Session.TimeOffset = timeOffset;

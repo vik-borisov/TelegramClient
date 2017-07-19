@@ -97,21 +97,27 @@ namespace TelegramClient.Core
                 SessionStore.Save();
             }
 
-            //set-up layer
-            var request = new RequestInitConnection
-            {
-                ApiId = ClientSettings.AppId,
-                AppVersion = "1.0.0",
-                DeviceModel = "PC",
-                LangCode = "en",
-                Query = new RequestGetConfig(),
-                SystemVersion = "Win 10.0"
-            };
-
             ConfirmationSendService.StartSendingConfirmation();
             ProtoRecieveService.StartReceiving();
 
-            var response = (TConfig) await SendRequestAsync(new RequestInvokeWithLayer {Layer = SchemaInfo.SchemaVersion, Query = request});
+            //set-up layer
+            var request = new RequestInvokeWithLayer
+                          {
+                              Layer = SchemaInfo.SchemaVersion,
+                              Query = new RequestInitConnection
+                                      {
+                                          ApiId = ClientSettings.AppId,
+                                          AppVersion = "1.0.0",
+                                          DeviceModel = "PC",
+                                          LangCode = "en",
+                                          LangPack = "tdesktop",
+                                          SystemLangCode = "en",
+                                          Query = new RequestGetConfig(),
+                                          SystemVersion = "Win 10.0"
+                                      }
+                          };
+
+            var response = (TConfig)await SendRequestAsync(request);
             _dcOptions = response.DcOptions.Items.Cast<TDcOption>().ToArray();
         }
 

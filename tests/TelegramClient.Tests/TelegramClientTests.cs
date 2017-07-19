@@ -344,8 +344,18 @@ namespace TelegramClient.Tests
                 .OfType<TUser>()
                 .FirstOrDefault(x => x.Phone == NumberToSendMessage);
 
-            var inputPeer = new TInputPeerUser {UserId = user.Id};
-            var res = await client.SendRequestAsync(new RequestGetHistory {Peer = inputPeer, Limit = 20});
+            var inputPeer = new TInputPeerUser {UserId = user.Id, AccessHash = 0};
+            var res = await client.SendRequestAsync(
+                          new RequestGetHistory
+                          {
+                              Peer = inputPeer,
+                              Limit = 3,
+                              AddOffset = 0,
+                              MaxId = 0,
+                              MinId = 0,
+                              OffsetDate = 0,
+                              OffsetId = 0
+                          });
             var document = res.Messages.Items
                 .OfType<TMessage>()
                 .Where(m => m.Media != null)
@@ -364,7 +374,7 @@ namespace TelegramClient.Tests
                 },
                 document.Size);
 
-            Assert.True(resFile.Cast<TFile>().Bytes.Length > 0);
+            Assert.True(resFile.Cast<TFileCdnRedirect>().EncryptionIv.Length > 0);
         }
 
         [Fact]

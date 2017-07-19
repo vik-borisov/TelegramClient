@@ -8,6 +8,7 @@
     using Moq;
 
     using OpenTl.Schema;
+    using OpenTl.Schema.Serialization;
 
     using TelegramClient.Core.Helpers;
     using TelegramClient.Core.MTProto.Crypto;
@@ -25,7 +26,7 @@
         [Fact]
         public void Recieve_SimpleCall_NotThrows()
         {
-            const ulong RequestMessageId = 1234;
+            const long RequestMessageId = 1234;
             var authKeyData = SessionMock.GenerateAuthKeyData();
             const ulong sessionId = 123456;
             const ulong salt = 654321;
@@ -54,7 +55,7 @@
             var mRecieveHandler = RecieveHandlerMock.Create().BuildRecieveHandler(rpcResponceCode).BuildHandleResponce(
                 (code, reader) =>
                 {
-                    Assert.Equal(RequestMessageId, reader.ReadUInt64());
+                    Assert.Equal(RequestMessageId, reader.ReadInt64());
                     return  null;
                 });
             this.RegisterMock(mRecieveHandler);
@@ -63,7 +64,8 @@
             this.RegisterType<RecievingService>();
 
             // ---
-            var recieveData = EncodePacket(BinaryHelper.WriteBytes(new RpcResponce(RequestMessageId, sendUser).Serialize), RequestMessageId);
+            var rpcResult = new TRpcResult{ReqMsgId = RequestMessageId, Result = sendUser};
+            var recieveData = EncodePacket(Serializer.SerializeObject(rpcResult), RequestMessageId);
 
             var mtProtoPlainSender = this.Resolve<RecievingService>();
             mtProtoPlainSender.StartReceiving();
