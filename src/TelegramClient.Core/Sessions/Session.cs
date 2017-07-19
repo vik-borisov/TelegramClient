@@ -3,10 +3,11 @@
     using System;
     using System.IO;
 
+    using OpenTl.Schema;
+    using OpenTl.Schema.Serialization;
+
     using TelegramClient.Core.MTProto;
     using TelegramClient.Core.MTProto.Crypto;
-    using TelegramClient.Entities;
-    using TelegramClient.Entities.TL;
 
     public class Session : ISession
     {
@@ -32,7 +33,7 @@
 
         public int SessionExpires { get; set; }
 
-        public TlUser TlUser { get; set; }
+        public TUser User { get; set; }
 
         public static Session FromBytes(byte[] buffer, string sessionUserId)
         {
@@ -48,11 +49,11 @@
 
                 var isAuthExsist = reader.ReadInt32() == 1;
                 var sessionExpires = 0;
-                TlUser tlUser = null;
+                TUser tlUser = null;
                 if (isAuthExsist)
                 {
                     sessionExpires = reader.ReadInt32();
-                    tlUser = (TlUser)ObjectUtils.DeserializeObject(reader);
+                    tlUser = (TUser)Serializer.DeserializeObject(reader);
                 }
 
                 var authData = Serializers.Bytes.Read(reader);
@@ -65,7 +66,7 @@
                            TimeOffset = timeOffset,
                            SessionSeqNo = sequence,
                            SessionExpires = sessionExpires,
-                           TlUser = tlUser,
+                           User = tlUser,
                            SessionUserId = sessionUserId,
                            ServerAddress = serverAddress,
                            Port = port
@@ -121,11 +122,12 @@
                 Serializers.String.Write(writer, ServerAddress);
                 writer.Write(Port);
 
-                if (TlUser != null)
+                if (User != null)
                 {
                     writer.Write(1);
                     writer.Write(SessionExpires);
-                    ObjectUtils.SerializeObject(TlUser, writer);
+                    var data = Serializer.SerializeObject(User);
+                    writer.Write(data);
                 }
                 else
                 {

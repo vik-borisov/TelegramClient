@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 using TelegramClient.Core.Auth;
 using TelegramClient.Core.Network;
 using TelegramClient.Core.Utils;
-using TelegramClient.Entities;
-using TelegramClient.Entities.TL;
-using TelegramClient.Entities.TL.Help;
-using TelegramClient.Entities.TL.Messages;
 
 namespace TelegramClient.Core
 {
@@ -17,6 +13,11 @@ namespace TelegramClient.Core
 
     using log4net;
     using Autofac;
+
+    using OpenTl.Schema;
+    using OpenTl.Schema.Help;
+    using OpenTl.Schema.Messages;
+    using OpenTl.Schema.Serialization;
 
     using TelegramClient.Core.ApiServies;
     using TelegramClient.Core.IoC;
@@ -50,7 +51,7 @@ namespace TelegramClient.Core
 
         public IUpdatesApiService Updates { get; set; }
 
-        private List<TlDcOption> _dcOptions;
+        private TDcOption[] _dcOptions;
 
         private async Task<Step3Response> DoAuthentication()
         {
@@ -96,23 +97,28 @@ namespace TelegramClient.Core
                 SessionStore.Save();
             }
 
-            //set-up layer
-            var config = new TlRequestGetConfig();
-            var request = new TlRequestInitConnection
-            {
-                ApiId = ClientSettings.AppId,
-                AppVersion = "1.0.0",
-                DeviceModel = "PC",
-                LangCode = "en",
-                Query = config,
-                SystemVersion = "Win 10.0"
-            };
-
             ConfirmationSendService.StartSendingConfirmation();
             ProtoRecieveService.StartReceiving();
 
-            var response = await SendRequestAsync<TlConfig>(new TlRequestInvokeWithLayer {Layer = 57, Query = request});
-            _dcOptions = response.DcOptions.Lists;
+            //set-up layer
+            var request = new RequestInvokeWithLayer
+                          {
+                              Layer = SchemaInfo.SchemaVersion,
+                              Query = new RequestInitConnection
+                                      {
+                                          ApiId = ClientSettings.AppId,
+                                          AppVersion = "1.0.0",
+                                          DeviceModel = "PC",
+                                          LangCode = "en",
+                                          LangPack = "tdesktop",
+                                          SystemLangCode = "en",
+                                          Query = new RequestGetConfig(),
+                                          SystemVersion = "Win 10.0"
+                                      }
+                          };
+
+            var response = (TConfig)await SendRequestAsync(request);
+            _dcOptions = response.DcOptions.Items.Cast<TDcOption>().ToArray();
         }
 
         public async Task ReconnectToDcAsync(int dcId)
@@ -128,7 +134,7 @@ namespace TelegramClient.Core
             await ConnectAsync(true);
         }
 
-        public async Task<T> SendRequestAsync<T>(TlMethod methodToExecute)
+        public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute)
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
@@ -141,12 +147,11 @@ namespace TelegramClient.Core
             {
                 resultReader = await SendAndRecieve(methodToExecute);
             }
-            methodToExecute.DeserializeResponse(resultReader);
 
-            return (T)methodToExecute.GetType().GetProperty("Response").GetValue(methodToExecute);
+            return (TResult) Serializer.Deserialize(resultReader, typeof(TResult).GetTypeInfo());
         }
 
-        private async Task<BinaryReader> SendAndRecieve(TlMethod methodToExecute)
+        private async Task<BinaryReader> SendAndRecieve(IRequest methodToExecute)
         {
             var sendTask = await Sender.Send(methodToExecute);
             var recieveTask = ResponseResultGetter.Recieve(sendTask.Item2);
@@ -157,13 +162,13 @@ namespace TelegramClient.Core
             return recieveTask.Result;
         }
 
-        public async Task<TlAbsUpdates> SendMessageAsync(TlAbsInputPeer peer, string message)
+        public async Task<IUpdates> SendMessageAsync(IInputPeer peer, string message)
         {
             if (!this.IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
 
-            return await SendRequestAsync<TlAbsUpdates>(
-                new TlRequestSendMessage
+            return await SendRequestAsync(
+                new RequestSendMessage
                 {
                     Peer = peer,
                     Message = message,

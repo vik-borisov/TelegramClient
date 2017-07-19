@@ -1,65 +1,66 @@
 ﻿using System;
 using System.Threading.Tasks;
 using TelegramClient.Core.Utils;
-using TelegramClient.Entities;
-using TelegramClient.Entities.TL;
-using TelegramClient.Entities.TL.Contacts;
-using TelegramClient.Entities.TL.Messages;
-using TlRequestSearch = TelegramClient.Entities.TL.Messages.TlRequestSearch;
 
 namespace TelegramClient.Core
 {
+    using OpenTl.Schema;
+    using OpenTl.Schema.Contacts;
+    using OpenTl.Schema.Messages;
+
+    using RequestSearch = OpenTl.Schema.Contacts.RequestSearch;
+
     public static class MessageExtentions
     {
-        public static async Task<bool> SendTypingAsync(this ITelegramClient client, TlAbsInputPeer peer)
+        public static async Task<bool> SendTypingAsync(this ITelegramClient client, IInputPeer peer)
         {
-            var req = new TlRequestSetTyping
+            var req = new RequestSetTyping
             {
-                Action = new TlSendMessageTypingAction(),
+                Action = new TSendMessageTypingAction(),
                 Peer = peer
             };
-            return await client.SendRequestAsync<bool>(req);
+            
+            return await client.SendRequestAsync(req);
         }
 
-        public static async Task<TlAbsDialogs> GetUserDialogsAsync(this ITelegramClient client, int limit = 100)
+        public static async Task<IDialogs> GetUserDialogsAsync(this ITelegramClient client, int limit = 100)
         {
-            var getDialogs = new TlRequestGetDialogs
+            var getDialogs = new RequestGetDialogs
             {
                 OffsetDate = 0,
-                OffsetPeer = new TlInputPeerSelf(),
+                OffsetPeer = new TInputPeerSelf(),
                 Limit = limit
             };
 
-            return await client.SendRequestAsync<TlAbsDialogs>(getDialogs);
+            return await client.SendRequestAsync(getDialogs);
         }
 
-        public static async Task<TlAbsUpdates> SendUploadedPhoto(this ITelegramClient client, TlAbsInputPeer peer,
-            TlAbsInputFile file, string caption)
+        public static async Task<IUpdates> SendUploadedPhoto(this ITelegramClient client, IInputPeer peer, IInputFile file, string caption)
         {
-            return await client.SendRequestAsync<TlAbsUpdates>(new TlRequestSendMedia
+            return await client.SendRequestAsync(new RequestSendMedia
             {
                 RandomId = TlHelpers.GenerateRandomLong(),
                 Background = false,
                 ClearDraft = false,
-                Media = new TlInputMediaUploadedPhoto {File = file, Caption = caption},
+                Media = new TInputMediaUploadedPhoto {File = file, Caption = caption},
                 Peer = peer
             });
         }
 
-        public static async Task<TlAbsUpdates> SendUploadedDocument(
+        public static async Task<IUpdates> SendUploadedDocument(
             this ITelegramClient client,
-            TlAbsInputPeer peer,
-            TlAbsInputFile file,
+            IInputPeer peer,
+            IInputFile file,
             string caption,
             string mimeType,
-            TlVector<TlAbsDocumentAttribute> attributes)
+            TVector<IDocumentAttribute> attributes)
         {
-            return await client.SendRequestAsync<TlAbsUpdates>(new TlRequestSendMedia
+            return await client.SendRequestAsync<IUpdates>(new RequestSendMedia
             {
                 RandomId = TlHelpers.GenerateRandomLong(),
                 Background = false,
                 ClearDraft = false,
-                Media = new TlInputMediaUploadedDocument
+                Media = new TInputMediaUploadedDocument
                 {
                     File = file,
                     Caption = caption,
@@ -70,19 +71,19 @@ namespace TelegramClient.Core
             });
         }
 
-        public static async Task<TlAbsMessages> GetHistoryAsync(this ITelegramClient client, TlAbsInputPeer peer, int offset, int maxId, int limit)
+        public static async Task<IMessages> GetHistoryAsync(this ITelegramClient client, IInputPeer peer, int offset, int maxId, int limit)
         {
             if (!client.IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
 
-            var req = new TlRequestGetHistory
+            var req = new RequestGetHistory
             {
                 Peer = peer,
                 AddOffset = offset,
                 MaxId = maxId,
                 Limit = limit
             };
-            return await client.SendRequestAsync<TlAbsMessages>(req);
+            return await client.SendRequestAsync(req);
         }
 
         /// <summary>
@@ -91,15 +92,15 @@ namespace TelegramClient.Core
         /// <param name="q">User or chat name</param>
         /// <param name="limit">Max result count</param>
         /// <returns></returns>
-        public static async Task<TlFound> SearchUserAsync(this ITelegramClient client, string q, int limit = 10)
+        public static async Task<IFound> SearchUserAsync(this ITelegramClient client, string q, int limit = 10)
         {
-            var r = new TlRequestSearch
+            var r = new RequestSearch
             {
                 Q = q,
                 Limit = limit
             };
 
-            return await client.SendRequestAsync<TlFound>(r);
+            return await client.SendRequestAsync(r);
         }
     }
 }

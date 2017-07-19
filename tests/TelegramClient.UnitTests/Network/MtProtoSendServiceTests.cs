@@ -7,15 +7,15 @@
 
     using Moq;
 
+    using OpenTl.Schema;
+    using OpenTl.Schema.Serialization;
+
     using TelegramClient.Core.Helpers;
     using TelegramClient.Core.MTProto.Crypto;
     using TelegramClient.Core.Network;
-    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Network.Tcp;
-    using TelegramClient.Core.Requests;
     using TelegramClient.Core.Settings;
     using TelegramClient.Core.Utils;
-    using TelegramClient.Entities;
     using TelegramClient.UnitTests.Framework;
 
     using Xunit;
@@ -36,7 +36,7 @@
                 .BuildGenerateMessageSeqNo(confirm => Tuple.Create(SendMessageId, seqNo))
                 .BuildSession(sessionId, salt, authKey);
             
-            var request = new PingRequest();
+            var request = new RequestPing();
 
             var mTcpTransport = TcpTransportMock.Create();
             AddSendHandler(mTcpTransport, request);
@@ -61,7 +61,7 @@
             var mtProtoPlainSender = this.Resolve<MtProtoSendService>();
             var sendResult =  mtProtoPlainSender.Send(request);
 
-            await sendResult.Item1;
+            await sendResult.Result.Item1;
             // --
 
             mTcpTransport.Verify(transport => transport.Send(It.IsAny<byte[]>()), Times.Once);
@@ -69,7 +69,7 @@
             mConfirmRecieve.Verify(store => store.WaitForConfirm(It.IsAny<ulong>()), Times.Once);
         }
 
-        private void AddSendHandler(Mock<ITcpTransport> mock, TlMethod request)
+        private void AddSendHandler(Mock<ITcpTransport> mock, IRequest request)
         {
             mock
                 .BuildSend(
@@ -104,7 +104,7 @@
                                 var packetLength = reader.ReadInt32();
                                 Assert.True(packetLength > 0);
 
-                                var requestBytes = BinaryHelper.WriteBytes(request.SerializeBody);
+                                var requestBytes = Serializer.SerializeObject(request);
                                 Assert.Equal(requestBytes, reader.ReadBytes(packetLength));
                             });
                     });

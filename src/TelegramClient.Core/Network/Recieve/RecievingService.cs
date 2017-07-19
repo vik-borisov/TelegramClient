@@ -31,7 +31,7 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IConfirmationSendService ConfirmationSendService { get; set; }
 
-        public Dictionary<int, IRecieveHandler> RecieveHandlersMap { get; set; }
+        public Dictionary<uint, IRecieveHandler> RecieveHandlersMap { get; set; }
 
         public void StartReceiving()
         {
@@ -74,10 +74,10 @@ namespace TelegramClient.Core.Network.Recieve
             _recievingCts?.Cancel();
         }
 
-        private Tuple<byte[], ulong> DecodeMessage(byte[] body)
+        private Tuple<byte[], long> DecodeMessage(byte[] body)
         {
             byte[] message;
-            ulong remoteMessageId;
+            long remoteMessageId;
 
             using (var inputStream = new MemoryStream(body))
             using (var inputReader = new BinaryReader(inputStream))
@@ -100,7 +100,7 @@ namespace TelegramClient.Core.Network.Recieve
                 {
                     var remoteSalt = plaintextReader.ReadUInt64();
                     var remoteSessionId = plaintextReader.ReadUInt64();
-                    remoteMessageId = plaintextReader.ReadUInt64();
+                    remoteMessageId = plaintextReader.ReadInt64();
                     plaintextReader.ReadInt32();
                     var msgLen = plaintextReader.ReadInt32();
                     message = plaintextReader.ReadBytes(msgLen);
@@ -110,7 +110,7 @@ namespace TelegramClient.Core.Network.Recieve
             return Tuple.Create(message, remoteMessageId);
         }
 
-        private void ProcessByRecieveHandler(int code, BinaryReader reader, IRecieveHandler handler)
+        private void ProcessByRecieveHandler(uint code, BinaryReader reader, IRecieveHandler handler)
         {
             Log.Debug($"Handler found - {handler}");
 
@@ -138,7 +138,7 @@ namespace TelegramClient.Core.Network.Recieve
 
             for (var i = 0; i < size; i++)
             {
-                var innerMessageId = reader.ReadUInt64();
+                var innerMessageId = reader.ReadInt64();
                 var innerSequence = reader.ReadInt32();
                 var innerLength = reader.ReadInt32();
 
@@ -156,7 +156,7 @@ namespace TelegramClient.Core.Network.Recieve
                 message,
                 reader =>
                 {
-                    var code = reader.ReadInt32();
+                    var code = reader.ReadUInt32();
 
                     Log.Debug($"Try handle response with code = {code}");
 

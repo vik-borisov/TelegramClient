@@ -1,9 +1,10 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
-    using TelegramClient.Core.IoC;
-    using TelegramClient.Entities.TL;
+    using OpenTl.Schema;
 
-    public delegate void UpdateHandler(TlAbsUpdates update);
+    using TelegramClient.Core.IoC;
+
+    public delegate void UpdateHandler(IUpdates update);
 
     public interface IUpdatesApiService
     {
@@ -12,7 +13,7 @@
 
     internal interface IUpdatesApiServiceRaiser
     {
-        void OnUpdateRecieve(TlAbsUpdates message);
+        void OnUpdateRecieve(IUpdates message);
     }
 
     [SingleInstance(typeof(IUpdatesApiService), typeof(IUpdatesApiServiceRaiser))]
@@ -21,7 +22,7 @@
     {
         public event UpdateHandler RecieveUpdates;
 
-        public void OnUpdateRecieve(TlAbsUpdates message)
+        public void OnUpdateRecieve(IUpdates message)
         {
             RecieveUpdates?.Invoke(message);
         }

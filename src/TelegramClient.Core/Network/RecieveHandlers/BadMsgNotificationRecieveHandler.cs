@@ -14,11 +14,11 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BadMsgNotificationRecieveHandler));
 
-        public int[] HandleCodes { get; } = { -1477445615 };
+        public uint[] HandleCodes { get; } = {0xa7eff811 };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
-        public byte[] HandleResponce(int code, BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             var requestId = reader.ReadUInt64();
             var requestSequence = reader.ReadInt32();

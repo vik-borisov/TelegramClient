@@ -14,9 +14,9 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(HandleGzipPackedRecieveHandler));
 
-        public int[] HandleCodes { get; } = { 0x3072cfa1 };
+        public uint[] HandleCodes { get; } = { 0x3072cfa1 };
 
-        public byte[] HandleResponce(int code, BinaryReader reader)
+        public byte[] HandleResponce(uint code, BinaryReader reader)
         {
             Log.Debug($"Recived Gzip message");
 

@@ -65,9 +65,9 @@
                    .As<IRecieveHandler>()
                    .SingleInstance()
                    .PropertiesAutowired();
-            builder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<int, IRecieveHandler>>(handlers =>
+            builder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<uint, IRecieveHandler>>(handlers =>
             {
-                var handlerMap = new Dictionary<int, IRecieveHandler>();
+                var handlerMap = new Dictionary<uint, IRecieveHandler>();
                 foreach (var handler in handlers.ToArray())
                 {
                     foreach (var handleCode in handler.HandleCodes)

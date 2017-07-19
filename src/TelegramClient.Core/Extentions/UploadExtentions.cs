@@ -1,23 +1,38 @@
 ﻿using System.Threading.Tasks;
 using TelegramClient.Core.Network;
-using TelegramClient.Entities.TL;
-using TelegramClient.Entities.TL.Auth;
-using TelegramClient.Entities.TL.Upload;
-using TlAuthorization = TelegramClient.Entities.TL.TlAuthorization;
 
 namespace TelegramClient.Core
 {
     using BarsGroup.CodeGuard;
 
+    using OpenTl.Schema;
+    using OpenTl.Schema.Auth;
+    using OpenTl.Schema.Upload;
+
     using TelegramClient.Core.Network.Exceptions;
 
     public static class UploadExtentions
     {
-        public static async Task<TlFile> GetFile(this ITelegramClient client, TlAbsInputFileLocation location, int filePartSize, int offset = 0)
+        private static readonly int DownloadPhotoPartSize = 64 * 1024; // 64kb for photo
+        
+        private static readonly int DownloadDocumentPartSize =  128 * 1024; // 128kb for document
+        
+        
+        public static async Task<IFile> GetFile(this ITelegramClient client, IInputFileLocation location, int fileSize, int offset = 0)
         {
+            int filePartSize;
+            if (location is TInputDocumentFileLocation)
+            {
+                filePartSize = DownloadDocumentPartSize;
+            }
+            else
+            {
+                filePartSize = DownloadPhotoPartSize;
+            }
+            
             try
             {
-                return await client.SendRequestAsync<TlFile>(new TlRequestGetFile
+                return await client.SendRequestAsync(new RequestGetFile
                 {
                     Location = location,
                     Limit = filePartSize,
@@ -26,8 +41,7 @@ namespace TelegramClient.Core
             }
             catch (FileMigrationException ex)
             {
-                var exportedAuth =
-                    await client.SendRequestAsync<TlExportedAuthorization>(new TlRequestExportAuthorization {DcId = ex.Dc});
+                var exportedAuth = (TExportedAuthorization) await client.SendRequestAsync(new RequestExportAuthorization {DcId = ex.Dc});
 
                 var clientSettings = client.GetSettings();
                 Guard.That(clientSettings).IsNotNull();
@@ -39,12 +53,12 @@ namespace TelegramClient.Core
                 var serverPort = clientSettings.Session.Port;
 
                 await client.ReconnectToDcAsync(ex.Dc);
-                await client.SendRequestAsync<TlAuthorization>(new TlRequestImportAuthorization
+                await client.SendRequestAsync(new RequestImportAuthorization
                 {
                     Bytes = exportedAuth.Bytes,
                     Id = exportedAuth.Id
                 });
-               var result = await client.GetFile(location, filePartSize, offset);
+               var result = await client.GetFile(location, fileSize, offset);
 
                 clientSettings.Session.AuthKey = authKey;
                 clientSettings.Session.TimeOffset = timeOffset;

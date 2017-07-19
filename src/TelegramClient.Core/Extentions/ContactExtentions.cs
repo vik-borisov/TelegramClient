@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
-using TelegramClient.Entities.TL.Contacts;
 
 namespace TelegramClient.Core
 {
+    using OpenTl.Schema.Contacts;
+
     public static class ContactExtentions
     {
-        public static async Task<TlContacts> GetContactsAsync(this ITelegramClient client)
+        public static async Task<IContacts> GetContactsAsync(this ITelegramClient client)
         {
             if (!client.IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
 
-            var req = new TlRequestGetContacts { Hash = "" };
+            var req = new RequestGetContacts { Hash = "" };
 
-            return await client.SendRequestAsync<TlContacts>(req);
+            return await client.SendRequestAsync(req);
         }
 
     }

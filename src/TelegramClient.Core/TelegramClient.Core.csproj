@@ -15,9 +15,6 @@
     <RepositoryUrl>https://github.com/vik-borisov/TelegramClient</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TelegramClient.Entities\TelegramClient.Entities.csproj" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Autofac">
       <Version>4.5.0</Version>
     </PackageReference>
@@ -30,6 +27,7 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>10.0.2</Version>
     </PackageReference>
+    <PackageReference Include="OpenTl.Schema" Version="0.68.10" />
     <PackageReference Include="System.Security.Cryptography.Algorithms">
       <Version>4.3.0</Version>
     </PackageReference>

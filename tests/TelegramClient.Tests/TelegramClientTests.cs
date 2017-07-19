@@ -8,15 +8,19 @@ using Microsoft.Extensions.Configuration;
 using TelegramClient.Core;
 using TelegramClient.Core.Network;
 using TelegramClient.Core.Utils;
-using TelegramClient.Entities.TL;
-using TelegramClient.Entities.TL.Messages;
+using OpenTl.Schema;
 using Xunit;
 
 namespace TelegramClient.Tests
 {
+    using OpenTl.Schema.Account;
+    using OpenTl.Schema.Auth;
+    using OpenTl.Schema.Contacts;
+    using OpenTl.Schema.Messages;
+    using OpenTl.Schema.Upload;
+
     using TelegramClient.Core.Exceptions;
     using TelegramClient.Core.Network.Exceptions;
-    using TelegramClient.Entities.TL.Updates;
 
     using Xunit.Abstractions;
 
@@ -137,21 +141,21 @@ namespace TelegramClient.Tests
 
             await client.ConnectAsync();
 
-            var hash = await client.SendCodeRequestAsync(NumberToAuthenticate);
+            var sentCode = (TSentCode) await client.SendCodeRequestAsync(NumberToAuthenticate);
             var code = CodeToAuthenticate; // you can change code in debugger too
 
             if (string.IsNullOrWhiteSpace(code))
                 throw new Exception(
                     "CodeToAuthenticate is empty in the appsettings.json file, fill it with the code you just got now by SMS/Telegram");
 
-            TlUser user;
+            TUser user;
             try
             {
-                user = await client.MakeAuthAsync(NumberToAuthenticate, hash, code);
+                user = await client.MakeAuthAsync(NumberToAuthenticate, sentCode.PhoneCodeHash, code);
             }
             catch (CloudPasswordNeededException)
             {
-                var password = await client.GetPasswordSetting();
+                var password = (TPassword) await client.GetPasswordSetting();
                 var passwordStr = PasswordToAuthenticate;
 
                 user = await client.MakeAuthWithPasswordAsync(password, passwordStr);
@@ -167,7 +171,7 @@ namespace TelegramClient.Tests
             Thread.Sleep(1000);
         }
 
-        private async Task<TlUser> GetUser(ITelegramClient client)
+        private async Task<TUser> GetUser(ITelegramClient client)
         {
             var normalizedNumber = NumberToSendMessage.StartsWith("+")
                                        ? NumberToSendMessage.Substring(1, NumberToSendMessage.Length - 1)
@@ -175,14 +179,14 @@ namespace TelegramClient.Tests
 
             var result = await client.GetContactsAsync();
 
-            return result.Users.Lists
-                             .OfType<TlUser>()
+            return result.Cast<TContacts>().Users.Items
+                             .OfType<TUser>()
                              .FirstOrDefault(x => x.Phone == normalizedNumber);
         }
 
-        private async Task SendMessage(ITelegramClient client, TlUser user)
+        private async Task SendMessage(ITelegramClient client, TUser user)
         {
-            await client.SendMessageAsync(new TlInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next());
+            await client.SendMessageAsync(new TInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next());
         }
 
         [Fact]
@@ -199,7 +203,7 @@ namespace TelegramClient.Tests
 
             var updates = await client.GetUpdates(currentState);
 
-            Assert.IsNotType<TlDifferenceEmpty>(updates);
+            Assert.IsNotType<IEmpty>(updates);
         }
 
         [Fact]
@@ -266,17 +270,17 @@ namespace TelegramClient.Tests
 
         private static async Task SendMessageToChannel(ITelegramClient client)
         {
-            var dialogs = (TlDialogs) await client.GetUserDialogsAsync();
+            var dialogs = (TDialogs) await client.GetUserDialogsAsync();
 
-            var chat = dialogs.Chats.Lists
-                              .OfType<TlChannel>()
+            var chat = dialogs.Chats.Items
+                              .OfType<TChannel>()
                               .FirstOrDefault(c => c.Title == "Виктор Борисов");
 
             await client.SendMessageAsync(
-                new TlInputPeerChannel
+                new TInputPeerChannel
                 {
                     ChannelId = chat.Id,
-                    AccessHash = chat.AccessHash.Value
+                    AccessHash = chat.AccessHash
                 },
                 "TEST MSG " + Random.Next());
         }
@@ -290,14 +294,14 @@ namespace TelegramClient.Tests
 
             var result = await client.GetContactsAsync();
 
-            var user = result.Users.Lists
-                .OfType<TlUser>()
+            var user = result.Cast<TContacts>().Users.Items
+                .OfType<TUser>()
                 .FirstOrDefault(x => x.Phone == NumberToSendMessage);
 
             using(var stream = new FileStream("data/cat.jpg", FileMode.Open))
             {
-                var fileResult = (TlInputFile) await client.UploadFile("cat.jpg", new StreamReader(stream));
-                await client.SendUploadedPhoto(new TlInputPeerUser { UserId = user.Id }, fileResult, "kitty");
+                var fileResult = (TInputFile) await client.UploadFile("cat.jpg", new StreamReader(stream));
+                await client.SendUploadedPhoto(new TInputPeerUser { UserId = user.Id }, fileResult, "kitty");
             }
         }
 
@@ -336,23 +340,33 @@ namespace TelegramClient.Tests
 
             var result = await client.GetContactsAsync();
 
-            var user = result.Users.Lists
-                .OfType<TlUser>()
+            var user = result.Cast<TContacts>().Users.Items
+                .OfType<TUser>()
                 .FirstOrDefault(x => x.Phone == NumberToSendMessage);
 
-            var inputPeer = new TlInputPeerUser {UserId = user.Id};
-            var res = await client.SendRequestAsync<TlMessages>(new TlRequestGetHistory {Peer = inputPeer});
-            var document = res.Messages.Lists
-                .OfType<TlMessage>()
+            var inputPeer = new TInputPeerUser {UserId = user.Id, AccessHash = 0};
+            var res = await client.SendRequestAsync(
+                          new RequestGetHistory
+                          {
+                              Peer = inputPeer,
+                              Limit = 3,
+                              AddOffset = 0,
+                              MaxId = 0,
+                              MinId = 0,
+                              OffsetDate = 0,
+                              OffsetId = 0
+                          });
+            var document = res.Messages.Items
+                .OfType<TMessage>()
                 .Where(m => m.Media != null)
                 .Select(m => m.Media)
-                .OfType<TlMessageMediaDocument>()
+                .OfType<TMessageMediaDocument>()
                 .Select(md => md.Document)
-                .OfType<TlDocument>()
+                .OfType<TDocument>()
                 .First();
 
             var resFile = await client.GetFile(
-                new TlInputDocumentFileLocation
+                new TInputDocumentFileLocation
                 {
                     AccessHash = document.AccessHash,
                     Id = document.Id,
@@ -360,7 +374,7 @@ namespace TelegramClient.Tests
                 },
                 document.Size);
 
-            Assert.True(resFile.Bytes.Length > 0);
+            Assert.True(resFile.Cast<TFileCdnRedirect>().EncryptionIv.Length > 0);
         }
 
         [Fact]
@@ -372,14 +386,14 @@ namespace TelegramClient.Tests
 
             var result = await client.GetContactsAsync();
 
-            var user = result.Users.Lists
-                .OfType<TlUser>()
+            var user = result.Cast<TContacts>().Users.Items
+                .OfType<TUser>()
                 .FirstOrDefault(x => x.Id == 5880094);
 
-            var photo = (TlUserProfilePhoto) user.Photo;
-            var photoLocation = (TlFileLocation) photo.PhotoBig;
+            var photo = (TUserProfilePhoto) user.Photo;
+            var photoLocation = (TFileLocation) photo.PhotoBig;
 
-            var resFile = await client.GetFile(new TlInputFileLocation
+            var resFile = await client.GetFile(new TInputFileLocation
             {
                 LocalId = photoLocation.LocalId,
                 Secret = photoLocation.Secret,
@@ -388,7 +402,7 @@ namespace TelegramClient.Tests
 
             var res = await client.GetUserDialogsAsync();
 
-            Assert.True(resFile.Bytes.Length > 0);
+            Assert.True(resFile.Cast<TFile>().Bytes.Length > 0);
         }
 
         [Fact]
@@ -397,14 +411,14 @@ namespace TelegramClient.Tests
             var client = NewClient();
             await client.ConnectAsync();
 
-            var hash = await client.SendCodeRequestAsync(NotRegisteredNumberToSignUp);
+            var sentCode = await client.SendCodeRequestAsync(NotRegisteredNumberToSignUp);
             var code = "";
 
-            var registeredUser = await client.SignUpAsync(NotRegisteredNumberToSignUp, hash, code, "TelegramClient", "User");
+            var registeredUser = await client.SignUpAsync(NotRegisteredNumberToSignUp, sentCode.PhoneCodeHash, code, "TelegramClient", "User");
             Assert.NotNull(registeredUser);
             Assert.True(client.IsUserAuthorized());
 
-            var loggedInUser = await client.MakeAuthAsync(NotRegisteredNumberToSignUp, hash, code);
+            var loggedInUser = await client.MakeAuthAsync(NotRegisteredNumberToSignUp, sentCode.PhoneCodeHash, code);
             Assert.NotNull(loggedInUser);
         }
 
@@ -414,7 +428,7 @@ namespace TelegramClient.Tests
             await client.ConnectAsync();
 
             var result = await client.IsPhoneRegisteredAsync(NumberToAuthenticate);
-            Assert.True(result);
+            Assert.True(result.PhoneRegistered);
         }
 
         [Fact]
@@ -446,27 +460,27 @@ namespace TelegramClient.Tests
 
             var result = await client.SearchUserAsync(UserNameToSendMessage);
 
-            var user = result.Users.Lists
-                .Where(x => x.GetType() == typeof(TlUser))
-                .OfType<TlUser>()
+            var user = result.Users.Items
+                .Where(x => x.GetType() == typeof(TUser))
+                .OfType<TUser>()
                 .FirstOrDefault(x => x.Username == UserNameToSendMessage.TrimStart('@'));
 
             if (user == null)
             {
                 var contacts = await client.GetContactsAsync();
 
-                user = contacts.Users.Lists
-                    .Where(x => x.GetType() == typeof(TlUser))
-                    .OfType<TlUser>()
+                user = contacts.Cast<TContacts>().Users.Items
+                    .Where(x => x.GetType() == typeof(TUser))
+                    .OfType<TUser>()
                     .FirstOrDefault(x => x.Username == UserNameToSendMessage.TrimStart('@'));
             }
 
             if (user == null)
                 throw new Exception("Username was not found: " + UserNameToSendMessage);
 
-            await client.SendTypingAsync(new TlInputPeerUser {UserId = user.Id});
+            await client.SendTypingAsync(new TInputPeerUser {UserId = user.Id});
             Thread.Sleep(3000);
-            await client.SendMessageAsync(new TlInputPeerUser {UserId = user.Id}, "TEST");
+            await client.SendMessageAsync(new TInputPeerUser {UserId = user.Id}, "TEST");
         }
     }
 }
