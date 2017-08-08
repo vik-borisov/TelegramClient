@@ -22,7 +22,7 @@
 
     public static class ClientFactory
     {
-        public static ITelegramClient BuildClient(int appId, string appHash, string serverAddress, int serverPort, string sessionUserId = "session")
+        public static ITelegramClient BuildClient(int appId, string appHash, string serverAddress, int serverPort, string serverPublicKey, string sessionUserId = "session")
         {
             Guard.That(appId).IsPositive();
             Guard.That(appHash).IsNotNullOrWhiteSpace();
@@ -32,23 +32,25 @@
 
             var container = RegisterDependency();
 
-            FillSettings(container, appId, appHash, sessionUserId, serverAddress, serverPort);
+            FillSettings(container, appId, appHash, sessionUserId, serverAddress, serverPort, serverPublicKey);
 
             return container.Resolve<ITelegramClient>();
         }
 
-        private static void FillSettings(IContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort)
+        private static void FillSettings(IContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort, string serverPublicKey)
         {
             Guard.That(appId).IsPositive();
             Guard.That(appHash).IsNotNullOrWhiteSpace();
             Guard.That(sessionUserId).IsNotNullOrWhiteSpace();
             Guard.That(serverAddress).IsNotNullOrWhiteSpace();
             Guard.That(serverPort).IsPositive();
+            Guard.That(serverPublicKey).IsNotNullOrWhiteSpace();
 
             var settings = container.Resolve<IClientSettings>();
 
             settings.AppId = appId;
             settings.AppHash = appHash;
+            settings.ServerPublicKey = serverPublicKey;
 
             var store = container.Resolve<ISessionStore>();
             settings.Session = TryLoadOrCreateNew(store, sessionUserId, serverAddress, serverPort);

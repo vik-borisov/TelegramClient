@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sln", "sln", "{679DFB1A-3BA
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTl.Common", "..\OpenTl.Common\src\OpenTl.Common\OpenTl.Common.csproj", "{FC109D0A-783D-4C0F-87E1-AE38504765AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{D258CC09-CBC8-4183-B60C-7C116A1E126F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D258CC09-CBC8-4183-B60C-7C116A1E126F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D258CC09-CBC8-4183-B60C-7C116A1E126F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC109D0A-783D-4C0F-87E1-AE38504765AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC109D0A-783D-4C0F-87E1-AE38504765AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC109D0A-783D-4C0F-87E1-AE38504765AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC109D0A-783D-4C0F-87E1-AE38504765AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
