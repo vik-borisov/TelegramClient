@@ -10,6 +10,8 @@
 
         public string AppHash { get; set; }
 
+        public string ServerPublicKey { get; set; }
+
         public ISession Session { get; set; }
     }
 }

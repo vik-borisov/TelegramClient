@@ -51,6 +51,8 @@ namespace TelegramClient.Tests
         private string ApiHash { get; set; }
 
         private int ApiId { get; set; }
+        
+        private string ServerPublicKey { get; set; }
 
         public TelegramClientTests(ITestOutputHelper output) : base(output)
         {
@@ -61,7 +63,7 @@ namespace TelegramClient.Tests
         {
             try
             {
-                return ClientFactory.BuildClient(ApiId, ApiHash, ServerAddress, ServerPort);
+                return ClientFactory.BuildClient(ApiId, ApiHash, ServerAddress, ServerPort, ServerPublicKey);
             }
             catch (MissingApiConfigurationException ex)
             {
@@ -95,6 +97,10 @@ namespace TelegramClient.Tests
             if (string.IsNullOrEmpty(ServerAddress))
                 Debug.WriteLine(appConfigMsgWarning, nameof(ServerAddress));
 
+            ServerPublicKey = builder[nameof(ServerPublicKey)];
+            if (string.IsNullOrEmpty(ServerPublicKey))
+                Debug.WriteLine(appConfigMsgWarning, nameof(ServerPublicKey));
+            
             var apiId = builder[nameof(ApiId)];
             if (string.IsNullOrEmpty(apiId))
                 Debug.WriteLine(appConfigMsgWarning, nameof(ApiId));
@@ -132,6 +138,13 @@ namespace TelegramClient.Tests
             NumberToSendMessage = builder[nameof(NumberToSendMessage)];
             if (string.IsNullOrEmpty(NumberToSendMessage))
                 Debug.WriteLine(appConfigMsgWarning, nameof(NumberToSendMessage));
+        }
+
+        [Fact]
+        public virtual async Task Connect()
+        {
+            var client = NewClient();
+            await client.ConnectAsync();
         }
 
         [Fact]

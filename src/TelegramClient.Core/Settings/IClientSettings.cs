@@ -8,6 +8,9 @@
 
         string AppHash { get; set; }
 
+        string ServerPublicKey { get; set; }
+        
         ISession Session { get; set; }
+        
     }
 }

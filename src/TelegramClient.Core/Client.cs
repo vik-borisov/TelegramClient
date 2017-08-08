@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using TelegramClient.Core.Auth;
-using TelegramClient.Core.Network;
+
 using TelegramClient.Core.Utils;
 
 namespace TelegramClient.Core
@@ -12,8 +10,10 @@ namespace TelegramClient.Core
     using System.IO;
 
     using log4net;
+
     using Autofac;
 
+    using OpenTl.Common.Auth.Client;
     using OpenTl.Schema;
     using OpenTl.Schema.Help;
     using OpenTl.Schema.Messages;
@@ -21,6 +21,7 @@ namespace TelegramClient.Core
 
     using TelegramClient.Core.ApiServies;
     using TelegramClient.Core.IoC;
+    using TelegramClient.Core.MTProto.Crypto;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Interfaces;
@@ -53,37 +54,37 @@ namespace TelegramClient.Core
 
         private TDcOption[] _dcOptions;
 
-        private async Task<Step3Response> DoAuthentication()
+        private async Task<Tuple<AuthKey, int>> DoAuthentication()
         {
             Log.Info("Try do authentication");
 
-            var step1 = new Step1PqRequest();
-            var step1Result = await MtProtoPlainSender.SendAndReceive(step1.ToBytes());
-            var step1Response = step1.FromBytes(step1Result);
+            var reqPq = Step1ClientHelper.GetRequest(out var nonce);
+            var step1 = Serializer.SerializeObject(reqPq);
+            var step1Result = await MtProtoPlainSender.SendAndReceive(step1);
+            var step1Response = Serializer.DeserializeObject(step1Result).Cast<TResPQ>();
 
             Log.Debug("First step is done");
 
-            var step2 = new Step2DhExchange();
-            var step2Result = await MtProtoPlainSender.SendAndReceive(step2.ToBytes(
-                                  step1Response.Nonce,
-                                  step1Response.ServerNonce,
-                                  step1Response.Fingerprints,
-                                  step1Response.Pq));
-            var step2Response = step2.FromBytes(step2Result);
+            var reqDhParams = Step2ClientHelper.GetRequest(step1Response, ClientSettings.ServerPublicKey, out var newNonse);
+            var step2 = Serializer.SerializeObject(reqDhParams);
+            var step2Result = await MtProtoPlainSender.SendAndReceive(step2);
+            var step2Response = Serializer.DeserializeObject(step2Result).As<TServerDHParamsOk>();
 
             Log.Debug("Second step is done");
 
-            var step3 = new Step3CompleteDhExchange();
-            var step3Result = await MtProtoPlainSender.SendAndReceive(step3.ToBytes(
-                step2Response.Nonce,
-                step2Response.ServerNonce,
-                step2Response.NewNonce,
-                step2Response.EncryptedAnswer));
-            var step3Response = step3.FromBytes(step3Result);
+            if (step2Response != null)
+            {
+                var request = Step3ClientHelper.GetRequest(step2Response, newNonse, out var clientAgree, out var serverTime);
+                var step3 = Serializer.SerializeObject(request);
+                var step3Result = await MtProtoPlainSender.SendAndReceive(step3);
+                var step3Response = Serializer.DeserializeObject(step2Result).As<TServerDHParamsOk>();
 
-            Log.Debug("Third step is done");
+                Log.Debug("Third step is done");
 
-            return step3Response;
+                return Tuple.Create(new AuthKey(clientAgree), serverTime);
+            }
+
+            throw new NotSupportedException();
         }
 
         public async Task ConnectAsync(bool reconnect = false)
@@ -91,8 +92,8 @@ namespace TelegramClient.Core
             if (ClientSettings.Session.AuthKey == null || reconnect)
             {
                 var result = await DoAuthentication();
-                ClientSettings.Session.AuthKey = result.AuthKey;
-                ClientSettings.Session.TimeOffset = result.TimeOffset;
+                ClientSettings.Session.AuthKey = result.Item1;
+                ClientSettings.Session.TimeOffset = result.Item2;
 
                 SessionStore.Save();
             }
@@ -148,7 +149,7 @@ namespace TelegramClient.Core
                 resultReader = await SendAndRecieve(methodToExecute);
             }
 
-            return (TResult) Serializer.Deserialize(resultReader, typeof(TResult).GetTypeInfo());
+            return (TResult)Serializer.Deserialize(resultReader, typeof(TResult).GetTypeInfo());
         }
 
         private async Task<BinaryReader> SendAndRecieve(IRequest methodToExecute)
@@ -168,12 +169,12 @@ namespace TelegramClient.Core
                 throw new InvalidOperationException("Authorize user first!");
 
             return await SendRequestAsync(
-                new RequestSendMessage
-                {
-                    Peer = peer,
-                    Message = message,
-                    RandomId = TlHelpers.GenerateRandomLong()
-                });
+                       new RequestSendMessage
+                       {
+                           Peer = peer,
+                           Message = message,
+                           RandomId = TlHelpers.GenerateRandomLong()
+                       });
         }
     }
 }
