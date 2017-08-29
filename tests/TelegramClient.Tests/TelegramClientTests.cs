@@ -13,6 +13,8 @@ using Xunit;
 
 namespace TelegramClient.Tests
 {
+    using log4net;
+
     using OpenTl.Schema.Account;
     using OpenTl.Schema.Auth;
     using OpenTl.Schema.Contacts;
@@ -26,6 +28,8 @@ namespace TelegramClient.Tests
 
     public class TelegramClientTests: LogOutputTester
     {
+        private static readonly ILog Log = LogManager.GetLogger(typeof(TelegramClientTests));
+
         private static readonly Random Random = new Random();
 
         private string ServerAddress { get; set; }
@@ -55,6 +59,8 @@ namespace TelegramClient.Tests
         public TelegramClientTests(ITestOutputHelper output) : base(output)
         {
             GatherTestConfiguration();
+
+            Log.Info($"\n\n#################################################  {DateTime.Now.ToShortTimeString()}  ################################################################################\n\n");
         }
 
         private ITelegramClient NewClient()

@@ -27,7 +27,7 @@
 
         private int SessionSeqNo { get; set; }
 
-        public ulong Salt { get; set; }
+        public long Salt { get; set; }
 
         public int TimeOffset { get; set; }
 
@@ -42,7 +42,7 @@
             {
                 var id = reader.ReadUInt64();
                 var sequence = reader.ReadInt32();
-                var salt = reader.ReadUInt64();
+                var salt = reader.ReadInt64();
                 var timeOffset = reader.ReadInt32();
                 var serverAddress = Serializers.String.Read(reader);
                 var port = reader.ReadInt32();
@@ -81,7 +81,7 @@
                        : SessionSeqNo * 2;
         }
 
-        public Tuple<ulong, int> GenerateMsgIdAndSeqNo(bool confirmed)
+        public Tuple<long, int> GenerateMsgIdAndSeqNo(bool confirmed)
         {
             lock (_syncObject)
             {
@@ -89,7 +89,7 @@
             }
         }
 
-        public ulong GenerateMsgId()
+        public long GenerateMsgId()
         {
             if (_msgIdInc >= 4194303 - 4)
             {
@@ -107,7 +107,7 @@
                 ((seconds % 1000) << 22) |
                 _msgIdInc;
 
-            return (ulong)newMessageId;
+            return newMessageId;
         }
 
         public byte[] ToBytes()

@@ -1,9 +1,10 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
     using System;
-    using System.IO;
 
     using log4net;
+
+    using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
@@ -13,13 +14,13 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(FutureSaltsRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0xae500895 };
+        public Type[] HandleCodes { get; } = { typeof(TFutureSalts) };
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public void HandleResponce(IObject obj)
         {
-            var requestId = reader.ReadUInt64();
+            var message = obj.Cast<TFutureSalts>();
 
-            Log.Debug($"Handle Future Salts for request {requestId}");
+            Log.Debug($"Handle Future Salts for request {message.ReqMsgId}");
 
             throw new NotImplementedException("The future sault does not supported yet");
         }

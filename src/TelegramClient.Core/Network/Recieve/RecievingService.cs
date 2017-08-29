@@ -8,6 +8,11 @@ namespace TelegramClient.Core.Network.Recieve
 
     using log4net;
 
+    using Newtonsoft.Json;
+
+    using OpenTl.Schema;
+    using OpenTl.Schema.Serialization;
+
     using TelegramClient.Core.Helpers;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto.Crypto;
@@ -31,7 +36,9 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IConfirmationSendService ConfirmationSendService { get; set; }
 
-        public Dictionary<uint, IRecieveHandler> RecieveHandlersMap { get; set; }
+        public Dictionary<Type, IRecieveHandler> RecieveHandlersMap { get; set; }
+
+        public IGZipPackedHandler ZipPackedHandler { get; set; }
 
         public void StartReceiving()
         {
@@ -110,69 +117,46 @@ namespace TelegramClient.Core.Network.Recieve
             return Tuple.Create(message, remoteMessageId);
         }
 
-        private void ProcessByRecieveHandler(uint code, BinaryReader reader, IRecieveHandler handler)
-        {
-            Log.Debug($"Handler found - {handler}");
-
-            var postProcessedMessage = handler.HandleResponce(code, reader);
-            if (postProcessedMessage == null)
-            {
-                return;
-            }
-
-            try
-            {
-                ProcessReceivedMessage(postProcessedMessage);
-            }
-            catch (Exception ex)
-            {
-                Log.Error("Cannot process message", ex);
-            }
-        }
-
-        private void ProcessContainerMessage(BinaryReader reader)
-        {
-            Log.Debug("Handle container");
-
-            var size = reader.ReadInt32();
-
-            for (var i = 0; i < size; i++)
-            {
-                var innerMessageId = reader.ReadInt64();
-                var innerSequence = reader.ReadInt32();
-                var innerLength = reader.ReadInt32();
-
-                Log.Debug($"Process responce with inner id = '{innerMessageId}' into container");
-
-                ProcessReceivedMessage(reader.ReadBytes(innerLength));
-
-                ConfirmationSendService.AddForSend(innerMessageId);
-            }
-        }
-
         private void ProcessReceivedMessage(byte[] message)
         {
-            BinaryHelper.ReadBytes(
-                message,
-                reader =>
-                {
-                    var code = reader.ReadUInt32();
+            var obj = Serializer.DeserializeObject(message);
 
-                    Log.Debug($"Try handle response with code = {code}");
+            ProcessReceivedMessage(obj);
+        }
 
-                    switch (code)
+        private void ProcessReceivedMessage(IObject obj)
+        {
+            if (Log.IsDebugEnabled)
+            {
+                var jObject = JsonConvert.SerializeObject(obj);
+                Log.Debug($"Try handle response for object: {obj} \n{jObject}");
+            }
+
+            switch (obj)
+            {
+                case var o when RecieveHandlersMap.TryGetValue(o.GetType(), out var handler):
+                    Log.Debug($"Handler found - {handler}");
+                    handler.HandleResponce(obj);
+                    break;
+                case TMsgContainer container:
+                    foreach (var containerMessage in container.Messages)
                     {
-                        case var c when RecieveHandlersMap.TryGetValue(c, out var handler):
-                            ProcessByRecieveHandler(code, reader, handler);
-                            break;
-                        case 0x73f1f8dc:
-                            ProcessContainerMessage(reader);
-                            break;
-                        default:
-                            Log.Error($"Cannot handle response with code = {code}");
-                            break;
+                        ProcessReceivedMessage(containerMessage.Body);
+                        ConfirmationSendService.AddForSend(containerMessage.MsgId);
                     }
-                });
+                    break;
+                case TgZipPacked zipPacked:
+                    var unzippedData = ZipPackedHandler.HandleGZipPacked(zipPacked);
+                    ProcessReceivedMessage(unzippedData);
+                    break;
+                default:
+                    if (Log.IsErrorEnabled)
+                    {
+                        var jObject = JsonConvert.SerializeObject(obj);
+                        Log.Error($"Cannot handle object: {obj} \n{jObject}");
+                    }
+                    break;
+            }
         }
     }
 }

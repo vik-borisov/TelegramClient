@@ -1,9 +1,10 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
     using System;
-    using System.IO;
 
     using log4net;
+
+    using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
@@ -14,19 +15,16 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BadMsgNotificationRecieveHandler));
 
-        public uint[] HandleCodes { get; } = {0xa7eff811 };
+        public Type[] HandleCodes { get; } = { typeof(TBadMsgNotification) };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public void HandleResponce(IObject obj)
         {
-            var requestId = reader.ReadUInt64();
-            var requestSequence = reader.ReadInt32();
-            var errorCode = reader.ReadInt32();
-
+            var message = obj.Cast<TBadMsgNotification>();
 
             Exception exception;
-            switch (errorCode)
+            switch (message.ErrorCode)
             {
                 case 16:
                     exception = new InvalidOperationException(
@@ -75,11 +73,9 @@
                     break;
             }
 
-            Log.Error($"Handle a bad message notification for request id = {requestId}", exception);
+            Log.Error($"Handle a bad message notification for request id = {message.BadMsgId}", exception);
 
-            ConfirmationRecieveService.RequestWithException(requestId, exception);
-
-            return null;
+            ConfirmationRecieveService.RequestWithException(message.BadMsgId, exception);
         }
     }
 }

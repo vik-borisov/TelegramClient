@@ -18,7 +18,7 @@ namespace TelegramClient.Core.Sessions
 
         ulong Id { get; set; }
 
-        ulong Salt { get; set; }
+        long Salt { get; set; }
 
         int TimeOffset { get; set; }
 
@@ -28,8 +28,8 @@ namespace TelegramClient.Core.Sessions
 
         byte[] ToBytes();
 
-        Tuple<ulong, int> GenerateMsgIdAndSeqNo(bool confirmed);
+        Tuple<long, int> GenerateMsgIdAndSeqNo(bool confirmed);
 
-        ulong GenerateMsgId();
+        long GenerateMsgId();
     }
 }

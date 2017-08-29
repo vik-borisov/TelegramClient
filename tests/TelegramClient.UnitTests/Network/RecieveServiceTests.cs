@@ -76,7 +76,7 @@
             Thread.Sleep(500);
 
             // --
-            mRecieveHandler.Verify(recieveService => recieveService.HandleResponce(It.IsAny<uint>(), It.IsAny<BinaryReader>()), Times.Once);
+            mRecieveHandler.Verify(recieveService => recieveService.HandleResponce(It.IsAny<BinaryReader>()), Times.Once);
             mConfrimSendService.Verify(recieveService => recieveService.AddForSend(It.IsAny<long>()), Times.Once);
         }
 

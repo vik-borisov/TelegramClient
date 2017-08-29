@@ -9,9 +9,9 @@ namespace TelegramClient.Core.Network.Confirm
     [SingleInstance(typeof(IConfirmationRecieveService))]
     internal class ConfirmationRecieveService : IConfirmationRecieveService
     {
-        private readonly ConcurrentDictionary<ulong, TaskCompletionSource<bool>> _waitConfirm = new ConcurrentDictionary<ulong, TaskCompletionSource<bool>>();
+        private readonly ConcurrentDictionary<long, TaskCompletionSource<bool>> _waitConfirm = new ConcurrentDictionary<long, TaskCompletionSource<bool>>();
 
-        public Task WaitForConfirm(ulong messageId)
+        public Task WaitForConfirm(long messageId)
         {
             var tsc = new TaskCompletionSource<bool>();
             _waitConfirm.TryAdd(messageId, tsc);
@@ -19,7 +19,7 @@ namespace TelegramClient.Core.Network.Confirm
             return tsc.Task;
         }
 
-        public void ConfirmRequest(ulong requestId)
+        public void ConfirmRequest(long requestId)
         {
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
             {
@@ -27,7 +27,7 @@ namespace TelegramClient.Core.Network.Confirm
             }
         }
 
-        public void RequestWithException(ulong requestId, Exception exception)
+        public void RequestWithException(long requestId, Exception exception)
         {
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
             {

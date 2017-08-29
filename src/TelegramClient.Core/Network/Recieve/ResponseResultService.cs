@@ -7,6 +7,8 @@
 
     using log4net;
 
+    using OpenTl.Schema;
+
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Recieve.Interfaces;
 
@@ -16,22 +18,21 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ResponseResultService));
 
-        private readonly ConcurrentDictionary<ulong, TaskCompletionSource<BinaryReader>> _resultCallbacks = new ConcurrentDictionary<ulong, TaskCompletionSource<BinaryReader>>();
+        private readonly ConcurrentDictionary<long, TaskCompletionSource<IObject>> _resultCallbacks = new ConcurrentDictionary<long, TaskCompletionSource<IObject>>();
 
-        public Task<BinaryReader> Recieve(ulong requestId)
+        public Task<IObject> Recieve(long requestId)
         {
-            var tcs = new TaskCompletionSource<BinaryReader>();
+            var tcs = new TaskCompletionSource<IObject>();
 
             _resultCallbacks[requestId] = tcs;
             return tcs.Task;
         }
 
-        public void ReturnResult(ulong requestId, byte[] bytes)
+        public void ReturnResult(long requestId, IObject obj)
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
-                var binaryReader = new BinaryReader(new MemoryStream(bytes));
-                callback.SetResult(binaryReader);
+                callback.SetResult(obj);
             }
             else
             {
@@ -39,7 +40,7 @@
             }
         }
 
-        public void ReturnException(ulong requestId, Exception exception)
+        public void ReturnException(long requestId, Exception exception)
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {

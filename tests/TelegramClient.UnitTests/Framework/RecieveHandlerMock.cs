@@ -23,7 +23,7 @@ namespace TelegramClient.UnitTests.Framework
         public static Mock<IRecieveHandler> BuildHandleResponce(this Mock<IRecieveHandler> mock, Func<uint, BinaryReader, byte[]> callback)
         {
             mock
-                .Setup(recieveHandler => recieveHandler.HandleResponce(It.IsAny<uint>(), It.IsAny<BinaryReader>()))
+                .Setup(recieveHandler => recieveHandler.HandleResponce(It.IsAny<BinaryReader>()))
                 .Returns(callback);
 
             return mock;

@@ -3,8 +3,10 @@
     using System.IO;
     using System.Threading.Tasks;
 
+    using OpenTl.Schema;
+
     internal interface IResponseResultGetter
     {
-        Task<BinaryReader> Recieve(ulong requestId);
+        Task<IObject> Recieve(long requestId);
     }
 }

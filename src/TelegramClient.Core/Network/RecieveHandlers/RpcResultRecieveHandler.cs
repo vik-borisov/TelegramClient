@@ -1,15 +1,14 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
     using System;
-    using System.IO;
-    using System.IO.Compression;
     using System.Text.RegularExpressions;
 
     using log4net;
 
+    using OpenTl.Schema;
+
     using TelegramClient.Core.Exceptions;
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.MTProto;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Recieve.Interfaces;
@@ -20,108 +19,88 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RpcResultRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0xf35c6d01 };
+        public Type[] HandleCodes { get; } = { typeof(TRpcResult) };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
         public IResponseResultSetter ResponseResultSetter { get; set; }
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public IGZipPackedHandler ZipPackedHandler { get; set; }
+
+        public void HandleResponce(IObject obj)
         {
             Log.Debug("Handle RpcResult");
 
-            var requestId = reader.ReadUInt64();
+            var message = obj.Cast<TRpcResult>();
 
-            Log.Debug($"Process RpcResult  with request id = '{requestId}'");
+            Log.Debug($"Process RpcResult  with request id = '{message.ReqMsgId}'");
 
-            ConfirmationRecieveService.ConfirmRequest(requestId);
+            ConfirmationRecieveService.ConfirmRequest(message.ReqMsgId);
 
-            var innerCode = reader.ReadUInt32();
-            switch (innerCode)
+            switch (message.Result)
             {
-                case 0x2144ca19:
-                    HandleRpcError(reader, requestId);
+                case TRpcError error:
+                    HandleRpcError(message.ReqMsgId, error);
+                break;
+                    
+                case TgZipPacked zipPacked:
+                    var result =  ZipPackedHandler.HandleGZipPacked(zipPacked);
+                    ResponseResultSetter.ReturnResult(message.ReqMsgId, result);
+                break;
+
+                default: 
+                     ResponseResultSetter.ReturnResult(message.ReqMsgId, message.Result);
                     break;
-                case 0x3072cfa1:
-                    HandleZipPacket(reader, requestId);
-                    break;
-                default:
-                    reader.BaseStream.Position -= 4;
-                    var bytes = reader.ReadBytes((int)(reader.BaseStream.Length - reader.BaseStream.Position));
-
-                    ResponseResultSetter.ReturnResult(requestId, bytes);
-                    break;
-            }
-
-            return null;
-        }
-
-        private void HandleZipPacket(BinaryReader reader, ulong requestId)
-        {
-            try
-            {
-                // gzip_packed
-                var packedData = Serializers.Bytes.Read(reader);
-
-                using (var ms = new MemoryStream())
-                {
-                    using (var packedStream = new MemoryStream(packedData, false))
-                    using (var zipStream = new GZipStream(packedStream, CompressionMode.Decompress))
-                    {
-                        zipStream.CopyTo(ms);
-                        ms.Position = 0;
-                    }
-
-                    ResponseResultSetter.ReturnResult(requestId, ms.ToArray());
-                }
-            }
-            catch (NotSupportedException ex)
-            {
-                Log.Error("gzip_packed", ex);
             }
         }
 
-        private void HandleRpcError(BinaryReader reader, ulong requestId)
+        private void HandleRpcError(long messageReqMsgId, TRpcError error)
         {
             // rpc_error
-            var errorCode = reader.ReadInt32();
-            var errorMessage = Serializers.String.Read(reader);
 
-            Log.Warn($"Recieve error from server: {errorMessage}");
+            Log.Warn($"Recieve error from server: {error.ErrorMessage}");
 
             Exception exception;
-            if (errorMessage.StartsWith("FLOOD_WAIT_"))
+            switch (error.ErrorMessage)
             {
-                var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                var seconds = int.Parse(resultString);
-                exception = new FloodException(TimeSpan.FromSeconds(seconds));
+                case var floodMessage when floodMessage.StartsWith("FLOOD_WAIT_"):
+                    var floodMessageTime = Regex.Match(floodMessage, @"\d+").Value;
+                    var seconds = int.Parse(floodMessageTime);
+                    exception = new FloodException(TimeSpan.FromSeconds(seconds));    
+                 break;
+                
+                case var phoneMigrate when phoneMigrate.StartsWith("FLOOD_WAIT_"):
+                    var phoneMigrateDcNumber = Regex.Match(phoneMigrate, @"\d+").Value;
+                    var phoneMigrateDcIdx = int.Parse(phoneMigrateDcNumber);
+                    exception = new PhoneMigrationException(phoneMigrateDcIdx);
+                break;
+                
+                case var fileMigrate when fileMigrate.StartsWith("FILE_MIGRATE_"):
+                    var fileMigrateDcNumber = Regex.Match(fileMigrate, @"\d+").Value;
+                    var fileMigrateDcIdx = int.Parse(fileMigrateDcNumber);
+                    exception = new FileMigrationException(fileMigrateDcIdx);
+                break;
+                    
+                case var userMigrate when userMigrate.StartsWith("FILE_MIGRATE_"):
+                    var userMigrateDcNumber = Regex.Match(userMigrate, @"\d+").Value;
+                    var userMigrateDcIdx = int.Parse(userMigrateDcNumber);
+                    exception = new UserMigrationException(userMigrateDcIdx);
+                break;
+                    
+                case "PHONE_CODE_INVALID" :
+                    exception = new InvalidPhoneCodeException("The numeric code used to authenticate does not match the numeric code sent by SMS/Telegram");
+                break;
+                    
+                case "SESSION_PASSWORD_NEEDED" :
+                    exception = new CloudPasswordNeededException("This Account has Cloud Password !");
+                break;
+                    
+                default:
+                    exception = new InvalidOperationException(error.ErrorMessage);
+                break;
             }
-            else if (errorMessage.StartsWith("PHONE_MIGRATE_"))
-            {
-                var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                var dcIdx = int.Parse(resultString);
-                exception = new PhoneMigrationException(dcIdx);
-            }
-            else if (errorMessage.StartsWith("FILE_MIGRATE_"))
-            {
-                var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                var dcIdx = int.Parse(resultString);
-                exception = new FileMigrationException(dcIdx);
-            }
-            else if (errorMessage.StartsWith("USER_MIGRATE_"))
-            {
-                var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                var dcIdx = int.Parse(resultString);
-                exception = new UserMigrationException(dcIdx);
-            }
-            else if (errorMessage == "PHONE_CODE_INVALID")
-                exception = new InvalidPhoneCodeException("The numeric code used to authenticate does not match the numeric code sent by SMS/Telegram");
-            else if (errorMessage == "SESSION_PASSWORD_NEEDED")
-                exception = new CloudPasswordNeededException("This Account has Cloud Password !");
-            else
-                exception = new InvalidOperationException(errorMessage);
-
-            ResponseResultSetter.ReturnException(requestId, exception);
+            
+            ResponseResultSetter.ReturnException(messageReqMsgId, exception);
         }
     }
 }

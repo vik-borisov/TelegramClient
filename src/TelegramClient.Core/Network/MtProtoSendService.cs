@@ -13,7 +13,6 @@ namespace TelegramClient.Core.Network
 	using OpenTl.Schema;
 	using OpenTl.Schema.Serialization;
 
-	using TelegramClient.Core.Helpers;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
@@ -34,7 +33,7 @@ namespace TelegramClient.Core.Network
 
 		public ISessionStore SessionStore { get; set; }
 
-	    private byte[] PrepareToSend(IObject obj, out ulong mesId)
+	    private byte[] PrepareToSend(IObject obj, out long mesId)
 		{
 			var packet = Serializer.SerializeObject(obj);
 
@@ -76,7 +75,7 @@ namespace TelegramClient.Core.Network
 
 		}
 
-		public async Task<Tuple<Task, ulong>> Send(IObject obj)
+		public async Task<Tuple<Task, long>> Send(IObject obj)
 		{
 			var preparedData = PrepareToSend(obj, out var mesId);
 

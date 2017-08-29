@@ -138,20 +138,20 @@ namespace TelegramClient.Core
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
-            BinaryReader resultReader;
+            IObject result;
             try
             {
-                resultReader = await SendAndRecieve(methodToExecute);
+                result = await SendAndRecieve(methodToExecute);
             }
             catch (BadServerSaltException)
             {
-                resultReader = await SendAndRecieve(methodToExecute);
+                result = await SendAndRecieve(methodToExecute);
             }
 
-            return (TResult) Serializer.Deserialize(resultReader, typeof(TResult).GetTypeInfo());
+            return (TResult) result;
         }
 
-        private async Task<BinaryReader> SendAndRecieve(IRequest methodToExecute)
+        private async Task<IObject> SendAndRecieve(IObject methodToExecute)
         {
             var sendTask = await Sender.Send(methodToExecute);
             var recieveTask = ResponseResultGetter.Recieve(sendTask.Item2);

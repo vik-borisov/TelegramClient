@@ -2,10 +2,12 @@
 {
     using System;
 
+    using OpenTl.Schema;
+
     internal interface IResponseResultSetter
     {
-        void ReturnResult(ulong requestId, byte[] bytes);
+        void ReturnResult(long requestId, IObject obj);
 
-        void ReturnException(ulong requestId, Exception exception);
+        void ReturnException(long requestId, Exception exception);
     }
 }

@@ -1,8 +1,10 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
-    using System.IO;
+    using System;
 
     using log4net;
+
+    using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
@@ -12,13 +14,11 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(NewSessionCreatedRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0x9ec20908 };
+        public Type[] HandleCodes { get; } = { typeof(TNewSessionCreated) };
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public void HandleResponce(IObject obj)
         {
             Log.Debug("Handle a new session was created");
-
-            return null;
         }
     }
 }

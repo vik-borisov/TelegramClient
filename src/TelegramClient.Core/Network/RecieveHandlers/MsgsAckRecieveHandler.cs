@@ -1,9 +1,12 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
-    using System.Collections.Generic;
-    using System.IO;
+    using System;
 
     using log4net;
+
+    using Newtonsoft.Json;
+
+    using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
@@ -13,24 +16,19 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(MsgsAckRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0x62d6b459 };
+        public Type[] HandleCodes { get; } = { typeof(TMsgsAck) };
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public void HandleResponce(IObject obj)
         {
             Log.Debug("Handle a messages ack");
 
-            var vector = reader.ReadInt32();
-            var count = reader.ReadInt32();
-
-            var ackMessages = new List<ulong>();
-            for (var i = 0; i < count; i++)
+            if (Log.IsDebugEnabled)
             {
-                ackMessages.Add(reader.ReadUInt64());
+                var message = obj.Cast<TMsgsAck>();
+                
+                var jMessages = JsonConvert.SerializeObject(message.MsgIds.Items);
+                Log.Debug($"Receiving confirmation of the messages: {jMessages}");
             }
-
-            Log.Debug($"Receiving confirmation of the messages: {string.Join(",", ackMessages)}");
-
-            return null;
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers.Interfaces
 {
-    using System.IO;
+    using System;
+
+    using OpenTl.Schema;
 
     public interface IRecieveHandler
     {
-        uint[] HandleCodes { get; }
+        Type[] HandleCodes { get; }
 
-        byte[] HandleResponce(uint code, BinaryReader reader);
+        void HandleResponce(IObject obj);
     }
 }

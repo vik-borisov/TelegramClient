@@ -1,8 +1,12 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
-    using System.IO;
+    using System;
 
     using log4net;
+
+    using Newtonsoft.Json;
+
+    using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
@@ -13,19 +17,20 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(PongRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0x347773c5 };
+        public Type[] HandleCodes { get; } = { typeof(TPong) };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public void HandleResponce(IObject obj)
         {
-            var requestId = reader.ReadUInt64();
-
-            Log.Debug($"Handle pong for request = {requestId}");
-
-            ConfirmationRecieveService.ConfirmRequest(requestId);
-
-            return null;
+            var message = obj.Cast<TPong>();
+            ConfirmationRecieveService.ConfirmRequest(message.MsgId);
+            
+            if (Log.IsDebugEnabled)
+            {
+                var jMessages = JsonConvert.SerializeObject(message);
+                Log.Debug($"Handle pong for request = {message}");
+            }
         }
     }
 }

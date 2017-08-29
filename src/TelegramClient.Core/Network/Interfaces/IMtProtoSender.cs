@@ -7,6 +7,6 @@ namespace TelegramClient.Core.Network.Interfaces
 
     internal interface IMtProtoSender
     {
-        Task<Tuple<Task, ulong>> Send(IObject obj);
+        Task<Tuple<Task, long>> Send(IObject obj);
     }
 }

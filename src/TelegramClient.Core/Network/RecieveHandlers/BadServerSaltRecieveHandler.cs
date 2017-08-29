@@ -1,8 +1,10 @@
 ﻿namespace TelegramClient.Core.Network.RecieveHandlers
 {
-    using System.IO;
+    using System;
 
     using log4net;
+
+    using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
@@ -15,26 +17,21 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(BadServerSaltRecieveHandler));
 
-        public uint[] HandleCodes { get; } = { 0xedab447b };
+        public Type[] HandleCodes { get; } = { typeof(TBadServerSalt) };
 
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
 
-        public byte[] HandleResponce(uint code, BinaryReader reader)
+        public void HandleResponce(IObject obj)
         {
-            var badMsgId = reader.ReadUInt64();
-            var badMsgSeqNo = reader.ReadInt32();
-            var errorCode = reader.ReadInt32();
-            var newSalt = reader.ReadUInt64();
+            var message = obj.Cast<TBadServerSalt>();
+            
+            Log.Info($"Bad server sault detected! message id = {message.BadMsgId} ");
 
-            Log.Info($"Bad server sault detected! message id = {badMsgId} ");
+            ClientSettings.Session.Salt = message.NewServerSalt;
 
-            ClientSettings.Session.Salt = newSalt;
-
-            ConfirmationRecieveService.RequestWithException(badMsgId, new BadServerSaltException());
-
-            return null;
+            ConfirmationRecieveService.RequestWithException(message.BadMsgId, new BadServerSaltException());
         }
     }
 }
