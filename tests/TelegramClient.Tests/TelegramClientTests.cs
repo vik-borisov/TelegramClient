@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using TelegramClient.Core;
-using TelegramClient.Core.Network;
 using TelegramClient.Core.Utils;
 using OpenTl.Schema;
 using Xunit;
