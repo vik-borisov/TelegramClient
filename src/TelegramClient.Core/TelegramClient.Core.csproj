@@ -33,7 +33,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ApiServies" />
     <Folder Include="IoC" />
   </ItemGroup>
 </Project>

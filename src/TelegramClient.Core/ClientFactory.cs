@@ -10,13 +10,7 @@
     using BarsGroup.CodeGuard;
 
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Network;
-    using TelegramClient.Core.Network.Confirm;
-    using TelegramClient.Core.Network.Interfaces;
-    using TelegramClient.Core.Network.Recieve;
-    using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
-    using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 

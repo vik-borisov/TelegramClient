@@ -4,27 +4,22 @@ using System.Runtime.CompilerServices;
 
 namespace TelegramClient.Core
 {
-    using System.Threading.Tasks;
-
-    using Autofac;
-
-    using OpenTl.Schema;
-
-    using TelegramClient.Core.ApiServies;
-
+    using TelegramClient.Core.ApiServies.Interfaces;
 
     public interface ITelegramClient
     {
-        IComponentContext Container { get;}
+        ISenderService SendService { get; }
 
-        Task ConnectAsync(bool reconnect = false);
+        IUpdatesApiService UpdatesService { get; }
 
-        Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> requestToExecute);
+        IConnectApiService ConnectService { get; }
 
-        Task<IUpdates> SendMessageAsync(IInputPeer peer, string message);
+        IAuthApiService AuthService { get; }
 
-        Task ReconnectToDcAsync(int dcId);
+        IMessagesApiService MessagesService { get; }
 
-        IUpdatesApiService Updates { get; set; }
+        IContactsApiService ContactsService { get; }
+
+        IUploadApiService UploadService { get; }
     }
 }
