@@ -380,6 +380,25 @@
             return await SenderService.SendRequestAsync(deleteMessages);
         }
 
+        /// <summary>
+        /// Forwards single messages.
+        /// </summary>
+        /// <param name="peer">User or chat where a message will be forwarded</param>
+        /// <param name="messageId">Forwarded message ID</param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
+        public  async Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId)
+        {
+            EnsureUserAuthorized();
+
+            var forwardMessage = new RequestForwardMessage()
+                                 {
+                                     Peer = peer,
+                                     Id = messageId,
+                                     RandomId = TlHelpers.GenerateRandomLong()
+                                 };
+
+            return await SenderService.SendRequestAsync(forwardMessage);
+        }
 
         private void EnsureUserAuthorized()
         {

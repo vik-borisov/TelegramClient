@@ -135,6 +135,14 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
         Task<IAffectedMessages> DeleteMessagesAsync(TVector<int> ids, bool revoke);
 
+        /// <summary>
+        /// Forwards single messages.
+        /// </summary>
+        /// <param name="peer">User or chat where a message will be forwarded</param>
+        /// <param name="messageId">Forwarded message ID</param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
+        Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);
