@@ -108,14 +108,14 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// </summary>
         /// <param name="peer">User or group to receive the message</param>
         /// <param name="maxId">If a positive value is passed, only messages with identifiers less or equal than the given one will be read</param>
-        /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
         Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId);
 
         /// <summary>
         /// Notifies the sender about the recipient having listened a voice message or watched a video.
         /// </summary>
         /// <param name="ids">Identifiers of messages</param>
-        /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
         Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids);
 
         Task<bool> SendTypingAsync(IInputPeer peer);

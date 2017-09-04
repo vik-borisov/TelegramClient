@@ -302,7 +302,7 @@
         /// </summary>
         /// <param name="peer">User or group to receive the message</param>
         /// <param name="maxId">If a positive value is passed, only messages with identifiers less or equal than the given one will be read</param>
-        /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
         public  async Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId)
         {
             EnsureUserAuthorized();
@@ -320,8 +320,8 @@
         /// Notifies the sender about the recipient having listened a voice message or watched a video.
         /// </summary>
         /// <param name="ids">Identifiers of messages</param>
-        /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
-        public async Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids)
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        public  async Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids)
         {
             EnsureUserAuthorized();
 
