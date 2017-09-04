@@ -84,6 +84,15 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// </returns>
         Task<IUpdates> CreateChatAsync(string title, TVector<IInputUser> users);
 
+        /// <summary>
+        /// Returns the list of messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>
+        /// Object contains list of messages
+        /// </returns>
+        Task<IMessages> GetMessagesAsync(TVector<int> ids);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);

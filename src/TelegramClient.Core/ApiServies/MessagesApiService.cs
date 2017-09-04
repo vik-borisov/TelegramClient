@@ -253,7 +253,26 @@
             };
             return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
         }
-      
+
+        /// <summary>
+        /// Returns the list of messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>
+        /// Object contains list of messages
+        /// </returns>
+        public  async Task<IMessages> GetMessagesAsync(TVector<int> ids)
+        {
+            EnsureUserAuthorized();
+
+            var getMessagesRequest = new RequestGetMessages
+                                     {
+                                         Id = ids
+                                     };
+
+            return await SenderService.SendRequestAsync(getMessagesRequest);
+        }
+
         private void EnsureUserAuthorized()
         {
             if (!AuthApiService.IsUserAuthorized())
