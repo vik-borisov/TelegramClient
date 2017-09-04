@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <TargetFrameworks>netstandard1.5;net46</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <Title>Unofficial Telegram client API library</Title>
@@ -22,9 +22,9 @@
     <PackageReference Include="log4net">
       <Version>2.0.8</Version>
     </PackageReference>
-    <PackageReference Include="NETStandard.Library" Version="2.0.0" />
+    <PackageReference Include="NETStandard.Library" Version="1.6.1" />
+    <PackageReference Include="OpenTl.Schema" Version="0.70.28" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="OpenTl.Schema" Version="0.70.27" />
     <PackageReference Include="System.Security.Cryptography.Algorithms">
       <Version>4.3.0</Version>
     </PackageReference>

@@ -25,7 +25,7 @@
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
-            IObject result;
+            object result;
             try
             {
                 result = await SendAndRecieve(methodToExecute);
@@ -38,7 +38,7 @@
             return (TResult)result;
         }
 
-        private async Task<IObject> SendAndRecieve(IObject methodToExecute)
+        private async Task<object> SendAndRecieve(IObject methodToExecute)
         {
             var sendTask = await Sender.Send(methodToExecute);
             var recieveTask = ResponseResultGetter.Recieve(sendTask.Item2);

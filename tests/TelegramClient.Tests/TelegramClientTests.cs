@@ -58,7 +58,7 @@ namespace TelegramClient.Tests
         {
             GatherTestConfiguration();
 
-            Log.Info($"\n\n#################################################  {DateTime.Now.ToShortTimeString()}  ################################################################################\n\n");
+            Log.Info($"\n\n#################################################  {DateTime.Now}  ################################################################################\n\n");
         }
 
         private ITelegramClient NewClient()
