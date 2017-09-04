@@ -111,6 +111,13 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
         Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId);
 
+        /// <summary>
+        /// Notifies the sender about the recipient having listened a voice message or watched a video.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
+        Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);

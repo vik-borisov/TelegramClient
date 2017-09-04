@@ -316,6 +316,23 @@
             return await SenderService.SendRequestAsync(readHistory);
         }
 
+        /// <summary>
+        /// Notifies the sender about the recipient having listened a voice message or watched a video.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
+        public async Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids)
+        {
+            EnsureUserAuthorized();
+
+            var readMessageContents = new RequestReadMessageContents()
+                                      {
+                                          Id = ids
+                                      };
+
+            return await SenderService.SendRequestAsync(readMessageContents);
+        }
+
         private void EnsureUserAuthorized()
         {
             if (!AuthApiService.IsUserAuthorized())
