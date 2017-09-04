@@ -358,6 +358,29 @@
             return await SenderService.SendRequestAsync(deleteHistory);
         }
 
+        /// <summary>
+        /// Deletes messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <param name="revoke">Delete messages for everyone</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        public  async Task<IAffectedMessages> DeleteMessagesAsync(TVector<int> ids, bool revoke)
+        {
+            EnsureUserAuthorized();
+
+            var flags = new BitArray(1, revoke);
+
+            var deleteMessages = new RequestDeleteMessages()
+                                 {
+                                    Id = ids,
+                                    Flags = flags,
+                                    Revoke = revoke
+                                 };
+
+            return await SenderService.SendRequestAsync(deleteMessages);
+        }
+
+
         private void EnsureUserAuthorized()
         {
             if (!AuthApiService.IsUserAuthorized())

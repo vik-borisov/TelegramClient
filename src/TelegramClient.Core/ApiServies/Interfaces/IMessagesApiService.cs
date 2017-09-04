@@ -127,6 +127,14 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// <returns>Returns a <see cref="IAffectedHistory"/> object containing a affected history</returns>
         Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear);
 
+        /// <summary>
+        /// Deletes messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <param name="revoke">Delete messages for everyone</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        Task<IAffectedMessages> DeleteMessagesAsync(TVector<int> ids, bool revoke);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);
