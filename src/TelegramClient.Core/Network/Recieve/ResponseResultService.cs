@@ -18,17 +18,17 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ResponseResultService));
 
-        private readonly ConcurrentDictionary<long, TaskCompletionSource<IObject>> _resultCallbacks = new ConcurrentDictionary<long, TaskCompletionSource<IObject>>();
+        private readonly ConcurrentDictionary<long, TaskCompletionSource<object>> _resultCallbacks = new ConcurrentDictionary<long, TaskCompletionSource<object>>();
 
-        public Task<IObject> Recieve(long requestId)
+        public Task<object> Recieve(long requestId)
         {
-            var tcs = new TaskCompletionSource<IObject>();
+            var tcs = new TaskCompletionSource<object>();
 
             _resultCallbacks[requestId] = tcs;
             return tcs.Task;
         }
 
-        public void ReturnResult(long requestId, IObject obj)
+        public void ReturnResult(long requestId, object obj)
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {

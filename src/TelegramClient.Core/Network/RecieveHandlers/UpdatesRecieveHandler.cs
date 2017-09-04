@@ -9,6 +9,7 @@
     using OpenTl.Schema;
 
     using TelegramClient.Core.ApiServies;
+    using TelegramClient.Core.ApiServies.Interfaces;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 

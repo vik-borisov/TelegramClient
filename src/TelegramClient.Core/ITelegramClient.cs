@@ -1,30 +1,33 @@
 using System.Runtime.CompilerServices;
+
 [assembly: InternalsVisibleTo("TelegramClient.UnitTests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace TelegramClient.Core
 {
-    using System.Threading.Tasks;
-
-    using Autofac;
-
-    using OpenTl.Schema;
-
-    using TelegramClient.Core.ApiServies;
-
+    using TelegramClient.Core.ApiServies.Interfaces;
 
     public interface ITelegramClient
     {
-        IComponentContext Container { get;}
+        /// <summary>Send custom messages</summary>
+        ISenderService SendService { get; }
 
-        Task ConnectAsync(bool reconnect = false);
+        /// <summary>Automatic and manual updates</summary>
+        IUpdatesApiService UpdatesService { get; }
 
-        Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> requestToExecute);
+        /// <summary>Connecting to the server</summary>
+        IConnectApiService ConnectService { get; }
 
-        Task<IUpdates> SendMessageAsync(IInputPeer peer, string message);
+        /// <summary>Registration and authentication</summary>
+        IAuthApiService AuthService { get; }
 
-        Task ReconnectToDcAsync(int dcId);
+        /// <summary>Messages and chats</summary>
+        IMessagesApiService MessagesService { get; }
 
-        IUpdatesApiService Updates { get; set; }
+        /// <summary>Working with contacts</summary>
+        IContactsApiService ContactsService { get; }
+
+        /// <summary>Working with files</summary>
+        IUploadApiService UploadService { get; }
     }
 }

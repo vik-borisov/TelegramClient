@@ -6,7 +6,7 @@
 
     internal interface IResponseResultSetter
     {
-        void ReturnResult(long requestId, IObject obj);
+        void ReturnResult(long requestId, object obj);
 
         void ReturnException(long requestId, Exception exception);
     }
