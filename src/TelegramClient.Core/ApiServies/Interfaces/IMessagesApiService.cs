@@ -103,6 +103,14 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// </returns>
         Task<IUpdates> SendMediaAsync(IInputPeer peer, IInputMedia media);
 
+        /// <summary>
+        /// Marks message history as read.
+        /// </summary>
+        /// <param name="peer">User or group to receive the message</param>
+        /// <param name="maxId">If a positive value is passed, only messages with identifiers less or equal than the given one will be read</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> contains affected messages</returns>
+        Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);
