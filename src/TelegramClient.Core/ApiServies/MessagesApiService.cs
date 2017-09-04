@@ -1,6 +1,7 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
     using System;
+    using System.Collections;
     using System.Threading.Tasks;
 
     using OpenTl.Schema;
@@ -331,6 +332,30 @@
                                       };
 
             return await SenderService.SendRequestAsync(readMessageContents);
+        }
+
+        /// <summary>
+        /// Deletes communication history.
+        /// </summary>
+        /// <param name="peer">User or chat, communication history of which will be deleted</param>
+        /// <param name="maxId">If a positive value was transferred, the method will return only messages with IDs less than the set one</param>
+        /// <param name="justClear">Delete as non-recoverable or just clear the history</param>
+        /// <returns>Returns a <see cref="IAffectedHistory"/> object containing a affected history</returns>
+        public  async Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear)
+        {
+            EnsureUserAuthorized();
+
+            var flags = new BitArray(1, justClear);
+
+            var deleteHistory = new RequestDeleteHistory()
+                                {
+                                    Peer = peer,
+                                    JustClear = justClear,
+                                    Flags = flags,
+                                    MaxId = maxId
+                                };
+
+            return await SenderService.SendRequestAsync(deleteHistory);
         }
 
         private void EnsureUserAuthorized()

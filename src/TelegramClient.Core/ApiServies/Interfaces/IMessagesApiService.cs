@@ -118,6 +118,15 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
         Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids);
 
+        /// <summary>
+        /// Deletes communication history.
+        /// </summary>
+        /// <param name="peer">User or chat, communication history of which will be deleted</param>
+        /// <param name="maxId">If a positive value was transferred, the method will return only messages with IDs less than the set one</param>
+        /// <param name="justClear">Delete as non-recoverable or just clear the history</param>
+        /// <returns>Returns a <see cref="IAffectedHistory"/> object containing a affected history</returns>
+        Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);
