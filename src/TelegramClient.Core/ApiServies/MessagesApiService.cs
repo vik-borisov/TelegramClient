@@ -273,6 +273,30 @@
             return await SenderService.SendRequestAsync(getMessagesRequest);
         }
 
+        /// <summary>
+        /// Sends a non-text message.
+        /// </summary>
+        /// <param name="peer">User or group to receive the message</param>
+        /// <param name="media">Message contents</param>
+        /// <returns>
+        /// Returns a <see cref="IUpdates"/> object containing a service message sent during the action.
+        /// </returns>
+        public  async Task<IUpdates> SendMediaAsync(IInputPeer peer, IInputMedia media)
+        {
+            EnsureUserAuthorized();
+
+            var sendMedia = new RequestSendMedia()
+                            {
+                                RandomId = TlHelpers.GenerateRandomLong(),
+                                Peer = peer,
+                                Media = media,
+                                Background = false,
+                                ClearDraft = false
+                            };
+
+            return await SenderService.SendRequestAsync(sendMedia);
+        }
+
         private void EnsureUserAuthorized()
         {
             if (!AuthApiService.IsUserAuthorized())

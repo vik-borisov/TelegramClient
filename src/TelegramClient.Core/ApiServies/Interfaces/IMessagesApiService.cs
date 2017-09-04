@@ -93,6 +93,16 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// </returns>
         Task<IMessages> GetMessagesAsync(TVector<int> ids);
 
+        /// <summary>
+        /// Sends a non-text message.
+        /// </summary>
+        /// <param name="peer">User or group to receive the message</param>
+        /// <param name="media">Message contents</param>
+        /// <returns>
+        /// Returns a <see cref="IUpdates"/> object containing a service message sent during the action.
+        /// </returns>
+        Task<IUpdates> SendMediaAsync(IInputPeer peer, IInputMedia media);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);
