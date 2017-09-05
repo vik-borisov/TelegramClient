@@ -399,7 +399,25 @@
 
             return await SenderService.SendRequestAsync(forwardMessage);
         }
-        
+
+        /// <summary>
+        /// Confirms receipt of messages by a client, cancels PUSH-notification sending.
+        /// </summary>
+        /// <param name="maxId">Maximum message ID available in a client.</param>
+        /// <returns>The method returns the list of message IDs, for which PUSH-notifications were cancelled.</returns>
+        /// TODO: interface?
+        public  async Task<TVector<TReceivedNotifyMessage>> ReceivedMessagesAsync(int maxId)
+        {
+            EnsureUserAuthorized();
+
+            var receivedMessages = new RequestReceivedMessages()
+                                   {
+                                        MaxId = maxId
+                                   };
+
+            return await SenderService.SendRequestAsync(receivedMessages);
+        }
+
         public  async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore)
         {
             throw new NotImplementedException();

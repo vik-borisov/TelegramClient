@@ -145,6 +145,8 @@ namespace TelegramClient.Core.ApiServies.Interfaces
 
         Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore);
 
+        Task<TVector<TReceivedNotifyMessage>> ReceivedMessagesAsync(int maxId);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);
