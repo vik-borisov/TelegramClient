@@ -253,11 +253,196 @@
             };
             return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
         }
-      
+
+        /// <summary>
+        /// Returns the list of messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>
+        /// Object contains list of messages
+        /// </returns>
+        public  async Task<IMessages> GetMessagesAsync(TVector<int> ids)
+        {
+            EnsureUserAuthorized();
+
+            var getMessagesRequest = new RequestGetMessages
+                                     {
+                                         Id = ids
+                                     };
+
+            return await SenderService.SendRequestAsync(getMessagesRequest).ConfigureAwait(false); 
+        }
+
+        /// <summary>
+        /// Sends a non-text message.
+        /// </summary>
+        /// <param name="peer">User or group to receive the message</param>
+        /// <param name="media">Message contents</param>
+        /// <returns>
+        /// Returns a <see cref="IUpdates"/> object containing a service message sent during the action.
+        /// </returns>
+        public  async Task<IUpdates> SendMediaAsync(IInputPeer peer, IInputMedia media)
+        {
+            EnsureUserAuthorized();
+
+            var sendMedia = new RequestSendMedia
+                            {
+                                RandomId = TlHelpers.GenerateRandomLong(),
+                                Peer = peer,
+                                Media = media,
+                                Background = false,
+                                ClearDraft = false
+                            };
+
+            return await SenderService.SendRequestAsync(sendMedia).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Marks message history as read.
+        /// </summary>
+        /// <param name="peer">User or group to receive the message</param>
+        /// <param name="maxId">If a positive value is passed, only messages with identifiers less or equal than the given one will be read</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        public  async Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId)
+        {
+            EnsureUserAuthorized();
+
+            var readHistory = new RequestReadHistory
+                              {
+                                  Peer = peer,
+                                  MaxId = maxId
+                              };
+
+            return await SenderService.SendRequestAsync(readHistory).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Notifies the sender about the recipient having listened a voice message or watched a video.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        public  async Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids)
+        {
+            EnsureUserAuthorized();
+
+            var readMessageContents = new RequestReadMessageContents
+                                      {
+                                          Id = ids
+                                      };
+
+            return await SenderService.SendRequestAsync(readMessageContents).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Deletes communication history.
+        /// </summary>
+        /// <param name="peer">User or chat, communication history of which will be deleted</param>
+        /// <param name="maxId">If a positive value was transferred, the method will return only messages with IDs less than the set one</param>
+        /// <param name="justClear">Delete as non-recoverable or just clear the history</param>
+        /// <returns>Returns a <see cref="IAffectedHistory"/> object containing a affected history</returns>
+        public  async Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear)
+        {
+            EnsureUserAuthorized();
+            
+            var deleteHistory = new RequestDeleteHistory
+                                {
+                                    Peer = peer,
+                                    JustClear = justClear,
+                                    MaxId = maxId
+                                };
+
+            return await SenderService.SendRequestAsync(deleteHistory).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Deletes messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <param name="revoke">Delete messages for everyone</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        public  async Task<IAffectedMessages> DeleteMessagesAsync(TVector<int> ids, bool revoke)
+        {
+            EnsureUserAuthorized();
+
+            var deleteMessages = new RequestDeleteMessages
+                                 {
+                                    Id = ids,
+                                    Revoke = revoke
+                                 };
+
+            return await SenderService.SendRequestAsync(deleteMessages).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Forwards single messages.
+        /// </summary>
+        /// <param name="peer">User or chat where a message will be forwarded</param>
+        /// <param name="messageId">Forwarded message ID</param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
+        public  async Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId)
+        {
+            EnsureUserAuthorized();
+
+            var forwardMessage = new RequestForwardMessage
+                                 {
+                                     Peer = peer,
+                                     Id = messageId,
+                                     RandomId = TlHelpers.GenerateRandomLong()
+                                 };
+
+            return await SenderService.SendRequestAsync(forwardMessage).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Confirms receipt of messages by a client, cancels PUSH-notification sending.
+        /// </summary>
+        /// <param name="maxId">Maximum message ID available in a client.</param>
+        /// <returns>The method returns the list of message IDs, for which PUSH-notifications were cancelled.</returns>
+        /// TODO: interface?
+        public  async Task<TVector<TReceivedNotifyMessage>> ReceivedMessagesAsync(int maxId)
+        {
+            EnsureUserAuthorized();
+
+            var receivedMessages = new RequestReceivedMessages
+                                   {
+                                        MaxId = maxId
+                                   };
+
+            return await SenderService.SendRequestAsync(receivedMessages).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Forwards messages by their IDs.
+        /// </summary>
+        /// <param name="fromPeer">User or chat from where a message will be forwarded</param>
+        /// <param name="toPeer">User or chat where a message will be forwarded</param>
+        /// <param name="ids">Forwarded message IDs</param>
+        /// <param name="silent"></param>
+        /// <param name="withMyScore"></param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
+        public async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore)
+        {
+            EnsureUserAuthorized();
+            
+            var forwardMessages = new RequestForwardMessages
+                                  {
+                                     FromPeer = fromPeer,
+                                     ToPeer = toPeer,
+                                     Id = ids,
+                                     Background = false,
+                                     Silent = silent,
+                                     WithMyScore = withMyScore,
+                                     RandomId = TlHelpers.GenerateRandomTVectorLong(ids.Items.Count)
+                                  };
+
+            return await SenderService.SendRequestAsync(forwardMessages);
+        }
+        
         private void EnsureUserAuthorized()
         {
             if (!AuthApiService.IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
         }
+
     }
 }

@@ -84,6 +84,78 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// </returns>
         Task<IUpdates> CreateChatAsync(string title, TVector<IInputUser> users);
 
+        /// <summary>
+        /// Returns the list of messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>
+        /// Object contains list of messages
+        /// </returns>
+        Task<IMessages> GetMessagesAsync(TVector<int> ids);
+
+        /// <summary>
+        /// Sends a non-text message.
+        /// </summary>
+        /// <param name="peer">User or group to receive the message</param>
+        /// <param name="media">Message contents</param>
+        /// <returns>
+        /// Returns a <see cref="IUpdates"/> object containing a service message sent during the action.
+        /// </returns>
+        Task<IUpdates> SendMediaAsync(IInputPeer peer, IInputMedia media);
+
+        /// <summary>
+        /// Marks message history as read.
+        /// </summary>
+        /// <param name="peer">User or group to receive the message</param>
+        /// <param name="maxId">If a positive value is passed, only messages with identifiers less or equal than the given one will be read</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId);
+
+        /// <summary>
+        /// Notifies the sender about the recipient having listened a voice message or watched a video.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids);
+
+        /// <summary>
+        /// Deletes communication history.
+        /// </summary>
+        /// <param name="peer">User or chat, communication history of which will be deleted</param>
+        /// <param name="maxId">If a positive value was transferred, the method will return only messages with IDs less than the set one</param>
+        /// <param name="justClear">Delete as non-recoverable or just clear the history</param>
+        /// <returns>Returns a <see cref="IAffectedHistory"/> object containing a affected history</returns>
+        Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear);
+
+        /// <summary>
+        /// Deletes messages by their IDs.
+        /// </summary>
+        /// <param name="ids">Identifiers of messages</param>
+        /// <param name="revoke">Delete messages for everyone</param>
+        /// <returns>Returns a <see cref="IAffectedMessages"/> object containing a affected messages</returns>
+        Task<IAffectedMessages> DeleteMessagesAsync(TVector<int> ids, bool revoke);
+
+        /// <summary>
+        /// Forwards single messages.
+        /// </summary>
+        /// <param name="peer">User or chat where a message will be forwarded</param>
+        /// <param name="messageId">Forwarded message ID</param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
+        Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId);
+
+        /// <summary>
+        /// Forwards messages by their IDs.
+        /// </summary>
+        /// <param name="fromPeer">User or chat from where a message will be forwarded</param>
+        /// <param name="toPeer">User or chat where a message will be forwarded</param>
+        /// <param name="ids">Forwarded message IDs</param>
+        /// <param name="silent"></param>
+        /// <param name="withMyScore"></param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
+        Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore);
+
+        Task<TVector<TReceivedNotifyMessage>> ReceivedMessagesAsync(int maxId);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);
