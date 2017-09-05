@@ -143,6 +143,8 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
         Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId);
 
+        Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore);
+
         Task<bool> SendTypingAsync(IInputPeer peer);
 
         Task<IDialogs> GetUserDialogsAsync(int limit = 100);

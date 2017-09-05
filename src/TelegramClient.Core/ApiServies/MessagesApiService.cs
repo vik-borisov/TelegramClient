@@ -399,11 +399,55 @@
 
             return await SenderService.SendRequestAsync(forwardMessage);
         }
+        
+        public  async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore)
+        {
+            throw new NotImplementedException();
+
+            EnsureUserAuthorized();
+
+            //TODO: 
+            //https://github.com/telegramdesktop/tdesktop/blob/8f82880b938e06b7a2a27685ef9301edb12b4648/Telegram/SourceFiles/mainwidget.cpp
+            //Line: 607 - flags by different types of peer 
+
+            var flags = new BitArray(1, silent);
+
+            var forwardMessages = new RequestForwardMessages()
+                                  {
+                                     FromPeer = fromPeer,
+                                     ToPeer = toPeer,
+                                     Id = ids,
+                                     Flags = flags,
+                                     Background = false,
+                                     Silent = silent,
+                                     WithMyScore = withMyScore,
+                                     RandomId = GenerateRandomTVectorLong(ids.Items.Count)
+                                  };
+
+            return await SenderService.SendRequestAsync(forwardMessages);
+        }
 
         private void EnsureUserAuthorized()
         {
             if (!AuthApiService.IsUserAuthorized())
                 throw new InvalidOperationException("Authorize user first!");
+        }
+
+        /// <summary>
+        /// Generate <see cref="TVector{T}"/> with random long numbers
+        /// </summary>
+        /// <param name="length">Length of list</param>
+        /// <returns>Returns a instance of <see cref="TVector{T}"/> with random long numbers</returns>
+        /// TODO: Move to  TlHelpers?
+        private TVector<long> GenerateRandomTVectorLong(int length)
+        {
+            var randomIds = new TVector<long>();
+            for (int i = 0; i < length; i++)
+            {
+                randomIds.Items.Add(TlHelpers.GenerateRandomLong());
+            }
+
+            return randomIds;
         }
     }
 }
