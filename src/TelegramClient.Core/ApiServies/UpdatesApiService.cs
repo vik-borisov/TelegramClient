@@ -23,7 +23,7 @@
 
         public async Task<IState> GetCurrentState()
         {
-            return await SenderService.SendRequestAsync(new RequestGetState());
+            return await SenderService.SendRequestAsync(new RequestGetState()).ConfigureAwait(false);
         }
 
         public async Task<IDifference> GetUpdates(IState currentState)
@@ -35,7 +35,7 @@
                                      Date = currentState.Date
                                  };
 
-            return await SenderService.SendRequestAsync(getDiffRequest);
+            return await SenderService.SendRequestAsync(getDiffRequest).ConfigureAwait(false);
         }
     }
 }

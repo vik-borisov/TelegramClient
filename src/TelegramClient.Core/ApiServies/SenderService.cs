@@ -28,11 +28,11 @@
             object result;
             try
             {
-                result = await SendAndRecieve(methodToExecute);
+                result = await SendAndRecieve(methodToExecute).ConfigureAwait(false);
             }
             catch (BadServerSaltException)
             {
-                result = await SendAndRecieve(methodToExecute);
+                result = await SendAndRecieve(methodToExecute).ConfigureAwait(false);
             }
 
             return (TResult)result;
@@ -40,11 +40,11 @@
 
         private async Task<object> SendAndRecieve(IObject methodToExecute)
         {
-            var sendTask = await Sender.Send(methodToExecute);
+            var sendTask = await Sender.Send(methodToExecute).ConfigureAwait(false);
             var recieveTask = ResponseResultGetter.Recieve(sendTask.Item2);
 
-            await sendTask.Item1;
-            await recieveTask;
+            await sendTask.Item1.ConfigureAwait(false);
+            await recieveTask.ConfigureAwait(false);
 
             return recieveTask.Result;
         }

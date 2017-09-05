@@ -69,7 +69,7 @@
 
             var tcpMessage = new TcpMessage(mesSeqNo, packet);
             var encodedMessage = tcpMessage.Encode();
-            await TcpService.Send(encodedMessage);
+            await TcpService.Send(encodedMessage).ConfigureAwait(false);
         }
 
         private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
@@ -84,10 +84,10 @@
 
         public async Task<byte[]> Receieve()
         {
-            var stream = await TcpService.Receieve();
+            var stream = await TcpService.Receieve().ConfigureAwait(false);
 
             var packetLengthBytes = new byte[4];
-            var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4);
+            var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4).ConfigureAwait(false);
 
             if (readLenghtBytes != 4)
                 throw new InvalidOperationException("Couldn't read the packet length");
@@ -95,7 +95,7 @@
             var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
             var seqBytes = new byte[4];
-            var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4);
+            var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4).ConfigureAwait(false);
 
             if (readSeqBytes != 4)
                 throw new InvalidOperationException("Couldn't read the sequence");
@@ -110,7 +110,7 @@
             do
             {
                 var bodyByte = new byte[packetLength - 12];
-                var availableBytes = await stream.ReadAsync(bodyByte, 0, neededToRead);
+                var availableBytes = await stream.ReadAsync(bodyByte, 0, neededToRead).ConfigureAwait(false);
                 neededToRead -= availableBytes;
                 Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
                 readBytes += availableBytes;
@@ -118,7 +118,7 @@
             while (readBytes != packetLength - 12);
 
             var crcBytes = new byte[4];
-            var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4);
+            var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4).ConfigureAwait(false);
             if (readCrcBytes != 4)
                 throw new InvalidOperationException("Couldn't read the crc");
             var checksum = BitConverter.ToInt32(crcBytes, 0);

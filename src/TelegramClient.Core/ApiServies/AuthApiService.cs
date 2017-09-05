@@ -42,11 +42,11 @@
             {
                 try
                 {
-                    return await SenderService.SendRequestAsync(authCheckPhoneRequest);
+                    return await SenderService.SendRequestAsync(authCheckPhoneRequest).ConfigureAwait(false);
                 }
                 catch (PhoneMigrationException e)
                 {
-                    await ConnectApiService.ReconnectToDcAsync(e.Dc);
+                    await ConnectApiService.ReconnectToDcAsync(e.Dc).ConfigureAwait(false);
                 }
             }
         }
@@ -65,11 +65,11 @@
             {
                 try
                 {
-                    return await SenderService.SendRequestAsync(request);
+                    return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
                 }
                 catch (PhoneMigrationException ex)
                 {
-                    await ConnectApiService.ReconnectToDcAsync(ex.Dc);
+                    await ConnectApiService.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
                 }
             }
         }
@@ -87,7 +87,7 @@
                               PhoneCode = code
                           };
 
-            var result = (TAuthorization)await SenderService.SendRequestAsync(request);
+            var result = (TAuthorization)await SenderService.SendRequestAsync(request).ConfigureAwait(false);
 
             var user = result.User.Cast<TUser>();
 
@@ -96,7 +96,7 @@
             return user;
         }
 
-        public async Task<IPassword> GetPasswordSetting() => await SenderService.SendRequestAsync(new RequestGetPassword());
+        public async Task<IPassword> GetPasswordSetting() => await SenderService.SendRequestAsync(new RequestGetPassword()).ConfigureAwait(false);
 
         public bool IsUserAuthorized() => ClientSettings.Session.User != null;
 
@@ -115,7 +115,7 @@
                           {
                               PasswordHash = passwordHash
                           };
-            var result = (TAuthorization)await SenderService.SendRequestAsync(request);
+            var result = (TAuthorization)await SenderService.SendRequestAsync(request).ConfigureAwait(false);
 
             var user = result.User.As<TUser>();
 
@@ -134,7 +134,7 @@
                               FirstName = firstName,
                               LastName = lastName
                           };
-            var result = (TAuthorization)await SenderService.SendRequestAsync(request);
+            var result = (TAuthorization)await SenderService.SendRequestAsync(request).ConfigureAwait(false);
 
             var user = result.User.Cast<TUser>();
 

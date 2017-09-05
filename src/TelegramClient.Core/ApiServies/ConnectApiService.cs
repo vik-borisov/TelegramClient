@@ -42,7 +42,7 @@
             Log.Info("Try do authentication");
 
             var step1 = new Step1PqRequest();
-            var step1Result = await MtProtoPlainSender.SendAndReceive(step1.ToBytes());
+            var step1Result = await MtProtoPlainSender.SendAndReceive(step1.ToBytes()).ConfigureAwait(false);
             var step1Response = step1.FromBytes(step1Result);
 
             Log.Debug("First step is done");
@@ -52,7 +52,7 @@
                                   step1Response.Nonce,
                                   step1Response.ServerNonce,
                                   step1Response.Fingerprints,
-                                  step1Response.Pq));
+                                  step1Response.Pq)).ConfigureAwait(false);
             var step2Response = step2.FromBytes(step2Result);
 
             Log.Debug("Second step is done");
@@ -62,7 +62,8 @@
                 step2Response.Nonce,
                 step2Response.ServerNonce,
                 step2Response.NewNonce,
-                step2Response.EncryptedAnswer));
+                step2Response.EncryptedAnswer))
+                                                      .ConfigureAwait(false);
             var step3Response = step3.FromBytes(step3Result);
 
             Log.Debug("Third step is done");
@@ -80,11 +81,11 @@
             return ConnectAsync(true);
         }
 
-        private async Task ConnectAsync(bool forceAuth = false)
+        private async Task ConnectAsync(bool forceAuth)
         {
             if (ClientSettings.Session.AuthKey == null || forceAuth)
             {
-                var result = await DoAuthentication();
+                var result = await DoAuthentication().ConfigureAwait(false);
                 ClientSettings.Session.AuthKey = result.AuthKey;
                 ClientSettings.Session.TimeOffset = result.TimeOffset;
 
@@ -111,21 +112,23 @@
                 }
             };
 
-            var response = (TConfig)await SendService.SendRequestAsync(request);
+            var response = (TConfig)await SendService.SendRequestAsync(request).ConfigureAwait(false);
             _dcOptions = response.DcOptions.Items.Cast<TDcOption>().ToArray();
         }
 
         public async Task ReconnectToDcAsync(int dcId)
         {
             if (_dcOptions == null || !_dcOptions.Any())
+            {
                 throw new InvalidOperationException($"Can't reconnect. Establish initial connection first.");
+            }
 
             var dc = _dcOptions.First(d => d.Id == dcId);
 
             ClientSettings.Session.ServerAddress = dc.IpAddress;
             ClientSettings.Session.Port = dc.Port;
 
-            await ConnectAsync(true);
+            await ConnectAsync(true).ConfigureAwait(false);
         }
 
     }

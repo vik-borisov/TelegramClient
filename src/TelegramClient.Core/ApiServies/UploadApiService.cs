@@ -20,9 +20,9 @@
     [SingleInstance(typeof(IUploadApiService))]
     internal class UploadApiService : IUploadApiService
     {
-        private readonly int DownloadPhotoPartSize = 64 * 1024; // 64kb for photo
-
         private readonly int DownloadDocumentPartSize = 128 * 1024; // 128kb for document
+
+        private readonly int DownloadPhotoPartSize = 64 * 1024; // 64kb for photo
 
         public ISenderService SenderService { get; set; }
 
@@ -50,7 +50,7 @@
                                Location = location,
                                Limit = filePartSize,
                                Offset = offset
-                           });
+                           }).ConfigureAwait(false);
             }
             catch (FileMigrationException ex)
             {
@@ -58,27 +58,27 @@
                                                                new RequestExportAuthorization
                                                                {
                                                                    DcId = ex.Dc
-                                                               });
+                                                               }).ConfigureAwait(false);
 
                 var authKey = ClientSettings.Session.AuthKey;
                 var timeOffset = ClientSettings.Session.TimeOffset;
                 var serverAddress = ClientSettings.Session.ServerAddress;
                 var serverPort = ClientSettings.Session.Port;
 
-                await ConnectApiService.ReconnectToDcAsync(ex.Dc);
+                await ConnectApiService.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
                 await SenderService.SendRequestAsync(
                     new RequestImportAuthorization
                     {
                         Bytes = exportedAuth.Bytes,
                         Id = exportedAuth.Id
-                    });
-                var result = await GetFile(location, offset);
+                    }).ConfigureAwait(false);
+                var result = await GetFile(location, offset).ConfigureAwait(false);
 
                 ClientSettings.Session.AuthKey = authKey;
                 ClientSettings.Session.TimeOffset = timeOffset;
                 ClientSettings.Session.ServerAddress = serverAddress;
                 ClientSettings.Session.Port = serverPort;
-                await ConnectApiService.ConnectAsync();
+                await ConnectApiService.ConnectAsync().ConfigureAwait(false);
 
                 return result;
             }
@@ -89,7 +89,7 @@
             const long TenMb = 10 * 1024 * 1024;
             var isBigFileUpload = reader.BaseStream.Length >= TenMb;
 
-            var file = GetFile(reader);
+            var file = await GetFile(reader);
             var fileParts = GetFileParts(file);
 
             var partNumber = 0;
@@ -100,6 +100,7 @@
                 var part = fileParts.Dequeue();
 
                 if (isBigFileUpload)
+                {
                     await SenderService.SendRequestAsync(
                         new RequestSaveBigFilePart
                         {
@@ -107,25 +108,30 @@
                             FilePart = partNumber,
                             Bytes = part,
                             FileTotalParts = partsCount
-                        });
+                        }).ConfigureAwait(false);
+                }
                 else
+                {
                     await SenderService.SendRequestAsync(
                         new RequestSaveFilePart
                         {
                             FileId = fileId,
                             FilePart = partNumber,
                             Bytes = part
-                        });
+                        }).ConfigureAwait(false);
+                }
                 partNumber++;
             }
 
             if (isBigFileUpload)
+            {
                 return new TInputFileBig
                        {
                            Id = fileId,
                            Name = name,
                            Parts = partsCount
                        };
+            }
             return new TInputFile
                    {
                        Id = fileId,
@@ -133,6 +139,18 @@
                        Parts = partsCount,
                        Md5Checksum = GetFileHash(file)
                    };
+        }
+
+        private static async Task<byte[]> GetFile(StreamReader reader)
+        {
+            var file = new byte[reader.BaseStream.Length];
+
+            using (reader)
+            {
+                await reader.BaseStream.ReadAsync(file, 0, (int)reader.BaseStream.Length).ConfigureAwait(false);
+            }
+
+            return file;
         }
 
         private static string GetFileHash(byte[] data)
@@ -154,31 +172,19 @@
             return md5Checksum;
         }
 
-        private static byte[] GetFile(StreamReader reader)
-        {
-            var file = new byte[reader.BaseStream.Length];
-
-            using (reader)
-            {
-                reader.BaseStream.Read(file, 0, (int)reader.BaseStream.Length);
-            }
-
-            return file;
-        }
-
         private static Queue<byte[]> GetFileParts(byte[] file)
         {
             var fileParts = new Queue<byte[]>();
 
-            const int maxFilePart = 512 * 1024;
+            const int MaxFilePart = 512 * 1024;
 
             using (var stream = new MemoryStream(file))
             {
                 while (stream.Position != stream.Length)
-                    if (stream.Length - stream.Position > maxFilePart)
+                    if (stream.Length - stream.Position > MaxFilePart)
                     {
-                        var temp = new byte[maxFilePart];
-                        stream.Read(temp, 0, maxFilePart);
+                        var temp = new byte[MaxFilePart];
+                        stream.Read(temp, 0, MaxFilePart);
                         fileParts.Enqueue(temp);
                     }
                     else

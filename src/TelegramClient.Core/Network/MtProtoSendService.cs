@@ -79,7 +79,7 @@ namespace TelegramClient.Core.Network
 		{
 			var preparedData = PrepareToSend(obj, out var mesId);
 
-			await TcpTransport.Send(preparedData);
+			await TcpTransport.Send(preparedData).ConfigureAwait(false);
 
 			SessionStore.Save();
 

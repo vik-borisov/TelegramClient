@@ -36,7 +36,7 @@
                            Peer = peer,
                            Message = message,
                            RandomId = TlHelpers.GenerateRandomLong()
-                       });
+                       }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@
 
             var request = new RequestGetChats { Id = ids };
 
-            return await SenderService.SendRequestAsync(request);
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@
 
             var request = new RequestGetFullChat { ChatId = chatId };
 
-            return await SenderService.SendRequestAsync(request);
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@
 
             var request = new RequestEditChatTitle { ChatId = chatId, Title = title };
 
-            return await SenderService.SendRequestAsync(request);
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -106,7 +106,7 @@
                 Photo = photo
             };
 
-            return await SenderService.SendRequestAsync(request);
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
 
        
@@ -131,7 +131,7 @@
                 FwdLimit = limit
             };
 
-            return await SenderService.SendRequestAsync(request);
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@
                 UserId = user
             };
 
-            return await SenderService.SendRequestAsync(request);
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@
                 Users = users
             };
 
-            return await SenderService.SendRequestAsync(request);
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
         public  async Task<bool> SendTypingAsync( IInputPeer peer)
         {
@@ -183,7 +183,7 @@
                 Peer = peer
             };
 
-            return await SenderService.SendRequestAsync(req);
+            return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
         }
 
         public  async Task<IDialogs> GetUserDialogsAsync( int limit = 100)
@@ -197,7 +197,7 @@
                 Limit = limit
             };
 
-            return await SenderService.SendRequestAsync(getDialogs);
+            return await SenderService.SendRequestAsync(getDialogs).ConfigureAwait(false);
         }
 
         public  async Task<IUpdates> SendUploadedPhoto( IInputPeer peer, IInputFile file, string caption)
@@ -211,7 +211,7 @@
                 ClearDraft = false,
                 Media = new TInputMediaUploadedPhoto { File = file, Caption = caption },
                 Peer = peer
-            });
+            }).ConfigureAwait(false);
         }
 
         public  async Task<IUpdates> SendUploadedDocument(
@@ -237,7 +237,7 @@
                     Attributes = attributes
                 },
                 Peer = peer
-            });
+            }).ConfigureAwait(false);
         }
 
         public  async Task<IMessages> GetHistoryAsync( IInputPeer peer, int offset, int maxId, int limit)
@@ -251,7 +251,7 @@
                 MaxId = maxId,
                 Limit = limit
             };
-            return await SenderService.SendRequestAsync(req);
+            return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
         }
       
         private void EnsureUserAuthorized()

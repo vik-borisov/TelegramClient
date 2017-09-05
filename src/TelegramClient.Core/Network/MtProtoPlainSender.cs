@@ -39,9 +39,9 @@ namespace TelegramClient.Core.Network
         {
             var preparedPacket = PrepareToSend(data);
 
-            await TcpTransport.Send(preparedPacket);
+            await TcpTransport.Send(preparedPacket).ConfigureAwait(false);
 
-            var result = await TcpTransport.Receieve();
+            var result = await TcpTransport.Receieve().ConfigureAwait(false);
 
             return ProcessReceivedMessage(result);
         }

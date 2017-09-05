@@ -21,7 +21,17 @@
 
             var req = new RequestGetContacts { Hash = "" };
 
-            return await SenderService.SendRequestAsync(req);
+            return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        ///     Serch user or chat. API: contacts.search#11f812d8 q:string limit:int = contacts.Found; By default the limit is 10.
+        /// </summary>
+        /// <param name="q">User or chat name</param>
+        /// <returns></returns>
+        public Task<IFound> SearchUserAsync(string q)
+        {
+            return SearchUserAsync(q, 10);
         }
 
         /// <summary>
@@ -30,7 +40,7 @@
         /// <param name="q">User or chat name</param>
         /// <param name="limit">Max result count</param>
         /// <returns></returns>
-        public async Task<IFound> SearchUserAsync(string q, int limit = 10)
+        public async Task<IFound> SearchUserAsync(string q, int limit)
         {
             EnsureUserAuthorized();
 
@@ -40,13 +50,15 @@
                         Limit = limit
                     };
 
-            return await SenderService.SendRequestAsync(r);
+            return await SenderService.SendRequestAsync(r).ConfigureAwait(false);
         }
 
         private void EnsureUserAuthorized()
         {
             if (!AuthApiService.IsUserAuthorized())
+            {
                 throw new InvalidOperationException("Authorize user first!");
+            }
         }
 
     }

@@ -31,7 +31,7 @@
                 if (_tcpClient == null)
                 {
                     _tcpClient = new TcpClient();
-                    await _tcpClient.ConnectAsync(session.ServerAddress, session.Port);
+                    await _tcpClient.ConnectAsync(session.ServerAddress, session.Port).ConfigureAwait(false);
 
                 }
                 _resetEvent.Set();
@@ -61,13 +61,13 @@
 
         public async Task Send(byte[] encodedMessage)
         {
-            await EnsureClientConnected();
-            await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length);
+            await EnsureClientConnected().ConfigureAwait(false);
+            await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length).ConfigureAwait(false);
         }
 
         public async Task<Stream> Receieve()
         {
-            await EnsureClientConnected();
+            await EnsureClientConnected().ConfigureAwait(false);
 
             return _tcpClient.GetStream();
         }
