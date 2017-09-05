@@ -444,6 +444,12 @@
 
             return await SenderService.SendRequestAsync(forwardMessages);
         }
+        
+        /// TODO: Not implemented in new api layers
+        public async Task SendBroadcastAsync()
+        {
+            throw new NotImplementedException();
+        }
 
         private void EnsureUserAuthorized()
         {
