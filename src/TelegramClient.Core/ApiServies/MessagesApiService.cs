@@ -412,16 +412,19 @@
             return await SenderService.SendRequestAsync(receivedMessages).ConfigureAwait(false);
         }
 
-        public  async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore)
+        /// <summary>
+        /// Forwards messages by their IDs.
+        /// </summary>
+        /// <param name="fromPeer">User or chat from where a message will be forwarded</param>
+        /// <param name="toPeer">User or chat where a message will be forwarded</param>
+        /// <param name="ids">Forwarded message IDs</param>
+        /// <param name="silent"></param>
+        /// <param name="withMyScore"></param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
+        public async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore)
         {
-            throw new NotImplementedException();
-
             EnsureUserAuthorized();
-
-            //TODO: 
-            //https://github.com/telegramdesktop/tdesktop/blob/8f82880b938e06b7a2a27685ef9301edb12b4648/Telegram/SourceFiles/mainwidget.cpp
-            //Line: 607 - flags by different types of peer 
-
+            
             var forwardMessages = new RequestForwardMessages()
                                   {
                                      FromPeer = fromPeer,

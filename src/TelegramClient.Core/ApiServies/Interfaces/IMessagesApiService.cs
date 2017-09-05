@@ -143,6 +143,15 @@ namespace TelegramClient.Core.ApiServies.Interfaces
         /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
         Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId);
 
+        /// <summary>
+        /// Forwards messages by their IDs.
+        /// </summary>
+        /// <param name="fromPeer">User or chat from where a message will be forwarded</param>
+        /// <param name="toPeer">User or chat where a message will be forwarded</param>
+        /// <param name="ids">Forwarded message IDs</param>
+        /// <param name="silent"></param>
+        /// <param name="withMyScore"></param>
+        /// <returns>Returns a <see cref="IUpdates"/> object containing a service message sent during an action.</returns>
         Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore);
 
         Task<TVector<TReceivedNotifyMessage>> ReceivedMessagesAsync(int maxId);
