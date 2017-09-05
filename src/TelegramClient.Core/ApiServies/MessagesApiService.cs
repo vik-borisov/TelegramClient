@@ -271,7 +271,7 @@
                                          Id = ids
                                      };
 
-            return await SenderService.SendRequestAsync(getMessagesRequest);
+            return await SenderService.SendRequestAsync(getMessagesRequest).ConfigureAwait(false); 
         }
 
         /// <summary>
@@ -295,7 +295,7 @@
                                 ClearDraft = false
                             };
 
-            return await SenderService.SendRequestAsync(sendMedia);
+            return await SenderService.SendRequestAsync(sendMedia).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -314,7 +314,7 @@
                                   MaxId = maxId
                               };
 
-            return await SenderService.SendRequestAsync(readHistory);
+            return await SenderService.SendRequestAsync(readHistory).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -331,7 +331,7 @@
                                           Id = ids
                                       };
 
-            return await SenderService.SendRequestAsync(readMessageContents);
+            return await SenderService.SendRequestAsync(readMessageContents).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -355,7 +355,7 @@
                                     MaxId = maxId
                                 };
 
-            return await SenderService.SendRequestAsync(deleteHistory);
+            return await SenderService.SendRequestAsync(deleteHistory).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -377,7 +377,7 @@
                                     Revoke = revoke
                                  };
 
-            return await SenderService.SendRequestAsync(deleteMessages);
+            return await SenderService.SendRequestAsync(deleteMessages).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -397,7 +397,7 @@
                                      RandomId = TlHelpers.GenerateRandomLong()
                                  };
 
-            return await SenderService.SendRequestAsync(forwardMessage);
+            return await SenderService.SendRequestAsync(forwardMessage).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -415,7 +415,7 @@
                                         MaxId = maxId
                                    };
 
-            return await SenderService.SendRequestAsync(receivedMessages);
+            return await SenderService.SendRequestAsync(receivedMessages).ConfigureAwait(false);
         }
 
         public  async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore)
@@ -445,9 +445,9 @@
             return await SenderService.SendRequestAsync(forwardMessages);
         }
         
-        /// TODO: Not implemented in new api layers
         public async Task SendBroadcastAsync()
         {
+            /// TODO: Not implemented in new api layers
             throw new NotImplementedException();
         }
 
