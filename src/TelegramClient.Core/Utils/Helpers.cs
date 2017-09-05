@@ -6,9 +6,28 @@ namespace TelegramClient.Core.Utils
 {
     using BarsGroup.CodeGuard;
 
+    using OpenTl.Schema;
+
     internal class TlHelpers
     {
         private static readonly Random Random = new Random();
+
+        /// <summary>
+        /// Generate <see cref="TVector{T}"/> with random long numbers
+        /// </summary>
+        /// <param name="length">Length of list</param>
+        /// <returns>Returns a instance of <see cref="TVector{T}"/> with random long numbers</returns>
+        /// TODO: Move to  TlHelpers?
+        public static TVector<long> GenerateRandomTVectorLong(int length)
+        {
+            var randomIds = new TVector<long>();
+            for (int i = 0; i < length; i++)
+            {
+                randomIds.Items.Add(TlHelpers.GenerateRandomLong());
+            }
+
+            return randomIds;
+        }
 
         public static ulong GenerateRandomUlong()
         {

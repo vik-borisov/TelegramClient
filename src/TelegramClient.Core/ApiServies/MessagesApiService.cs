@@ -1,7 +1,6 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
     using System;
-    using System.Collections;
     using System.Threading.Tasks;
 
     using OpenTl.Schema;
@@ -433,7 +432,7 @@
                                      Background = false,
                                      Silent = silent,
                                      WithMyScore = withMyScore,
-                                     RandomId = GenerateRandomTVectorLong(ids.Items.Count)
+                                     RandomId = TlHelpers.GenerateRandomTVectorLong(ids.Items.Count)
                                   };
 
             return await SenderService.SendRequestAsync(forwardMessages);
@@ -445,21 +444,5 @@
                 throw new InvalidOperationException("Authorize user first!");
         }
 
-        /// <summary>
-        /// Generate <see cref="TVector{T}"/> with random long numbers
-        /// </summary>
-        /// <param name="length">Length of list</param>
-        /// <returns>Returns a instance of <see cref="TVector{T}"/> with random long numbers</returns>
-        /// TODO: Move to  TlHelpers?
-        private TVector<long> GenerateRandomTVectorLong(int length)
-        {
-            var randomIds = new TVector<long>();
-            for (int i = 0; i < length; i++)
-            {
-                randomIds.Items.Add(TlHelpers.GenerateRandomLong());
-            }
-
-            return randomIds;
-        }
     }
 }
