@@ -286,7 +286,7 @@
         {
             EnsureUserAuthorized();
 
-            var sendMedia = new RequestSendMedia()
+            var sendMedia = new RequestSendMedia
                             {
                                 RandomId = TlHelpers.GenerateRandomLong(),
                                 Peer = peer,
@@ -308,7 +308,7 @@
         {
             EnsureUserAuthorized();
 
-            var readHistory = new RequestReadHistory()
+            var readHistory = new RequestReadHistory
                               {
                                   Peer = peer,
                                   MaxId = maxId
@@ -326,7 +326,7 @@
         {
             EnsureUserAuthorized();
 
-            var readMessageContents = new RequestReadMessageContents()
+            var readMessageContents = new RequestReadMessageContents
                                       {
                                           Id = ids
                                       };
@@ -345,7 +345,7 @@
         {
             EnsureUserAuthorized();
             
-            var deleteHistory = new RequestDeleteHistory()
+            var deleteHistory = new RequestDeleteHistory
                                 {
                                     Peer = peer,
                                     JustClear = justClear,
@@ -365,7 +365,7 @@
         {
             EnsureUserAuthorized();
 
-            var deleteMessages = new RequestDeleteMessages()
+            var deleteMessages = new RequestDeleteMessages
                                  {
                                     Id = ids,
                                     Revoke = revoke
@@ -384,7 +384,7 @@
         {
             EnsureUserAuthorized();
 
-            var forwardMessage = new RequestForwardMessage()
+            var forwardMessage = new RequestForwardMessage
                                  {
                                      Peer = peer,
                                      Id = messageId,
@@ -404,7 +404,7 @@
         {
             EnsureUserAuthorized();
 
-            var receivedMessages = new RequestReceivedMessages()
+            var receivedMessages = new RequestReceivedMessages
                                    {
                                         MaxId = maxId
                                    };
@@ -425,7 +425,7 @@
         {
             EnsureUserAuthorized();
             
-            var forwardMessages = new RequestForwardMessages()
+            var forwardMessages = new RequestForwardMessages
                                   {
                                      FromPeer = fromPeer,
                                      ToPeer = toPeer,
