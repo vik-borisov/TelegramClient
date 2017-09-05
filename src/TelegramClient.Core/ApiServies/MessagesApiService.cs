@@ -344,14 +344,11 @@
         public  async Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear)
         {
             EnsureUserAuthorized();
-
-            var flags = new BitArray(1, justClear);
-
+            
             var deleteHistory = new RequestDeleteHistory()
                                 {
                                     Peer = peer,
                                     JustClear = justClear,
-                                    Flags = flags,
                                     MaxId = maxId
                                 };
 
@@ -368,12 +365,9 @@
         {
             EnsureUserAuthorized();
 
-            var flags = new BitArray(1, revoke);
-
             var deleteMessages = new RequestDeleteMessages()
                                  {
                                     Id = ids,
-                                    Flags = flags,
                                     Revoke = revoke
                                  };
 
@@ -428,14 +422,11 @@
             //https://github.com/telegramdesktop/tdesktop/blob/8f82880b938e06b7a2a27685ef9301edb12b4648/Telegram/SourceFiles/mainwidget.cpp
             //Line: 607 - flags by different types of peer 
 
-            var flags = new BitArray(1, silent);
-
             var forwardMessages = new RequestForwardMessages()
                                   {
                                      FromPeer = fromPeer,
                                      ToPeer = toPeer,
                                      Id = ids,
-                                     Flags = flags,
                                      Background = false,
                                      Silent = silent,
                                      WithMyScore = withMyScore,
