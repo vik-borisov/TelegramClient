@@ -360,7 +360,7 @@ namespace TelegramClient.Tests
                               OffsetDate = 0,
                               OffsetId = 0
                           });
-            var document = res.Messages.Items
+            var document = res.As<TMessages>().Messages.Items
                 .OfType<TMessage>()
                 .Where(m => m.Media != null)
                 .Select(m => m.Media)

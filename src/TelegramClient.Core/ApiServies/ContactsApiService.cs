@@ -19,7 +19,7 @@
         {
             EnsureUserAuthorized();
 
-            var req = new RequestGetContacts { Hash = "" };
+            var req = new RequestGetContacts { Hash = 0 };
 
             return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
         }
