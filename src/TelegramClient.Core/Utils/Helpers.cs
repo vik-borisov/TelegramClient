@@ -4,6 +4,8 @@ using TelegramClient.Core.MTProto.Crypto;
 
 namespace TelegramClient.Core.Utils
 {
+    using System.Linq;
+
     using BarsGroup.CodeGuard;
 
     using OpenTl.Schema;
@@ -28,11 +30,10 @@ namespace TelegramClient.Core.Utils
 
             return randomIds;
         }
-
-        public static ulong GenerateRandomUlong()
+        
+        public static int GenerateRandomInt(int maxLengh)
         {
-            var rand = ((ulong) Random.Next() << 32) | (ulong) Random.Next();
-            return rand;
+            return Random.Next(maxLengh);
         }
 
         public static long GenerateRandomLong()
@@ -48,72 +49,44 @@ namespace TelegramClient.Core.Utils
             return data;
         }
 
-        public static AesKeyData CalcKey(byte[] sharedKey, byte[] msgKey, bool client)
+        public static AesKeyData CalcKey(byte[] authKey, byte[] msgKey, bool client)
         {
-            Guard.That(sharedKey.Length, nameof(sharedKey)).IsEqual(256);
+            Guard.That(authKey.Length, nameof(authKey)).IsEqual(256);
             Guard.That(msgKey.Length, nameof(msgKey)).IsEqual(16);
 
             var x = client ? 0 : 8;
-            var buffer = new byte[48];
+            
+            //sha256_a = SHA256 (msg_key + substr (auth_key, x, 36));
+            var sha256ASource =  msgKey.Concat(authKey.Skip(x).Take(36)).ToArray();
+            var sha256A = Sha256(sha256ASource);
+            
+            //sha256_b = SHA256 (substr (auth_key, 40+x, 36) + msg_key);
+            var sha256BSource =  authKey.Skip(40 + x).Take(36).Concat(msgKey).ToArray();
+            var sha256B = Sha256(sha256BSource);
+            
+            //aes_key = substr (sha256_a, 0, 8) + substr (sha256_b, 8, 16) + substr (sha256_a, 24, 8);
+            var aesKey = sha256A.Take(8).Concat(sha256B.Skip(8).Take(16)).Concat(sha256A.Skip(24).Take(8)).ToArray();
+            
+            //aes_iv = substr (sha256_b, 0, 8) + substr (sha256_a, 8, 16) + substr (sha256_b, 24, 8);
+            var aesIv =  sha256B.Take(8).Concat(sha256A.Skip(8).Take(16)).Concat(sha256B.Skip(24).Take(8)).ToArray();
 
-            Array.Copy(msgKey, 0, buffer, 0, 16); // buffer[0:16] = msgKey
-            Array.Copy(sharedKey, x, buffer, 16, 32); // buffer[16:48] = authKey[x:x+32]
-            var sha1A = Sha1(buffer); // sha1a = sha1(buffer)
-
-            Array.Copy(sharedKey, 32 + x, buffer, 0, 16); // buffer[0:16] = authKey[x+32:x+48]
-            Array.Copy(msgKey, 0, buffer, 16, 16); // buffer[16:32] = msgKey
-            Array.Copy(sharedKey, 48 + x, buffer, 32, 16); // buffer[32:48] = authKey[x+48:x+64]
-            var sha1B = Sha1(buffer); // sha1b = sha1(buffer)
-
-            Array.Copy(sharedKey, 64 + x, buffer, 0, 32); // buffer[0:32] = authKey[x+64:x+96]
-            Array.Copy(msgKey, 0, buffer, 32, 16); // buffer[32:48] = msgKey
-            var sha1C = Sha1(buffer); // sha1c = sha1(buffer)
-
-            Array.Copy(msgKey, 0, buffer, 0, 16); // buffer[0:16] = msgKey
-            Array.Copy(sharedKey, 96 + x, buffer, 16, 32); // buffer[16:48] = authKey[x+96:x+128]
-            var sha1D = Sha1(buffer); // sha1d = sha1(buffer)
-
-            var key = new byte[32]; // key = sha1a[0:8] + sha1b[8:20] + sha1c[4:16]
-            Array.Copy(sha1A, 0, key, 0, 8);
-            Array.Copy(sha1B, 8, key, 8, 12);
-            Array.Copy(sha1C, 4, key, 20, 12);
-
-            var iv = new byte[32]; // iv = sha1a[8:20] + sha1b[0:8] + sha1c[16:20] + sha1d[0:8]
-            Array.Copy(sha1A, 8, iv, 0, 12);
-            Array.Copy(sha1B, 0, iv, 12, 8);
-            Array.Copy(sha1C, 16, iv, 20, 4);
-            Array.Copy(sha1D, 0, iv, 24, 8);
-
-            return new AesKeyData(key, iv);
+            return new AesKeyData(aesKey, aesIv);
         }
 
-        public static byte[] CalcMsgKey(byte[] data)
+        public static byte[] CalcMsgKey(byte[] authKey, byte[] data)
         {
-            var msgKey = new byte[16];
-            Array.Copy(Sha1(data), 4, msgKey, 0, 16);
-            return msgKey;
+            //msg_key_large = SHA256 (substr (auth_key, 88+0, 32) + plaintext + random_padding);
+            var msgKeyLarge = Sha256(authKey.Skip(88).Take(32).Concat(data).ToArray());
+            
+            //msg_key = substr (msg_key_large, 8, 16);
+            return msgKeyLarge.Skip(8).Take(16).ToArray();
         }
 
-        public static byte[] CalcMsgKey(byte[] data, int offset, int limit)
+        private static byte[] Sha256(byte[] data)
         {
-            var msgKey = new byte[16];
-            Array.Copy(Sha1(data, offset, limit), 4, msgKey, 0, 16);
-            return msgKey;
-        }
-
-        public static byte[] Sha1(byte[] data)
-        {
-            using (var sha1 = SHA1.Create())
+            using (var sha1 = SHA256.Create())
             {
                 return sha1.ComputeHash(data);
-            }
-        }
-
-        public static byte[] Sha1(byte[] data, int offset, int limit)
-        {
-            using (var sha1 = SHA1.Create())
-            {
-                return sha1.ComputeHash(data, offset, limit);
             }
         }
     }

@@ -32,7 +32,7 @@ namespace TelegramClient.Core.Network
         public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
 		public ISessionStore SessionStore { get; set; }
-
+		
 	    private byte[] PrepareToSend(IObject obj, out long mesId)
 		{
 			var packet = Serializer.SerializeObject(obj);
@@ -44,7 +44,9 @@ namespace TelegramClient.Core.Network
 
 			byte[] msgKey;
 			byte[] ciphertext;
-			using (var plaintextPacket = MakeMemory(8 + 8 + 8 + 4 + 4 + packet.Length))
+			var randomPaddingLenght = TlHelpers.GenerateRandomInt(1024 / 16) * 16;
+			
+			using (var plaintextPacket = MakeMemory(8 + 8 + 8 + 4 + 4 + packet.Length + randomPaddingLenght))
 			{
 				using (var plaintextWriter = new BinaryWriter(plaintextPacket))
 				{
@@ -55,9 +57,16 @@ namespace TelegramClient.Core.Network
 					plaintextWriter.Write(packet.Length);
 					plaintextWriter.Write(packet);
 
+					plaintextWriter.Write(TlHelpers.GenerateRandomBytes(randomPaddingLenght));
+					
 					plaintextPacket.TryGetBuffer(out var buffer);
-					msgKey = TlHelpers.CalcMsgKey(buffer.Array);
-					ciphertext = AES.EncryptAes(TlHelpers.CalcKey(ClientSettings.Session.AuthKey.Data, msgKey, true), buffer.Array);
+					
+					var authKey = ClientSettings.Session.AuthKey.Data;
+					msgKey = TlHelpers.CalcMsgKey(authKey, buffer.Array);
+
+					var key = TlHelpers.CalcKey(authKey, msgKey, true);
+					
+					ciphertext = AES.EncryptAes(key, buffer.Array);
 				}
 			}
 

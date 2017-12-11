@@ -19,40 +19,6 @@ namespace TelegramClient.Core.MTProto.Crypto
 
     public class AES
     {
-        public static byte[] DecryptWithNonces(byte[] data, byte[] serverNonce, byte[] newNonce)
-        {
-            using (var hash = SHA1.Create())
-            {
-                var nonces = new byte[48];
-
-                newNonce.CopyTo(nonces, 0);
-                serverNonce.CopyTo(nonces, 32);
-                var hash1 = hash.ComputeHash(nonces);
-
-                serverNonce.CopyTo(nonces, 0);
-                newNonce.CopyTo(nonces, 16);
-                var hash2 = hash.ComputeHash(nonces);
-
-                nonces = new byte[64];
-                newNonce.CopyTo(nonces, 0);
-                newNonce.CopyTo(nonces, 32);
-                var hash3 = hash.ComputeHash(nonces);
-
-                using (var keyBuffer = new MemoryStream(32))
-                using (var ivBuffer = new MemoryStream(32))
-                {
-                    keyBuffer.Write(hash1, 0, hash1.Length);
-                    keyBuffer.Write(hash2, 0, 12);
-
-                    ivBuffer.Write(hash2, 12, 8);
-                    ivBuffer.Write(hash3, 0, hash3.Length);
-                    ivBuffer.Write(newNonce, 0, 4);
-
-                    return DecryptIge(data, keyBuffer.ToArray(), ivBuffer.ToArray());
-                }
-            }
-        }
-
         public static AesKeyData GenerateKeyDataFromNonces(byte[] serverNonce, byte[] newNonce)
         {
             using (var hash = SHA1.Create())
@@ -187,14 +153,6 @@ namespace TelegramClient.Core.MTProto.Crypto
             }
 
             return ciphertext;
-        }
-
-        public static byte[] Xor(byte[] buffer1, byte[] buffer2)
-        {
-            var result = new byte[buffer1.Length];
-            for (var i = 0; i < buffer1.Length; i++)
-                result[i] = (byte) (buffer1[i] ^ buffer2[i]);
-            return result;
         }
     }
 
