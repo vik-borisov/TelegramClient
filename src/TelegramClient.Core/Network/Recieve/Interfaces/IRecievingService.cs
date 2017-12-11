@@ -1,9 +1,8 @@
 namespace TelegramClient.Core.Network.Recieve.Interfaces
 {
-    internal interface IRecievingService
+    using System;
+    internal interface IRecievingService: IDisposable
     {
         void StartReceiving();
-
-        void StopRecieving();
     }
 }

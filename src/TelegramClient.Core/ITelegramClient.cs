@@ -5,9 +5,11 @@ using System.Runtime.CompilerServices;
 
 namespace TelegramClient.Core
 {
+    using System;
+
     using TelegramClient.Core.ApiServies.Interfaces;
 
-    public interface ITelegramClient
+    public interface ITelegramClient: IDisposable
     {
         /// <summary>Send custom messages</summary>
         ISenderService SendService { get; }

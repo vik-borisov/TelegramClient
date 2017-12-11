@@ -5,9 +5,10 @@
     using System.Linq;
     using System.Reflection;
 
-    using Autofac;
-
     using BarsGroup.CodeGuard;
+
+    using Castle.MicroKernel.Registration;
+    using Castle.Windsor;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
@@ -31,7 +32,7 @@
             return container.Resolve<ITelegramClient>();
         }
 
-        private static void FillSettings(IContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort)
+        private static void FillSettings(IWindsorContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort)
         {
             Guard.That(appId).IsPositive();
             Guard.That(appHash).IsNotNullOrWhiteSpace();
@@ -48,21 +49,18 @@
             settings.Session = TryLoadOrCreateNew(store, sessionUserId, serverAddress, serverPort);
         }
 
-        private static IContainer RegisterDependency()
+        private static IWindsorContainer RegisterDependency()
         {
-            var builder = new ContainerBuilder();
+            var container = new WindsorContainer();
 
-            builder.RegisterAttibuteRegistration(typeof(ClientFactory).GetTypeInfo().Assembly);
-
-            builder.RegisterAssemblyTypes(typeof(ClientFactory).GetTypeInfo().Assembly)
-                   .Where(typeof(IRecieveHandler).IsAssignableFrom)
-                   .As<IRecieveHandler>()
-                   .SingleInstance()
-                   .PropertiesAutowired();
-            builder.RegisterAdapter<IEnumerable<IRecieveHandler>, Dictionary<Type, IRecieveHandler>>(handlers =>
+            container.RegisterAttibuteRegistration(typeof(ClientFactory).GetTypeInfo().Assembly);
+            
+            container.Register(Component.For<IDictionary<Type, IRecieveHandler>>().UsingFactoryMethod(kernel =>
             {
                 var handlerMap = new Dictionary<Type, IRecieveHandler>();
-                foreach (var handler in handlers.ToArray())
+
+                var allHandlers = kernel.ResolveAll<IRecieveHandler>();
+                foreach (var handler in allHandlers.ToArray())
                 {
                     foreach (var handleCode in handler.HandleCodes)
                     {
@@ -71,9 +69,9 @@
                 }
 
                 return handlerMap;
-            });
+            }));
 
-           return builder.Build();
+           return container;
         }
 
     private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)

@@ -1,6 +1,8 @@
 ﻿namespace TelegramClient.Core
 {
-    using Autofac;
+    using System;
+
+    using Castle.Windsor;
 
     using TelegramClient.Core.ApiServies.Interfaces;
     using TelegramClient.Core.IoC;
@@ -8,7 +10,7 @@
     [SingleInstance(typeof(ITelegramClient))]
     internal class Client : ITelegramClient
     {
-        internal IComponentContext Container { get; set; }
+        internal IWindsorContainer Container { get; set; }
 
         public ISenderService SendService { get; set; }
 
@@ -23,5 +25,10 @@
         public IContactsApiService ContactsService { get; set; }
 
         public IUploadApiService UploadService { get; set; }
+
+        public void Dispose()
+        {
+            Container?.Dispose();
+        }
     }
 }

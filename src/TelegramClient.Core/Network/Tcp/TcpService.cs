@@ -12,8 +12,7 @@
     using TelegramClient.Core.Settings;
 
     [SingleInstance(typeof(ITcpService))]
-    internal class TcpService: IDisposable,
-                               ITcpService
+    internal class TcpService: ITcpService
     {
         private readonly AutoResetEvent _resetEvent = new AutoResetEvent(true);
 

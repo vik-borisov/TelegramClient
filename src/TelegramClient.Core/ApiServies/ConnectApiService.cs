@@ -92,7 +92,6 @@
                 SessionStore.Save();
             }
 
-            ConfirmationSendService.StartSendingConfirmation();
             ProtoRecieveService.StartReceiving();
 
             //set-up layer

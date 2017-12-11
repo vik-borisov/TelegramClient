@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.ComponentModel;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -24,10 +25,11 @@
 
         public ITcpService TcpService { get; set; }
 
+        private readonly BackgroundWorker _worker = new BackgroundWorker();
+
         public TcpTransport()
         {
-            ThreadPool.QueueUserWorkItem(
-                state =>
+            _worker.DoWork += (sender, args) => 
                 {
                     while (true)
                     {
@@ -35,6 +37,11 @@
                         {
                             _resetEvent.Reset();
                             _resetEvent.Wait();
+                        }
+
+                        if (args.Cancel)
+                        {
+                            return;
                         }
 
                         _queue.TryDequeue(out var item);
@@ -49,7 +56,8 @@
                             Log.Error("Process message failed", e);
                         }
                     }
-                });
+                };
+            _worker.RunWorkerAsync();
         }
 
         public Task Send(byte[] packet)
@@ -136,6 +144,13 @@
                 throw new InvalidOperationException("invalid checksum! skip");
 
             return body;
+        }
+
+        public void Dispose()
+        {
+            _resetEvent?.Dispose();
+            _worker?.CancelAsync();
+            _worker?.Dispose();
         }
     }
 }

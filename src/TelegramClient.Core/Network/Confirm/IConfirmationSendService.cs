@@ -1,9 +1,8 @@
 ﻿namespace TelegramClient.Core.Network.Confirm
 {
-    internal interface IConfirmationSendService
+    using System;
+    internal interface IConfirmationSendService: IDisposable
     {
-        void StartSendingConfirmation();
-
         void AddForSend(long messageId);
     }
 }

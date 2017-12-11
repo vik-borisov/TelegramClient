@@ -2,6 +2,7 @@ namespace TelegramClient.Core.Network.Recieve
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -28,57 +29,50 @@ namespace TelegramClient.Core.Network.Recieve
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RecievingService));
 
-        private CancellationTokenSource _recievingCts;
-
         public ITcpTransport TcpTransport { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
 
         public IConfirmationSendService ConfirmationSendService { get; set; }
 
-        public Dictionary<Type, IRecieveHandler> RecieveHandlersMap { get; set; }
+        public IDictionary<Type, IRecieveHandler> RecieveHandlersMap { get; set; }
 
         public IGZipPackedHandler ZipPackedHandler { get; set; }
 
-        public void StartReceiving()
+        private readonly BackgroundWorker _worker = new BackgroundWorker();
+
+        public RecievingService()
         {
-            if (_recievingCts != null && _recievingCts.IsCancellationRequested)
+            _worker.DoWork += (sender, args) =>
             {
-                return;
-            }
-
-            _recievingCts = new CancellationTokenSource();
-
-            Task.Run(
-                () =>
+                while (true)
                 {
-                    while (!_recievingCts.Token.IsCancellationRequested)
+                    try
                     {
-                        try
+                        var recieveTask = TcpTransport.Receieve();
+                        recieveTask.Wait();
+
+                        if (args.Cancel)
                         {
-                            var recieveTask = TcpTransport.Receieve();
-                            recieveTask.Wait(_recievingCts.Token);
-                            var recieveData = recieveTask.Result;
-
-                            var decodedData = DecodeMessage(recieveData);
-
-                            Log.Debug($"Recieve message with remote id: {decodedData.Item2}");
-
-                            ProcessReceivedMessage(decodedData.Item1);
-
-                            ConfirmationSendService.AddForSend(decodedData.Item2);
+                            return;
                         }
-                        catch (Exception e)
-                        {
-                            Log.Error("Recieve message failed", e);
-                        }
+                        
+                        var recieveData = recieveTask.Result;
+
+                        var decodedData = DecodeMessage(recieveData);
+
+                        Log.Debug($"Recieve message with remote id: {decodedData.Item2}");
+
+                        ProcessReceivedMessage(decodedData.Item1);
+
+                        ConfirmationSendService.AddForSend(decodedData.Item2);
                     }
-                });
-        }
-
-        public void StopRecieving()
-        {
-            _recievingCts?.Cancel();
+                    catch (Exception e)
+                    {
+                        Log.Error("Recieve message failed", e);
+                    }
+                }
+            };
         }
 
         private Tuple<byte[], long> DecodeMessage(byte[] body)
@@ -157,6 +151,18 @@ namespace TelegramClient.Core.Network.Recieve
                     }
                     break;
             }
+        }
+
+        public void Dispose()
+        {
+            _worker?.Dispose();
+            TcpTransport?.Dispose();
+            ConfirmationSendService?.Dispose();
+        }
+
+        public void StartReceiving()
+        {
+            _worker.RunWorkerAsync();
         }
     }
 }
