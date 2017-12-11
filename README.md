@@ -4,7 +4,7 @@
 [![NuGet version](https://badge.fury.io/nu/telegramclientapi.svg)](https://badge.fury.io/nu/telegramclientapi)
 [![Join the chat at https://gitter.im/DotNetTelegramClientApi](https://img.shields.io/badge/GITTER-JOIN_CHAT_%E2%86%92-1dce73.svg)](https://gitter.im/DotNetTelegramClientApi/Lobby?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
 
-_Unofficial_ Telegram (http://telegram.org) client library implemented in C#. Latest TL scheme supported (70 layer)
+_Unofficial_ Telegram (http://telegram.org) client library implemented in C#. Latest TL scheme supported (72 layer). We used MtProto 2.0
 
 It's a perfect fit for any developer who would like to send data directly to Telegram users or write own custom Telegram client.
 
