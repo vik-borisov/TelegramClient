@@ -17,8 +17,6 @@ Install via NuGet
 ```
 	> Install-Package TelegramClientApi
 ```
-## [Migrate to 0.2 version](https://github.com/vik-borisov/TelegramClient/wiki/Migrate-to-version-0.2)
-
 ## [Quick Start](https://github.com/vik-borisov/TelegramClient/wiki/Quick-Start)
 
 ## [Available Methods](https://github.com/vik-borisov/TelegramClient/wiki/Supported-methods)
