@@ -25,7 +25,7 @@
         {
             var message = obj.Cast<TPong>();
             ConfirmationRecieveService.ConfirmRequest(message.MsgId);
-            
+
             if (Log.IsDebugEnabled)
             {
                 var jMessages = JsonConvert.SerializeObject(message);

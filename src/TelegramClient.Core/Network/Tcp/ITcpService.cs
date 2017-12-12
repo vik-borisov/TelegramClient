@@ -4,10 +4,10 @@
     using System.IO;
     using System.Threading.Tasks;
 
-    internal interface ITcpService: IDisposable
+    internal interface ITcpService : IDisposable
     {
-        Task Send(byte[] encodedMessage);
-
         Task<Stream> Receieve();
+
+        Task Send(byte[] encodedMessage);
     }
 }

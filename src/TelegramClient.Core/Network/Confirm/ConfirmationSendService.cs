@@ -19,18 +19,18 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ConfirmationSendService));
 
-        private readonly ConcurrentQueue<long> _waitSendConfirmation = new ConcurrentQueue<long>();
         private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
 
-        public IMtProtoSender MtProtoSender { get; set; }
+        private readonly ConcurrentQueue<long> _waitSendConfirmation = new ConcurrentQueue<long>();
 
         private readonly BackgroundWorker _worker = new BackgroundWorker();
+
+        public IMtProtoSender MtProtoSender { get; set; }
 
         public ConfirmationSendService()
         {
             _worker.DoWork += (sender, args) =>
             {
-                
                 while (true)
                 {
                     if (_waitSendConfirmation.IsEmpty)
@@ -55,7 +55,7 @@
                     {
                         Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
 
-                        var message = new TMsgsAck()
+                        var message = new TMsgsAck
                                       {
                                           MsgIds = new TVector<long>(msgs.ToArray())
                                       };
@@ -83,9 +83,22 @@
 
         public void Dispose()
         {
-            _resetEvent?.Dispose();
-            _worker?.CancelAsync();
-            _worker?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _resetEvent?.Dispose();
+                _worker?.Dispose();
+            }
+        }
+
+        ~ConfirmationSendService()
+        {
+            Dispose(false);
         }
     }
 }

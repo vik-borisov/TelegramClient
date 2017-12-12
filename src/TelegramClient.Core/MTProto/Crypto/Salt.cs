@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TelegramClient.Core.MTProto.Crypto
+﻿namespace TelegramClient.Core.MTProto.Crypto
 {
+    using System;
+    using System.Collections.Generic;
+
     public class Salt : IComparable<Salt>
     {
+        public int ValidSince { get; }
+
+        public int ValidUntil { get; }
+
+        public ulong Value { get; }
+
         public Salt(int validSince, int validUntil, ulong salt)
         {
             ValidSince = validSince;
             ValidUntil = validUntil;
             Value = salt;
         }
-
-        public int ValidSince { get; }
-
-        public int ValidUntil { get; }
-
-        public ulong Value { get; }
 
         public int CompareTo(Salt other)
         {
@@ -40,17 +40,17 @@ namespace TelegramClient.Core.MTProto.Crypto
 
     public class GetFutureSaltsResponse
     {
-        public GetFutureSaltsResponse(ulong requestId, int now)
-        {
-            RequestId = requestId;
-            Now = now;
-        }
-
         public ulong RequestId { get; }
 
         public int Now { get; }
 
         public SaltCollection Salts { get; }
+
+        public GetFutureSaltsResponse(ulong requestId, int now)
+        {
+            RequestId = requestId;
+            Now = now;
+        }
 
         public void AddSalt(Salt salt)
         {

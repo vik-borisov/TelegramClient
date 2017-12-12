@@ -26,7 +26,7 @@
         public void HandleResponce(IObject obj)
         {
             var message = obj.Cast<TBadServerSalt>();
-            
+
             Log.Info($"Bad server sault detected! message id = {message.BadMsgId} ");
 
             ClientSettings.Session.Salt = message.NewServerSalt;

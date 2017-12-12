@@ -2,9 +2,9 @@ namespace TelegramClient.Core.Sessions
 {
     using System;
 
-    using global::TelegramClient.Core.MTProto.Crypto;
-
     using OpenTl.Schema;
+
+    using TelegramClient.Core.MTProto.Crypto;
 
     internal interface ISession
     {
@@ -26,10 +26,10 @@ namespace TelegramClient.Core.Sessions
 
         TUser User { get; set; }
 
-        byte[] ToBytes();
+        long GenerateMsgId();
 
         Tuple<long, int> GenerateMsgIdAndSeqNo(bool confirmed);
 
-        long GenerateMsgId();
+        byte[] ToBytes();
     }
 }

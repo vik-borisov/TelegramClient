@@ -9,7 +9,6 @@
     using log4net;
 
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Utils;
 
     [SingleInstance(typeof(ITcpTransport))]
@@ -21,73 +20,49 @@
 
         private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
 
+        private readonly BackgroundWorker _worker = new BackgroundWorker();
+
         private int _messageSeqNo;
 
         public ITcpService TcpService { get; set; }
 
-        private readonly BackgroundWorker _worker = new BackgroundWorker();
-
         public TcpTransport()
         {
-            _worker.DoWork += (sender, args) => 
+            _worker.DoWork += (sender, args) =>
+            {
+                while (true)
                 {
-                    while (true)
+                    if (_queue.IsEmpty)
                     {
-                        if (_queue.IsEmpty)
-                        {
-                            _resetEvent.Reset();
-                            _resetEvent.Wait();
-                        }
-
-                        if (args.Cancel)
-                        {
-                            return;
-                        }
-
-                        _queue.TryDequeue(out var item);
-
-                        try
-                        {
-                            SendPacket(item.Item1).Wait();
-                            item.Item2.SetResult(true);
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error("Process message failed", e);
-                        }
+                        _resetEvent.Reset();
+                        _resetEvent.Wait();
                     }
-                };
+
+                    if (args.Cancel)
+                    {
+                        return;
+                    }
+
+                    _queue.TryDequeue(out var item);
+
+                    try
+                    {
+                        SendPacket(item.Item1).Wait();
+                        item.Item2.SetResult(true);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error("Process message failed", e);
+                    }
+                }
+            };
             _worker.RunWorkerAsync();
         }
 
-        public Task Send(byte[] packet)
+        public void Dispose()
         {
-            var tcs = new TaskCompletionSource<bool>();
-
-            PushToQueue(packet, tcs);
-
-            return tcs.Task;
-        }
-
-        private async Task SendPacket(byte[] packet)
-        {
-            var mesSeqNo = _messageSeqNo++;
-
-            Log.Debug($"Send message with seq_no {mesSeqNo}");
-
-            var tcpMessage = new TcpMessage(mesSeqNo, packet);
-            var encodedMessage = tcpMessage.Encode();
-            await TcpService.Send(encodedMessage).ConfigureAwait(false);
-        }
-
-        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
-        {
-            _queue.Enqueue(Tuple.Create(packet, tcs) );
-
-            if (!_resetEvent.IsSet)
-            {
-                _resetEvent.Set();
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public async Task<byte[]> Receieve()
@@ -98,7 +73,9 @@
             var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4).ConfigureAwait(false);
 
             if (readLenghtBytes != 4)
+            {
                 throw new InvalidOperationException("Couldn't read the packet length");
+            }
 
             var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
@@ -106,7 +83,10 @@
             var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4).ConfigureAwait(false);
 
             if (readSeqBytes != 4)
+            {
                 throw new InvalidOperationException("Couldn't read the sequence");
+            }
+
             var mesSeqNo = BitConverter.ToInt32(seqBytes, 0);
 
             Log.Debug($"Recieve message with seq_no {mesSeqNo}");
@@ -128,7 +108,10 @@
             var crcBytes = new byte[4];
             var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4).ConfigureAwait(false);
             if (readCrcBytes != 4)
+            {
                 throw new InvalidOperationException("Couldn't read the crc");
+            }
+
             var checksum = BitConverter.ToInt32(crcBytes, 0);
 
             var rv = new byte[packetLengthBytes.Length + seqBytes.Length + body.Length];
@@ -141,16 +124,56 @@
             var validChecksum = crc32.Crc32Result;
 
             if (checksum != validChecksum)
+            {
                 throw new InvalidOperationException("invalid checksum! skip");
+            }
 
             return body;
         }
 
-        public void Dispose()
+        public Task Send(byte[] packet)
         {
-            _resetEvent?.Dispose();
-            _worker?.CancelAsync();
-            _worker?.Dispose();
+            var tcs = new TaskCompletionSource<bool>();
+
+            PushToQueue(packet, tcs);
+
+            return tcs.Task;
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _resetEvent?.Dispose();
+                _worker?.Dispose();
+                TcpService?.Dispose();
+            }
+        }
+
+        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
+        {
+            _queue.Enqueue(Tuple.Create(packet, tcs));
+
+            if (!_resetEvent.IsSet)
+            {
+                _resetEvent.Set();
+            }
+        }
+
+        private async Task SendPacket(byte[] packet)
+        {
+            var mesSeqNo = _messageSeqNo++;
+
+            Log.Debug($"Send message with seq_no {mesSeqNo}");
+
+            var tcpMessage = new TcpMessage(mesSeqNo, packet);
+            var encodedMessage = tcpMessage.Encode();
+            await TcpService.Send(encodedMessage).ConfigureAwait(false);
+        }
+
+        ~TcpTransport()
+        {
+            Dispose(false);
         }
     }
 }

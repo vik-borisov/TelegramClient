@@ -11,14 +11,6 @@ namespace TelegramClient.Core.Network.Confirm
     {
         private readonly ConcurrentDictionary<long, TaskCompletionSource<bool>> _waitConfirm = new ConcurrentDictionary<long, TaskCompletionSource<bool>>();
 
-        public Task WaitForConfirm(long messageId)
-        {
-            var tsc = new TaskCompletionSource<bool>();
-            _waitConfirm.TryAdd(messageId, tsc);
-
-            return tsc.Task;
-        }
-
         public void ConfirmRequest(long requestId)
         {
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
@@ -33,6 +25,14 @@ namespace TelegramClient.Core.Network.Confirm
             {
                 tsc.SetException(exception);
             }
+        }
+
+        public Task WaitForConfirm(long messageId)
+        {
+            var tsc = new TaskCompletionSource<bool>();
+            _waitConfirm.TryAdd(messageId, tsc);
+
+            return tsc.Task;
         }
     }
 }

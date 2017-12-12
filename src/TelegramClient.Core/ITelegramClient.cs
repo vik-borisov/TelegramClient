@@ -9,7 +9,7 @@ namespace TelegramClient.Core
 
     using TelegramClient.Core.ApiServies.Interfaces;
 
-    public interface ITelegramClient: IDisposable
+    public interface ITelegramClient : IDisposable
     {
         /// <summary>Send custom messages</summary>
         ISenderService SendService { get; }

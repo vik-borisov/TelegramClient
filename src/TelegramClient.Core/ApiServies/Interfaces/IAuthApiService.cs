@@ -8,17 +8,17 @@
 
     public interface IAuthApiService
     {
-        Task<ICheckedPhone> IsPhoneRegisteredAsync(string phoneNumber);
-
-        Task<ISentCode> SendCodeRequestAsync(string phoneNumber);
-
-        Task<TUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code);
-
         Task<IPassword> GetPasswordSetting();
+
+        Task<ICheckedPhone> IsPhoneRegisteredAsync(string phoneNumber);
 
         bool IsUserAuthorized();
 
+        Task<TUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code);
+
         Task<TUser> MakeAuthWithPasswordAsync(TPassword password, string passwordStr);
+
+        Task<ISentCode> SendCodeRequestAsync(string phoneNumber);
 
         Task<TUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName, string lastName);
     }

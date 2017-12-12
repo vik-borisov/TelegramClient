@@ -3,10 +3,10 @@
     using System;
     using System.Threading.Tasks;
 
-    internal interface ITcpTransport: IDisposable
+    internal interface ITcpTransport : IDisposable
     {
-        Task Send(byte[] packet);
-
         Task<byte[]> Receieve();
+
+        Task Send(byte[] packet);
     }
 }

@@ -89,7 +89,7 @@
             const long TenMb = 10 * 1024 * 1024;
             var isBigFileUpload = reader.BaseStream.Length >= TenMb;
 
-            var file = await GetFile(reader);
+            var file = await GetFile(reader).ConfigureAwait(false);
             var fileParts = GetFileParts(file);
 
             var partNumber = 0;
@@ -120,6 +120,7 @@
                             Bytes = part
                         }).ConfigureAwait(false);
                 }
+
                 partNumber++;
             }
 
@@ -132,6 +133,7 @@
                            Parts = partsCount
                        };
             }
+
             return new TInputFile
                    {
                        Id = fileId,
@@ -181,6 +183,7 @@
             using (var stream = new MemoryStream(file))
             {
                 while (stream.Position != stream.Length)
+                {
                     if (stream.Length - stream.Position > MaxFilePart)
                     {
                         var temp = new byte[MaxFilePart];
@@ -194,6 +197,7 @@
                         stream.Read(temp, 0, (int)length);
                         fileParts.Enqueue(temp);
                     }
+                }
             }
 
             return fileParts;

@@ -25,7 +25,7 @@
             if (Log.IsDebugEnabled)
             {
                 var message = obj.Cast<TMsgsAck>();
-                
+
                 var jMessages = JsonConvert.SerializeObject(message.MsgIds.Items);
                 Log.Debug($"Receiving confirmation of the messages: {jMessages}");
             }

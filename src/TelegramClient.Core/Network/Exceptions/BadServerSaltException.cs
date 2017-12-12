@@ -4,6 +4,5 @@
 
     internal class BadServerSaltException : Exception
     {
-        
     }
 }

@@ -25,8 +25,6 @@
 
         public ulong Id { get; set; }
 
-        private int SessionSeqNo { get; set; }
-
         public long Salt { get; set; }
 
         public int TimeOffset { get; set; }
@@ -34,6 +32,8 @@
         public int SessionExpires { get; set; }
 
         public TUser User { get; set; }
+
+        private int SessionSeqNo { get; set; }
 
         public static Session FromBytes(byte[] buffer, string sessionUserId)
         {
@@ -74,21 +74,6 @@
             }
         }
 
-        private int GenerateSeqNo(bool confirmed)
-        {
-            return confirmed
-                       ? SessionSeqNo++ * 2 + 1
-                       : SessionSeqNo * 2;
-        }
-
-        public Tuple<long, int> GenerateMsgIdAndSeqNo(bool confirmed)
-        {
-            lock (_syncObject)
-            {
-                return Tuple.Create(GenerateMsgId(), GenerateSeqNo(confirmed));
-            }
-        }
-
         public long GenerateMsgId()
         {
             if (_msgIdInc >= 4194303 - 4)
@@ -108,6 +93,14 @@
                 _msgIdInc;
 
             return newMessageId;
+        }
+
+        public Tuple<long, int> GenerateMsgIdAndSeqNo(bool confirmed)
+        {
+            lock (_syncObject)
+            {
+                return Tuple.Create(GenerateMsgId(), GenerateSeqNo(confirmed));
+            }
         }
 
         public byte[] ToBytes()
@@ -141,6 +134,13 @@
 
                 return stream.ToArray();
             }
+        }
+
+        private int GenerateSeqNo(bool confirmed)
+        {
+            return confirmed
+                       ? SessionSeqNo++ * 2 + 1
+                       : SessionSeqNo * 2;
         }
     }
 }

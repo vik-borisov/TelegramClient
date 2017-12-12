@@ -30,6 +30,11 @@
 
         public ISessionStore SessionStore { get; set; }
 
+        public async Task<IPassword> GetPasswordSetting()
+        {
+            return await SenderService.SendRequestAsync(new RequestGetPassword()).ConfigureAwait(false);
+        }
+
         public async Task<ICheckedPhone> IsPhoneRegisteredAsync(string phoneNumber)
         {
             Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
@@ -51,27 +56,9 @@
             }
         }
 
-        public async Task<ISentCode> SendCodeRequestAsync(string phoneNumber)
+        public bool IsUserAuthorized()
         {
-            Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
-
-            var request = new RequestSendCode
-                          {
-                              PhoneNumber = phoneNumber,
-                              ApiId = ClientSettings.AppId,
-                              ApiHash = ClientSettings.AppHash
-                          };
-            while (true)
-            {
-                try
-                {
-                    return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
-                }
-                catch (PhoneMigrationException ex)
-                {
-                    await ConnectApiService.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
-                }
-            }
+            return ClientSettings.Session.User != null;
         }
 
         public async Task<TUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code)
@@ -96,10 +83,6 @@
             return user;
         }
 
-        public async Task<IPassword> GetPasswordSetting() => await SenderService.SendRequestAsync(new RequestGetPassword()).ConfigureAwait(false);
-
-        public bool IsUserAuthorized() => ClientSettings.Session.User != null;
-
         public async Task<TUser> MakeAuthWithPasswordAsync(TPassword password, string passwordStr)
         {
             var passwordBytes = Encoding.UTF8.GetBytes(passwordStr);
@@ -122,6 +105,29 @@
             OnUserAuthenticated(user);
 
             return user;
+        }
+
+        public async Task<ISentCode> SendCodeRequestAsync(string phoneNumber)
+        {
+            Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
+
+            var request = new RequestSendCode
+                          {
+                              PhoneNumber = phoneNumber,
+                              ApiId = ClientSettings.AppId,
+                              ApiHash = ClientSettings.AppHash
+                          };
+            while (true)
+            {
+                try
+                {
+                    return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+                }
+                catch (PhoneMigrationException ex)
+                {
+                    await ConnectApiService.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
+                }
+            }
         }
 
         public async Task<TUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName, string lastName)

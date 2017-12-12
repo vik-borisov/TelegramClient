@@ -21,6 +21,40 @@
             Body = body;
         }
 
+        public static TcpMessage Decode(byte[] body)
+        {
+            Guard.That(body, nameof(body)).IsNotNull();
+            Guard.That(body.Length, nameof(body.Length)).IsGreaterThan(12);
+
+            using (var memoryStream = new MemoryStream(body))
+            {
+                using (var binaryReader = new BinaryReader(memoryStream))
+                {
+                    var packetLength = binaryReader.ReadInt32();
+
+                    if (packetLength < 12)
+                    {
+                        throw new InvalidOperationException($"invalid packet length: {packetLength}");
+                    }
+
+                    var seq = binaryReader.ReadInt32();
+                    var packet = binaryReader.ReadBytes(packetLength - 12);
+                    var checksum = binaryReader.ReadInt32();
+
+                    var crc32 = new Crc32();
+                    crc32.SlurpBlock(body, 0, packetLength - 4);
+                    var validChecksum = crc32.Crc32Result;
+
+                    if (checksum != validChecksum)
+                    {
+                        throw new InvalidOperationException("invalid checksum! skip");
+                    }
+
+                    return new TcpMessage(seq, packet);
+                }
+            }
+        }
+
         public byte[] Encode()
         {
             using (var memoryStream = new MemoryStream())
@@ -50,36 +84,6 @@
                     //					Debug.WriteLine("Tcp packet #{0}\n{1}", SequneceNumber, BitConverter.ToString(transportPacket));
 
                     return transportPacket;
-                }
-            }
-        }
-
-        public static TcpMessage Decode(byte[] body)
-        {
-            Guard.That(body, nameof(body)).IsNotNull();
-            Guard.That(body.Length, nameof(body.Length)).IsGreaterThan(12);
-
-            using (var memoryStream = new MemoryStream(body))
-            {
-                using (var binaryReader = new BinaryReader(memoryStream))
-                {
-                    var packetLength = binaryReader.ReadInt32();
-
-                    if (packetLength < 12)
-                        throw new InvalidOperationException($"invalid packet length: {packetLength}");
-
-                    var seq = binaryReader.ReadInt32();
-                    var packet = binaryReader.ReadBytes(packetLength - 12);
-                    var checksum = binaryReader.ReadInt32();
-
-                    var crc32 = new Crc32();
-                    crc32.SlurpBlock(body, 0, packetLength - 4);
-                    var validChecksum = crc32.Crc32Result;
-
-                    if (checksum != validChecksum)
-                        throw new InvalidOperationException("invalid checksum! skip");
-
-                    return new TcpMessage(seq, packet);
                 }
             }
         }

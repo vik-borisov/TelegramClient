@@ -9,22 +9,18 @@
     using Castle.Windsor;
 
     /// <summary>
-    /// Provides automatic component registration by scanning assemblies and types for
-    /// those that have the <see cref="ComponentAttribute"/> annotation.
+    ///     Provides automatic component registration by scanning assemblies and types for those that have the
+    ///     <see cref="ComponentAttribute" /> annotation.
     /// </summary>
     public static class CompositionExtensions
     {
-        /// <summary>
-        /// Registers the components found in the given assemblies.
-        /// </summary>
+        /// <summary>Registers the components found in the given assemblies.</summary>
         internal static void RegisterAttibuteRegistration(this IWindsorContainer builder, params Assembly[] assemblies)
         {
             RegisterComponents(builder, assemblies.SelectMany(x => x.GetTypes()));
         }
 
-        /// <summary>
-        /// Registers the components found in the given set of types.
-        /// </summary>
+        /// <summary>Registers the components found in the given set of types.</summary>
         private static void RegisterComponents(this IWindsorContainer builder, IEnumerable<Type> types)
         {
             var supportedTypes = types.Where(t => t.GetTypeInfo().GetCustomAttribute<ComponentAttribute>(true) != null).ToArray();

@@ -4,8 +4,6 @@ namespace TelegramClient.Core.Network.Recieve
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
 
     using log4net;
 
@@ -14,7 +12,6 @@ namespace TelegramClient.Core.Network.Recieve
     using OpenTl.Schema;
     using OpenTl.Schema.Serialization;
 
-    using TelegramClient.Core.Helpers;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto.Crypto;
     using TelegramClient.Core.Network.Confirm;
@@ -29,6 +26,8 @@ namespace TelegramClient.Core.Network.Recieve
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RecievingService));
 
+        private readonly BackgroundWorker _worker = new BackgroundWorker();
+
         public ITcpTransport TcpTransport { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
@@ -38,8 +37,6 @@ namespace TelegramClient.Core.Network.Recieve
         public IDictionary<Type, IRecieveHandler> RecieveHandlersMap { get; set; }
 
         public IGZipPackedHandler ZipPackedHandler { get; set; }
-
-        private readonly BackgroundWorker _worker = new BackgroundWorker();
 
         public RecievingService()
         {
@@ -56,7 +53,7 @@ namespace TelegramClient.Core.Network.Recieve
                         {
                             return;
                         }
-                        
+
                         var recieveData = recieveTask.Result;
 
                         var decodedData = DecodeMessage(recieveData);
@@ -73,6 +70,18 @@ namespace TelegramClient.Core.Network.Recieve
                     }
                 }
             };
+        }
+
+        public void Dispose()
+        {
+            _worker?.Dispose();
+            TcpTransport?.Dispose();
+            ConfirmationSendService?.Dispose();
+        }
+
+        public void StartReceiving()
+        {
+            _worker.RunWorkerAsync();
         }
 
         private Tuple<byte[], long> DecodeMessage(byte[] body)
@@ -138,6 +147,7 @@ namespace TelegramClient.Core.Network.Recieve
                         ProcessReceivedMessage(containerMessage.Body);
                         ConfirmationSendService.AddForSend(containerMessage.MsgId);
                     }
+
                     break;
                 case TgZipPacked zipPacked:
                     var unzippedData = ZipPackedHandler.HandleGZipPacked(zipPacked);
@@ -149,20 +159,9 @@ namespace TelegramClient.Core.Network.Recieve
                         var jObject = JsonConvert.SerializeObject(obj);
                         Log.Error($"Cannot handle object: {obj} \n{jObject}");
                     }
+
                     break;
             }
-        }
-
-        public void Dispose()
-        {
-            _worker?.Dispose();
-            TcpTransport?.Dispose();
-            ConfirmationSendService?.Dispose();
-        }
-
-        public void StartReceiving()
-        {
-            _worker.RunWorkerAsync();
         }
     }
 }

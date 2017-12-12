@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Text;
-
-namespace TelegramClient.Core.MTProto
+﻿namespace TelegramClient.Core.MTProto
 {
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Text;
+
     public class Serializers
     {
         public static string VectorToString<T>(List<T> list)
@@ -48,27 +48,30 @@ namespace TelegramClient.Core.MTProto
                 {
                     padding = (data.Length + 1) % 4;
                     if (padding != 0)
+                    {
                         padding = 4 - padding;
+                    }
 
-                    binaryWriter.Write((byte) data.Length);
+                    binaryWriter.Write((byte)data.Length);
                     binaryWriter.Write(data);
                 }
                 else
                 {
                     padding = data.Length % 4;
                     if (padding != 0)
+                    {
                         padding = 4 - padding;
+                    }
 
-                    binaryWriter.Write((byte) 254);
-                    binaryWriter.Write((byte) data.Length);
-                    binaryWriter.Write((byte) (data.Length >> 8));
-                    binaryWriter.Write((byte) (data.Length >> 16));
+                    binaryWriter.Write((byte)254);
+                    binaryWriter.Write((byte)data.Length);
+                    binaryWriter.Write((byte)(data.Length >> 8));
+                    binaryWriter.Write((byte)(data.Length >> 16));
                     binaryWriter.Write(data);
                 }
 
-
                 for (var i = 0; i < padding; i++)
-                    binaryWriter.Write((byte) 0);
+                    binaryWriter.Write((byte)0);
 
                 return binaryWriter;
             }

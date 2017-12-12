@@ -1,27 +1,28 @@
-﻿using System;
-
-namespace TelegramClient.Core.MTProto.Crypto
+﻿namespace TelegramClient.Core.MTProto.Crypto
 {
+    using System;
+
     public class FactorizedPair
     {
         private readonly BigInteger _p;
+
         private readonly BigInteger _q;
-
-        public FactorizedPair(BigInteger p, BigInteger q)
-        {
-            this._p = p;
-            this._q = q;
-        }
-
-        public FactorizedPair(long p, long q)
-        {
-            this._p = BigInteger.ValueOf(p);
-            this._q = BigInteger.ValueOf(q);
-        }
 
         public BigInteger Min => _p.Min(_q);
 
         public BigInteger Max => _p.Max(_q);
+
+        public FactorizedPair(BigInteger p, BigInteger q)
+        {
+            _p = p;
+            _q = q;
+        }
+
+        public FactorizedPair(long p, long q)
+        {
+            _p = BigInteger.ValueOf(p);
+            _q = BigInteger.ValueOf(q);
+        }
 
         public override string ToString()
         {
@@ -32,6 +33,22 @@ namespace TelegramClient.Core.MTProto.Crypto
     public class Factorizator
     {
         public static Random Random = new Random();
+
+        public static FactorizedPair Factorize(BigInteger pq)
+        {
+            if (pq.BitLength < 64)
+            {
+                var pqlong = pq.LongValue;
+                var divisor = FindSmallMultiplierLopatin(pqlong);
+                return new FactorizedPair(BigInteger.ValueOf(divisor), BigInteger.ValueOf(pqlong / divisor));
+            }
+
+            // TODO: port pollard factorization
+            throw new InvalidOperationException("pq too long; TODO: port the pollard algo");
+
+            // logger.error("pq too long; TODO: port the pollard algo");
+            // return null;
+        }
 
         public static long FindSmallMultiplierLopatin(long what)
         {
@@ -50,23 +67,40 @@ namespace TelegramClient.Core.MTProto.Crypto
                         {
                             c += a;
                             if (c >= what)
+                            {
                                 c -= what;
+                            }
                         }
+
                         a += a;
                         if (a >= what)
+                        {
                             a -= what;
+                        }
+
                         b >>= 1;
                     }
+
                     x = c;
-                    var z = x < y ? y - x : x - y;
+                    var z = x < y
+                                ? y - x
+                                : x - y;
                     g = Gcd(z, what);
                     if (g != 1)
+                    {
                         break;
+                    }
+
                     if ((j & (j - 1)) == 0)
+                    {
                         y = x;
+                    }
                 }
+
                 if (g > 1)
+                {
                     break;
+                }
             }
 
             var p = what / g;
@@ -82,24 +116,18 @@ namespace TelegramClient.Core.MTProto.Crypto
                 while ((a & 1) == 0)
                     a >>= 1;
                 if (a > b)
+                {
                     a -= b;
-                else b -= a;
+                }
+                else
+                {
+                    b -= a;
+                }
             }
-            return b == 0 ? a : b;
-        }
 
-        public static FactorizedPair Factorize(BigInteger pq)
-        {
-            if (pq.BitLength < 64)
-            {
-                var pqlong = pq.LongValue;
-                var divisor = FindSmallMultiplierLopatin(pqlong);
-                return new FactorizedPair(BigInteger.ValueOf(divisor), BigInteger.ValueOf(pqlong / divisor));
-            }
-            // TODO: port pollard factorization
-            throw new InvalidOperationException("pq too long; TODO: port the pollard algo");
-            // logger.error("pq too long; TODO: port the pollard algo");
-            // return null;
+            return b == 0
+                       ? a
+                       : b;
         }
     }
 }

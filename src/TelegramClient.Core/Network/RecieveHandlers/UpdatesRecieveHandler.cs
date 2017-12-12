@@ -8,17 +8,25 @@
 
     using OpenTl.Schema;
 
-    using TelegramClient.Core.ApiServies;
     using TelegramClient.Core.ApiServies.Interfaces;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 
     [SingleInstance(typeof(IRecieveHandler))]
-    internal class UpdatesRecieveHandler: IRecieveHandler
+    internal class UpdatesRecieveHandler : IRecieveHandler
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(UpdatesRecieveHandler));
 
-        public Type[] HandleCodes { get; } = { typeof(TUpdateShortMessage), typeof(TUpdateShortSentMessage), typeof(TUpdatesTooLong), typeof(TUpdateShortChatMessage), typeof(TUpdateShort), typeof(TUpdatesCombined),  typeof(TUpdates) };
+        public Type[] HandleCodes { get; } =
+            {
+                typeof(TUpdateShortMessage),
+                typeof(TUpdateShortSentMessage),
+                typeof(TUpdatesTooLong),
+                typeof(TUpdateShortChatMessage),
+                typeof(TUpdateShort),
+                typeof(TUpdatesCombined),
+                typeof(TUpdates)
+            };
 
         public IUpdatesApiServiceRaiser UpdateRaiser { get; set; }
 

@@ -5,10 +5,10 @@ namespace TelegramClient.Core.Network.Confirm
 
     internal interface IConfirmationRecieveService
     {
-        Task WaitForConfirm(long messageId);
-
         void ConfirmRequest(long requestId);
 
         void RequestWithException(long requestId, Exception exception);
+
+        Task WaitForConfirm(long messageId);
     }
 }

@@ -25,7 +25,8 @@
         }
 
         /// <summary>
-        ///     Serch user or chat. API: contacts.search#11f812d8 q:string limit:int = contacts.Found; By default the limit is 10.
+        ///     Serch user or chat. API: contacts.search#11f812d8 q:string limit:int = contacts.Found; By default the limit is
+        ///     10.
         /// </summary>
         /// <param name="q">User or chat name</param>
         /// <returns></returns>
@@ -34,9 +35,7 @@
             return SearchUserAsync(q, 10);
         }
 
-        /// <summary>
-        ///     Serch user or chat. API: contacts.search#11f812d8 q:string limit:int = contacts.Found;
-        /// </summary>
+        /// <summary>Serch user or chat. API: contacts.search#11f812d8 q:string limit:int = contacts.Found;</summary>
         /// <param name="q">User or chat name</param>
         /// <param name="limit">Max result count</param>
         /// <returns></returns>
@@ -60,6 +59,5 @@
                 throw new InvalidOperationException("Authorize user first!");
             }
         }
-
     }
 }

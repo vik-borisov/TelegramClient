@@ -1,12 +1,16 @@
-﻿using System;
-using System.IO;
-using System.Security.Cryptography;
-
-namespace TelegramClient.Core.MTProto.Crypto
+﻿namespace TelegramClient.Core.MTProto.Crypto
 {
+    using System;
+    using System.IO;
+    using System.Security.Cryptography;
+
     public class AuthKey
     {
         private readonly ulong _auxHash;
+
+        public byte[] Data { get; }
+
+        public ulong Id { get; }
 
         public AuthKey(BigInteger gab)
         {
@@ -42,10 +46,6 @@ namespace TelegramClient.Core.MTProto.Crypto
             }
         }
 
-        public byte[] Data { get; }
-
-        public ulong Id { get; }
-
         public byte[] CalcNewNonceHash(byte[] newNonce, int number)
         {
             using (var stream = new MemoryStream(100))
@@ -53,13 +53,13 @@ namespace TelegramClient.Core.MTProto.Crypto
                 using (var bufferWriter = new BinaryWriter(stream))
                 {
                     bufferWriter.Write(newNonce);
-                    bufferWriter.Write((byte) number);
+                    bufferWriter.Write((byte)number);
                     bufferWriter.Write(_auxHash);
                     using (var sha1 = SHA1.Create())
                     {
                         stream.TryGetBuffer(out var buffer);
 
-                        var hash = sha1.ComputeHash(buffer.Array, 0, (int) stream.Position);
+                        var hash = sha1.ComputeHash(buffer.Array, 0, (int)stream.Position);
                         var newNonceHash = new byte[16];
                         Array.Copy(hash, 4, newNonceHash, 0, 16);
                         return newNonceHash;

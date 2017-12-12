@@ -9,6 +9,7 @@
     using log4net.Config;
     using log4net.Core;
     using log4net.Layout;
+    using log4net.Repository.Hierarchy;
 
     using TelegramClient.Core;
 
@@ -34,23 +35,22 @@
     public class LogOutputTester : IDisposable
     {
         private readonly IAppenderAttachable _attachable;
-        private TestOutputAppender _appender;
+
+        private readonly TestOutputAppender _appender;
 
         protected LogOutputTester(ITestOutputHelper output)
         {
             var repo = LogManager.GetRepository(typeof(ITelegramClient).GetTypeInfo().Assembly);
             XmlConfigurator.Configure(repo, new FileInfo("log4net.config"));
-                
-            var root = ((log4net.Repository.Hierarchy.Hierarchy)repo).Root;
+
+            var root = ((Hierarchy)repo).Root;
             _attachable = root;
 
             _appender = new TestOutputAppender(output);
             _attachable?.AddAppender(_appender);
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
+        /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
         public void Dispose()
         {
             _attachable.RemoveAppender(_appender);

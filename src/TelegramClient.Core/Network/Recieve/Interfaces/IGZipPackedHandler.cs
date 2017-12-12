@@ -2,7 +2,7 @@
 {
     using OpenTl.Schema;
 
-    internal interface IGZipPackedHandler 
+    internal interface IGZipPackedHandler
     {
         IObject HandleGZipPacked(TgZipPacked obj);
     }

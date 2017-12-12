@@ -1,8 +1,8 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-
-namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network
 {
+    using System.IO;
+    using System.Threading.Tasks;
+
     using log4net;
 
     using TelegramClient.Core.Helpers;
@@ -20,6 +20,17 @@ namespace TelegramClient.Core.Network
 
         public IClientSettings ClientSettings { get; set; }
 
+        public async Task<byte[]> SendAndReceive(byte[] data)
+        {
+            var preparedPacket = PrepareToSend(data);
+
+            await TcpTransport.Send(preparedPacket).ConfigureAwait(false);
+
+            var result = await TcpTransport.Receieve().ConfigureAwait(false);
+
+            return ProcessReceivedMessage(result);
+        }
+
         private byte[] PrepareToSend(byte[] data)
         {
             var newMessageId = ClientSettings.Session.GenerateMsgId();
@@ -33,17 +44,6 @@ namespace TelegramClient.Core.Network
                     writer.Write(data.Length);
                     writer.Write(data);
                 });
-        }
-
-        public async Task<byte[]> SendAndReceive(byte[] data)
-        {
-            var preparedPacket = PrepareToSend(data);
-
-            await TcpTransport.Send(preparedPacket).ConfigureAwait(false);
-
-            var result = await TcpTransport.Receieve().ConfigureAwait(false);
-
-            return ProcessReceivedMessage(result);
         }
 
         private byte[] ProcessReceivedMessage(byte[] recievedMessage)

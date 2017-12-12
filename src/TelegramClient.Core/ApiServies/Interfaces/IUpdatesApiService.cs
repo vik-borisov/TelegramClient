@@ -9,12 +9,12 @@
 
     public interface IUpdatesApiService
     {
-        //
-        event UpdateHandler RecieveUpdates;
-
         Task<IState> GetCurrentState();
 
         Task<IDifference> GetUpdates(IState currentState);
+
+        //
+        event UpdateHandler RecieveUpdates;
     }
 
     internal interface IUpdatesApiServiceRaiser

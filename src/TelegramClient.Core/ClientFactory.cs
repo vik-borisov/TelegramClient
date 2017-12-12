@@ -54,27 +54,29 @@
             var container = new WindsorContainer();
 
             container.RegisterAttibuteRegistration(typeof(ClientFactory).GetTypeInfo().Assembly);
-            
-            container.Register(Component.For<IDictionary<Type, IRecieveHandler>>().UsingFactoryMethod(kernel =>
-            {
-                var handlerMap = new Dictionary<Type, IRecieveHandler>();
 
-                var allHandlers = kernel.ResolveAll<IRecieveHandler>();
-                foreach (var handler in allHandlers.ToArray())
-                {
-                    foreach (var handleCode in handler.HandleCodes)
+            container.Register(
+                Component.For<IDictionary<Type, IRecieveHandler>>().UsingFactoryMethod(
+                    kernel =>
                     {
-                        handlerMap[handleCode] = handler;
-                    }
-                }
+                        var handlerMap = new Dictionary<Type, IRecieveHandler>();
 
-                return handlerMap;
-            }));
+                        var allHandlers = kernel.ResolveAll<IRecieveHandler>();
+                        foreach (var handler in allHandlers.ToArray())
+                        {
+                            foreach (var handleCode in handler.HandleCodes)
+                            {
+                                handlerMap[handleCode] = handler;
+                            }
+                        }
 
-           return container;
+                        return handlerMap;
+                    }));
+
+            return container;
         }
 
-    private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)
+        private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)
         {
             ulong GenerateSessionId()
             {

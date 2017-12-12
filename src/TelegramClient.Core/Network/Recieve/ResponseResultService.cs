@@ -2,12 +2,9 @@
 {
     using System;
     using System.Collections.Concurrent;
-    using System.IO;
     using System.Threading.Tasks;
 
     using log4net;
-
-    using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Recieve.Interfaces;
@@ -28,18 +25,6 @@
             return tcs.Task;
         }
 
-        public void ReturnResult(long requestId, object obj)
-        {
-            if (_resultCallbacks.TryGetValue(requestId, out var callback))
-            {
-                callback.SetResult(obj);
-            }
-            else
-            {
-                Log.Error($"Callback for request with Id {requestId}");
-            }
-        }
-
         public void ReturnException(long requestId, Exception exception)
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
@@ -50,6 +35,18 @@
             else
             {
                 Log.Error($"Callback for request with Id {requestId} wasn't found");
+            }
+        }
+
+        public void ReturnResult(long requestId, object obj)
+        {
+            if (_resultCallbacks.TryGetValue(requestId, out var callback))
+            {
+                callback.SetResult(obj);
+            }
+            else
+            {
+                Log.Error($"Callback for request with Id {requestId}");
             }
         }
     }

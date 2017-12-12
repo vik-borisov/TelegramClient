@@ -14,13 +14,6 @@
     {
         public ISenderService SenderService { get; set; }
 
-        public event UpdateHandler RecieveUpdates;
-
-        public void OnUpdateRecieve(IUpdates message)
-        {
-            RecieveUpdates?.Invoke(message);
-        }
-
         public async Task<IState> GetCurrentState()
         {
             return await SenderService.SendRequestAsync(new RequestGetState()).ConfigureAwait(false);
@@ -37,5 +30,12 @@
 
             return await SenderService.SendRequestAsync(getDiffRequest).ConfigureAwait(false);
         }
+
+        public void OnUpdateRecieve(IUpdates message)
+        {
+            RecieveUpdates?.Invoke(message);
+        }
+
+        public event UpdateHandler RecieveUpdates;
     }
 }
