@@ -21,6 +21,8 @@ Install via NuGet
 
 ## [Available Methods](https://github.com/vik-borisov/TelegramClient/wiki/Supported-methods)
 
+## [Schema Documentation](https://opentl.github.io/OpenTl.Schema/api/index.html)
+
 ## [Roadmap](https://github.com/vik-borisov/TelegramClient/milestones)
 
 ## [FAQ](https://github.com/vik-borisov/TelegramClient/wiki/FAQ)
