@@ -31,8 +31,6 @@
 
         public IMtProtoPlainSender MtProtoPlainSender { get; set; }
 
-        public IConfirmationSendService ConfirmationSendService { get; set; }
-
         public IRecievingService ProtoRecieveService { get; set; }
 
         public ISenderService SendService { get; set; }

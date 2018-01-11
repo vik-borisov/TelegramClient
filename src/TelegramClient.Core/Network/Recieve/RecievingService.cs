@@ -55,7 +55,7 @@ namespace TelegramClient.Core.Network.Recieve
             }
         }
 
-        private async Task StartRecievingTask(CancellationToken cancellationToken)
+        private async void StartRecievingTask(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {

@@ -334,7 +334,7 @@
                 var m7 = SendMessage(client, user);
                 var m8 = SendMessage(client, user);
 
-                await Task.WhenAll(m1, m2, m3, m4, m5, m6, m7, m8);
+                await Task.WhenAll(m1, m2, m3, m4, m5, m6, m7, m8).ConfigureAwait(false);
             }
         }
 
