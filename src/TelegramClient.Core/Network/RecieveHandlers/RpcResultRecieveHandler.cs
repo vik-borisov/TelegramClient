@@ -81,7 +81,7 @@
                     exception = new FileMigrationException(fileMigrateDcIdx);
                     break;
 
-                case var userMigrate when userMigrate.StartsWith("FILE_MIGRATE_"):
+                case var userMigrate when userMigrate.StartsWith("USER_MIGRATE_"):
                     var userMigrateDcNumber = Regex.Match(userMigrate, @"\d+").Value;
                     var userMigrateDcIdx = int.Parse(userMigrateDcNumber);
                     exception = new UserMigrationException(userMigrateDcIdx);
