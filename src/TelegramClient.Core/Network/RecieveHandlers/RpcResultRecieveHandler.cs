@@ -69,7 +69,7 @@
                     exception = new FloodException(TimeSpan.FromSeconds(seconds));
                     break;
 
-                case var phoneMigrate when phoneMigrate.StartsWith("FLOOD_WAIT_"):
+                case var phoneMigrate when phoneMigrate.StartsWith("PHONE_MIGRATE_"):
                     var phoneMigrateDcNumber = Regex.Match(phoneMigrate, @"\d+").Value;
                     var phoneMigrateDcIdx = int.Parse(phoneMigrateDcNumber);
                     exception = new PhoneMigrationException(phoneMigrateDcIdx);
