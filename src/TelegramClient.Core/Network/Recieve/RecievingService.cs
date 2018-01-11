@@ -4,6 +4,8 @@ namespace TelegramClient.Core.Network.Recieve
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using log4net;
 
@@ -26,7 +28,7 @@ namespace TelegramClient.Core.Network.Recieve
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(RecievingService));
 
-        private readonly BackgroundWorker _worker = new BackgroundWorker();
+        private CancellationTokenSource _recievingTokenSource;
 
         public ITcpTransport TcpTransport { get; set; }
 
@@ -38,50 +40,42 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IGZipPackedHandler ZipPackedHandler { get; set; }
 
-        public RecievingService()
-        {
-            _worker.DoWork += (sender, args) =>
-            {
-                while (true)
-                {
-                    try
-                    {
-                        var recieveTask = TcpTransport.Receieve();
-                        recieveTask.Wait();
-
-                        if (args.Cancel)
-                        {
-                            return;
-                        }
-
-                        var recieveData = recieveTask.Result;
-
-                        var decodedData = DecodeMessage(recieveData);
-
-                        Log.Debug($"Recieve message with remote id: {decodedData.Item2}");
-
-                        ProcessReceivedMessage(decodedData.Item1);
-
-                        ConfirmationSendService.AddForSend(decodedData.Item2);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error("Recieve message failed", e);
-                    }
-                }
-            };
-        }
-
         public void Dispose()
         {
-            _worker?.Dispose();
+            _recievingTokenSource?.Cancel();
             TcpTransport?.Dispose();
-            ConfirmationSendService?.Dispose();
         }
 
         public void StartReceiving()
         {
-            _worker.RunWorkerAsync();
+            if (_recievingTokenSource == null)
+            {
+                _recievingTokenSource = new CancellationTokenSource();
+                StartRecievingTask(_recievingTokenSource.Token);    
+            }
+        }
+
+        private async Task StartRecievingTask(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var recieveData = await TcpTransport.Receieve();
+
+                    var decodedData = DecodeMessage(recieveData);
+
+                    Log.Debug($"Recieve message with remote id: {decodedData.Item2}");
+
+                    ProcessReceivedMessage(decodedData.Item1);
+
+                    ConfirmationSendService.AddForSend(decodedData.Item2);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Recieve message failed", e);
+                }
+            }
         }
 
         private Tuple<byte[], long> DecodeMessage(byte[] body)

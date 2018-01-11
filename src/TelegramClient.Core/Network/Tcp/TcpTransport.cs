@@ -16,50 +16,15 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
 
+        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1,1);
+        
         private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>>();
-
-        private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
-
-        private readonly BackgroundWorker _worker = new BackgroundWorker();
 
         private int _messageSeqNo;
 
         public ITcpService TcpService { get; set; }
 
-        public TcpTransport()
-        {
-            _worker.DoWork += (sender, args) =>
-            {
-                while (true)
-                {
-                    if (_queue.IsEmpty)
-                    {
-                        _resetEvent.Reset();
-                        _resetEvent.Wait();
-                    }
-
-                    if (args.Cancel)
-                    {
-                        return;
-                    }
-
-                    _queue.TryDequeue(out var item);
-
-                    try
-                    {
-                        SendPacket(item.Item1).Wait();
-                        item.Item2.SetResult(true);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error("Process message failed", e);
-                    }
-                }
-            };
-            _worker.RunWorkerAsync();
-        }
-
-        public void Dispose()
+  public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -144,8 +109,6 @@
         {
             if (disposing)
             {
-                _resetEvent?.Dispose();
-                _worker?.Dispose();
                 TcpService?.Dispose();
             }
         }
@@ -154,9 +117,34 @@
         {
             _queue.Enqueue(Tuple.Create(packet, tcs));
 
-            if (!_resetEvent.IsSet)
+            _semaphoreSlim.WaitAsync().ContinueWith(_ =>
             {
-                _resetEvent.Set();
+                if (!_queue.IsEmpty)
+                {
+                    SendFromQueue().ContinueWith(task => _semaphoreSlim.Release());
+                }
+                else
+                {
+                    _semaphoreSlim.Release();
+                }
+            });
+        }
+        
+        private async Task SendFromQueue()
+        {
+            while (!_queue.IsEmpty)
+            {
+                _queue.TryDequeue(out var item);
+
+                try
+                {
+                    await SendPacket(item.Item1).ConfigureAwait(false);
+                    item.Item2.SetResult(true);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Process message failed", e);
+                }
             }
         }
 

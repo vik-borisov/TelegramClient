@@ -6,6 +6,7 @@
     using System.ComponentModel;
     using System.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
 
     using log4net;
 
@@ -19,86 +20,56 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ConfirmationSendService));
 
-        private readonly ManualResetEventSlim _resetEvent = new ManualResetEventSlim(false);
+        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1,1);
 
         private readonly ConcurrentQueue<long> _waitSendConfirmation = new ConcurrentQueue<long>();
 
-        private readonly BackgroundWorker _worker = new BackgroundWorker();
-
         public IMtProtoSender MtProtoSender { get; set; }
 
-        public ConfirmationSendService()
+        private async Task SendFromQueue()
         {
-            _worker.DoWork += (sender, args) =>
+            while (!_waitSendConfirmation.IsEmpty)
             {
-                while (true)
+                var msgs = new HashSet<long>();
+                while (!_waitSendConfirmation.IsEmpty)
                 {
-                    if (_waitSendConfirmation.IsEmpty)
-                    {
-                        _resetEvent.Reset();
-                        _resetEvent.Wait();
-                    }
-
-                    if (args.Cancel)
-                    {
-                        return;
-                    }
-
-                    var msgs = new HashSet<long>();
-                    while (!_waitSendConfirmation.IsEmpty)
-                    {
-                        _waitSendConfirmation.TryDequeue(out var item);
-                        msgs.Add(item);
-                    }
-
-                    try
-                    {
-                        Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
-
-                        var message = new TMsgsAck
-                                      {
-                                          MsgIds = new TVector<long>(msgs.ToArray())
-                                      };
-
-                        MtProtoSender.Send(message);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error("Process message failed", e);
-                    }
+                    _waitSendConfirmation.TryDequeue(out var item);
+                    msgs.Add(item);
                 }
-            };
-            _worker.RunWorkerAsync();
+
+                try
+                {
+                    Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
+
+                    var message = new TMsgsAck
+                                  {
+                                      MsgIds = new TVector<long>(msgs.ToArray())
+                                  };
+
+                    await MtProtoSender.Send(message);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Process message failed", e);
+                }
+            }
         }
 
         public void AddForSend(long messageId)
         {
             _waitSendConfirmation.Enqueue(messageId);
 
-            if (!_resetEvent.IsSet)
+            _semaphoreSlim.WaitAsync().ContinueWith(_ =>
             {
-                _resetEvent.Set();
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _resetEvent?.Dispose();
-                _worker?.Dispose();
-            }
-        }
-
-        ~ConfirmationSendService()
-        {
-            Dispose(false);
+                if (!_waitSendConfirmation.IsEmpty)
+                {
+                    SendFromQueue().ContinueWith(task => _semaphoreSlim.Release());
+                }
+                else
+                {
+                    _semaphoreSlim.Release();
+                }
+            });
         }
     }
 }

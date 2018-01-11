@@ -1,8 +1,6 @@
 ﻿namespace TelegramClient.Core.Network.Confirm
 {
-    using System;
-
-    internal interface IConfirmationSendService : IDisposable
+    internal interface IConfirmationSendService
     {
         void AddForSend(long messageId);
     }

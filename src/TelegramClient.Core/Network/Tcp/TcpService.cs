@@ -13,7 +13,7 @@
     [SingleInstance(typeof(ITcpService))]
     internal class TcpService : ITcpService
     {
-        private readonly AutoResetEvent _resetEvent = new AutoResetEvent(true);
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1,1);
 
         private TcpClient _tcpClient;
 
@@ -42,7 +42,7 @@
         {
             if (disposing)
             {
-                _resetEvent?.Dispose();
+                _semaphore?.Dispose();
                 _tcpClient?.Dispose();
             }
         }
@@ -53,20 +53,20 @@
 
             if (_tcpClient == null)
             {
-                _resetEvent.WaitOne();
+                await _semaphore.WaitAsync();
                 if (_tcpClient == null)
                 {
                     _tcpClient = new TcpClient();
                     await _tcpClient.ConnectAsync(session.ServerAddress, session.Port).ConfigureAwait(false);
                 }
 
-                _resetEvent.Set();
+                _semaphore.Release();
             }
             else
             {
                 if (!_tcpClient.Connected)
                 {
-                    _resetEvent.WaitOne();
+                    await _semaphore.WaitAsync();
                     var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
 
                     if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
@@ -80,7 +80,7 @@
                             }
                         }
 
-                        _resetEvent.Set();
+                        _semaphore.Release();
                     }
                 }
             }

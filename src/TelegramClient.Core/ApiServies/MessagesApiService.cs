@@ -136,7 +136,7 @@
         /// <param name="chatId">Chat's identifier</param>
         /// <param name="title">New chat name, different from the old one</param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during an action.</returns>
-        public async Task<IUpdates> EditChatTitle(int chatId, string title)
+            public async Task<IUpdates> EditChatTitle(int chatId, string title)
         {
             EnsureUserAuthorized();
 
