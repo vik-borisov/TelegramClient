@@ -123,13 +123,13 @@
 				{
 					if (!_queue.IsEmpty)
 					{
-						await (SendFromQueue().ContinueWith(task => _semaphoreSlim.Release()));
+						await (SendFromQueue().ContinueWith(task => _semaphoreSlim.Release())).ConfigureAwait(false);
 					}
 					else
 					{
 						_semaphoreSlim.Release();
 					}
-				});
+				}).ConfigureAwait(false);
 			});
 			
 		}
