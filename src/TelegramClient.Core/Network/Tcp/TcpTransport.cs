@@ -1,167 +1,171 @@
 ﻿namespace TelegramClient.Core.Network.Tcp
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.ComponentModel;
-    using System.Threading;
-    using System.Threading.Tasks;
+	using System;
+	using System.Collections.Concurrent;
+	using System.ComponentModel;
+	using System.Threading;
+	using System.Threading.Tasks;
 
-    using log4net;
+	using log4net;
 
-    using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Utils;
+	using TelegramClient.Core.IoC;
+	using TelegramClient.Core.Utils;
 
-    [SingleInstance(typeof(ITcpTransport))]
-    internal class TcpTransport : ITcpTransport
-    {
-        private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
+	[SingleInstance(typeof(ITcpTransport))]
+	internal class TcpTransport : ITcpTransport
+	{
+		private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
 
-        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1,1);
-        
-        private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>>();
+		private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        private int _messageSeqNo;
+		private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>>();
 
-        public ITcpService TcpService { get; set; }
+		private int _messageSeqNo;
 
-  public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		public ITcpService TcpService { get; set; }
 
-        public async Task<byte[]> Receieve()
-        {
-            var stream = await TcpService.Receieve().ConfigureAwait(false);
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-            var packetLengthBytes = new byte[4];
-            var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4).ConfigureAwait(false);
+		public async Task<byte[]> Receieve()
+		{
+			var stream = await TcpService.Receieve().ConfigureAwait(false);
 
-            if (readLenghtBytes != 4)
-            {
-                throw new InvalidOperationException("Couldn't read the packet length");
-            }
+			var packetLengthBytes = new byte[4];
+			var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4).ConfigureAwait(false);
 
-            var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
+			if (readLenghtBytes != 4)
+			{
+				throw new InvalidOperationException("Couldn't read the packet length");
+			}
 
-            var seqBytes = new byte[4];
-            var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4).ConfigureAwait(false);
+			var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
-            if (readSeqBytes != 4)
-            {
-                throw new InvalidOperationException("Couldn't read the sequence");
-            }
+			var seqBytes = new byte[4];
+			var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4).ConfigureAwait(false);
 
-            var mesSeqNo = BitConverter.ToInt32(seqBytes, 0);
+			if (readSeqBytes != 4)
+			{
+				throw new InvalidOperationException("Couldn't read the sequence");
+			}
 
-            Log.Debug($"Recieve message with seq_no {mesSeqNo}");
+			var mesSeqNo = BitConverter.ToInt32(seqBytes, 0);
 
-            var readBytes = 0;
-            var body = new byte[packetLength - 12];
-            var neededToRead = packetLength - 12;
+			Log.Debug($"Recieve message with seq_no {mesSeqNo}");
 
-            do
-            {
-                var bodyByte = new byte[packetLength - 12];
-                var availableBytes = await stream.ReadAsync(bodyByte, 0, neededToRead).ConfigureAwait(false);
-                neededToRead -= availableBytes;
-                Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
-                readBytes += availableBytes;
-            }
-            while (readBytes != packetLength - 12);
+			var readBytes = 0;
+			var body = new byte[packetLength - 12];
+			var neededToRead = packetLength - 12;
 
-            var crcBytes = new byte[4];
-            var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4).ConfigureAwait(false);
-            if (readCrcBytes != 4)
-            {
-                throw new InvalidOperationException("Couldn't read the crc");
-            }
+			do
+			{
+				var bodyByte = new byte[packetLength - 12];
+				var availableBytes = await stream.ReadAsync(bodyByte, 0, neededToRead).ConfigureAwait(false);
+				neededToRead -= availableBytes;
+				Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
+				readBytes += availableBytes;
+			}
+			while (readBytes != packetLength - 12);
 
-            var checksum = BitConverter.ToInt32(crcBytes, 0);
+			var crcBytes = new byte[4];
+			var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4).ConfigureAwait(false);
+			if (readCrcBytes != 4)
+			{
+				throw new InvalidOperationException("Couldn't read the crc");
+			}
 
-            var rv = new byte[packetLengthBytes.Length + seqBytes.Length + body.Length];
+			var checksum = BitConverter.ToInt32(crcBytes, 0);
 
-            Buffer.BlockCopy(packetLengthBytes, 0, rv, 0, packetLengthBytes.Length);
-            Buffer.BlockCopy(seqBytes, 0, rv, packetLengthBytes.Length, seqBytes.Length);
-            Buffer.BlockCopy(body, 0, rv, packetLengthBytes.Length + seqBytes.Length, body.Length);
-            var crc32 = new Crc32();
-            crc32.SlurpBlock(rv, 0, rv.Length);
-            var validChecksum = crc32.Crc32Result;
+			var rv = new byte[packetLengthBytes.Length + seqBytes.Length + body.Length];
 
-            if (checksum != validChecksum)
-            {
-                throw new InvalidOperationException("invalid checksum! skip");
-            }
+			Buffer.BlockCopy(packetLengthBytes, 0, rv, 0, packetLengthBytes.Length);
+			Buffer.BlockCopy(seqBytes, 0, rv, packetLengthBytes.Length, seqBytes.Length);
+			Buffer.BlockCopy(body, 0, rv, packetLengthBytes.Length + seqBytes.Length, body.Length);
+			var crc32 = new Crc32();
+			crc32.SlurpBlock(rv, 0, rv.Length);
+			var validChecksum = crc32.Crc32Result;
 
-            return body;
-        }
+			if (checksum != validChecksum)
+			{
+				throw new InvalidOperationException("invalid checksum! skip");
+			}
 
-        public Task Send(byte[] packet)
-        {
-            var tcs = new TaskCompletionSource<bool>();
+			return body;
+		}
 
-            PushToQueue(packet, tcs);
+		public Task Send(byte[] packet)
+		{
+			var tcs = new TaskCompletionSource<bool>();
 
-            return tcs.Task;
-        }
+			PushToQueue(packet, tcs);
 
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                TcpService?.Dispose();
-            }
-        }
+			return tcs.Task;
+		}
 
-        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
-        {
-            _queue.Enqueue(Tuple.Create(packet, tcs));
+		private void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				TcpService?.Dispose();
+			}
+		}
 
-            _semaphoreSlim.WaitAsync().ContinueWith(_ =>
-            {
-                if (!_queue.IsEmpty)
-                {
-                    SendFromQueue().ContinueWith(task => _semaphoreSlim.Release());
-                }
-                else
-                {
-                    _semaphoreSlim.Release();
-                }
-            });
-        }
-        
-        private async Task SendFromQueue()
-        {
-            while (!_queue.IsEmpty)
-            {
-                _queue.TryDequeue(out var item);
+		private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
+		{
+			_queue.Enqueue(Tuple.Create(packet, tcs));
+			 
+			Task.Run(async () =>
+			{
+				await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
+				{
+					if (!_queue.IsEmpty)
+					{
+						await (SendFromQueue().ContinueWith(task => _semaphoreSlim.Release()));
+					}
+					else
+					{
+						_semaphoreSlim.Release();
+					}
+				});
+			});
+			
+		}
 
-                try
-                {
-                    await SendPacket(item.Item1).ConfigureAwait(false);
-                    item.Item2.SetResult(true);
-                }
-                catch (Exception e)
-                {
-                    Log.Error("Process message failed", e);
-                }
-            }
-        }
+		private async Task SendFromQueue()
+		{
+			while (!_queue.IsEmpty)
+			{
+				_queue.TryDequeue(out var item);
 
-        private async Task SendPacket(byte[] packet)
-        {
-            var mesSeqNo = _messageSeqNo++;
+				try
+				{
+					await SendPacket(item.Item1).ConfigureAwait(false);
+					item.Item2.SetResult(true);
+				}
+				catch (Exception e)
+				{
+					Log.Error("Process message failed", e);
+				}
+			}
+		}
 
-            Log.Debug($"Send message with seq_no {mesSeqNo}");
+		private async Task SendPacket(byte[] packet)
+		{
+			var mesSeqNo = _messageSeqNo++;
 
-            var tcpMessage = new TcpMessage(mesSeqNo, packet);
-            var encodedMessage = tcpMessage.Encode();
-            await TcpService.Send(encodedMessage).ConfigureAwait(false);
-        }
+			Log.Debug($"Send message with seq_no {mesSeqNo}");
 
-        ~TcpTransport()
-        {
-            Dispose(false);
-        }
-    }
+			var tcpMessage = new TcpMessage(mesSeqNo, packet);
+			var encodedMessage = tcpMessage.Encode();
+			await TcpService.Send(encodedMessage).ConfigureAwait(false);
+		}
+
+		~TcpTransport()
+		{
+			Dispose(false);
+		}
+	}
 }
