@@ -1,9 +1,13 @@
 namespace TelegramClient.Core.Sessions
 {
+    using System.Threading.Tasks;
+
     internal interface ISessionStore
     {
-        ISession Load(string sessionUserId);
+        Task<ISession> Load();
 
-        void Save();
+        Task Save();
+
+        Task Remove();
     }
 }

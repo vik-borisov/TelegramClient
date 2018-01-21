@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
 
     using BarsGroup.CodeGuard;
 
@@ -17,36 +18,33 @@
 
     public static class ClientFactory
     {
-        public static ITelegramClient BuildClient(int appId, string appHash, string serverAddress, int serverPort, string sessionUserId = "session")
+        public static async Task<ITelegramClient> BuildClient(IFactorySettings factorySettings)
         {
-            Guard.That(appId).IsPositive();
-            Guard.That(appHash).IsNotNullOrWhiteSpace();
-            Guard.That(sessionUserId).IsNotNullOrWhiteSpace();
-            Guard.That(serverAddress).IsNotNullOrWhiteSpace();
-            Guard.That(serverPort).IsPositive();
-
             var container = RegisterDependency();
 
-            FillSettings(container, appId, appHash, sessionUserId, serverAddress, serverPort);
+            await FillSettings(container, factorySettings).ConfigureAwait(false);
 
             return container.Resolve<ITelegramClient>();
         }
 
-        private static void FillSettings(IWindsorContainer container, int appId, string appHash, string sessionUserId, string serverAddress, int serverPort)
+        private static async Task FillSettings(IWindsorContainer container, IFactorySettings factorySettings)
         {
-            Guard.That(appId).IsPositive();
-            Guard.That(appHash).IsNotNullOrWhiteSpace();
-            Guard.That(sessionUserId).IsNotNullOrWhiteSpace();
-            Guard.That(serverAddress).IsNotNullOrWhiteSpace();
-            Guard.That(serverPort).IsPositive();
-
+            Guard.That(factorySettings.Id).IsPositive();
+            Guard.That(factorySettings.Hash).IsNotNullOrWhiteSpace();
+            Guard.That(factorySettings.ServerAddress).IsNotNullOrWhiteSpace();
+            Guard.That(factorySettings.ServerPort).IsPositive();
+            Guard.That(factorySettings.StoreProvider).IsNotNull();
+            
             var settings = container.Resolve<IClientSettings>();
 
-            settings.AppId = appId;
-            settings.AppHash = appHash;
+            settings.AppId = factorySettings.Id;
+            settings.AppHash = factorySettings.Hash;
 
-            var store = container.Resolve<ISessionStore>();
-            settings.Session = TryLoadOrCreateNew(store, sessionUserId, serverAddress, serverPort);
+            container.Register(Component.For<ISessionStoreProvider>().Instance(factorySettings.StoreProvider));
+
+            var sessionStore = container.Resolve<ISessionStore>();
+            
+            settings.Session = await TryLoadOrCreateNew(sessionStore, factorySettings).ConfigureAwait(false);
         }
 
         private static IWindsorContainer RegisterDependency()
@@ -76,22 +74,12 @@
             return container;
         }
 
-        private static ISession TryLoadOrCreateNew(ISessionStore store, string sessionUserId, string serverAddress, int serverPort)
+        private static async Task<ISession> TryLoadOrCreateNew(ISessionStore sessionStore, IFactorySettings factorySettings)
         {
-            ulong GenerateSessionId()
-            {
-                var random = new Random();
-                var rand = ((ulong)random.Next() << 32) | (ulong)random.Next();
-                return rand;
-            }
-
-            var session = store.Load(sessionUserId) ?? new Session
-                                                       {
-                                                           Id = GenerateSessionId(),
-                                                           SessionUserId = sessionUserId
-                                                       };
-            session.ServerAddress = serverAddress;
-            session.Port = serverPort;
+            var session = await sessionStore.Load().ConfigureAwait(false) ?? Session.Create();
+            
+            session.ServerAddress = factorySettings.ServerAddress;
+            session.Port = factorySettings.ServerPort;
 
             return session;
         }

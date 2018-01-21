@@ -78,7 +78,7 @@
 
             var user = result.User.Cast<TUser>();
 
-            OnUserAuthenticated(user);
+            await OnUserAuthenticated(user).ConfigureAwait(false);
 
             return user;
         }
@@ -102,7 +102,7 @@
 
             var user = result.User.As<TUser>();
 
-            OnUserAuthenticated(user);
+            await OnUserAuthenticated(user).ConfigureAwait(false);
 
             return user;
         }
@@ -144,11 +144,11 @@
 
             var user = result.User.Cast<TUser>();
 
-            OnUserAuthenticated(user);
+            await OnUserAuthenticated(user).ConfigureAwait(false);
             return user;
         }
 
-        private void OnUserAuthenticated(TUser tlUser)
+        private async Task OnUserAuthenticated(TUser tlUser)
         {
             var session = ClientSettings.Session;
             Guard.That(session).IsNotNull();
@@ -156,7 +156,7 @@
             session.User = tlUser;
             session.SessionExpires = int.MaxValue;
 
-            SessionStore.Save();
+            await SessionStore.Save().ConfigureAwait(false);
         }
     }
 }

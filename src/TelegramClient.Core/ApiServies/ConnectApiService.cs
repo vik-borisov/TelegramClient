@@ -68,7 +68,7 @@
                 ClientSettings.Session.AuthKey = result.AuthKey;
                 ClientSettings.Session.TimeOffset = result.TimeOffset;
 
-                SessionStore.Save();
+                await SessionStore.Save().ConfigureAwait(false);
             }
 
             ProtoRecieveService.StartReceiving();
