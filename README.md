@@ -22,6 +22,8 @@ Install via NuGet
 
 ## [Available Methods](https://github.com/vik-borisov/TelegramClient/wiki/Supported-methods)
 
+## [Migrate to version 0.4](https://github.com/vik-borisov/TelegramClient/wiki/Migrate-to-version-0.4)
+
 ## [Schema Documentation](https://opentl.github.io/OpenTl.Schema/api/index.html)
 
 ## [Roadmap](https://github.com/vik-borisov/TelegramClient/milestones)
