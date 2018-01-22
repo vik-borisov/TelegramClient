@@ -94,6 +94,10 @@
                 case "SESSION_PASSWORD_NEEDED":
                     exception = new CloudPasswordNeededException("This Account has Cloud Password !");
                     break;
+                
+                case "AUTH_RESTART":
+                    ResponseResultSetter.ReturnException(new AuthRestartException());
+                    return;
 
                 default:
                     exception = new InvalidOperationException(error.ErrorMessage);

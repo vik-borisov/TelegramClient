@@ -1,12 +1,16 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
+    using System;
     using System.Threading.Tasks;
+
+    using Castle.DynamicProxy.Generators.Emitters;
 
     using log4net;
 
     using OpenTl.Schema;
 
     using TelegramClient.Core.ApiServies.Interfaces;
+    using TelegramClient.Core.Exceptions;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Interfaces;
@@ -21,21 +25,31 @@
 
         public IResponseResultGetter ResponseResultGetter { get; set; }
 
+        public Lazy<IConnectApiService> ConnectApiService { get; set; }
+        
         public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute)
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
-            object result;
-            try
+            while (true)
             {
-                result = await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                try
+                {
+                    return (TResult) await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                }
+                catch (BadServerSaltException)
+                {
+                    return (TResult) await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                }
+                catch (AuthRestartException)
+                {
+                    await ConnectApiService.Value.ReAuthenticateAsync().ConfigureAwait(false);
+                }
+                catch (PhoneMigrationException ex)
+                {
+                    await ConnectApiService.Value.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
+                }
             }
-            catch (BadServerSaltException)
-            {
-                result = await SendAndRecieve(methodToExecute).ConfigureAwait(false);
-            }
-
-            return (TResult)result;
         }
 
         private async Task<object> SendAndRecieve(IObject methodToExecute)

@@ -65,7 +65,7 @@
         }
 
         [Fact]
-        public virtual async Task AuthUser()
+        public async Task AuthUser()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -105,7 +105,8 @@
             }
         }
 
-        public virtual async Task CheckPhones()
+        [Fact]
+        public async Task CheckPhones()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -116,8 +117,25 @@
             }
         }
 
+        [Fact]
+        public async Task LogOut()
+        {
+            using (var client = await NewClient().ConfigureAwait(false))
+            {
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client);
+
+                await client.ConnectService.LogOut().ConfigureAwait(false);
+
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client);
+            }
+        }
+        
         //[Fact]
-        //public virtual async Task SendBigFileToContactTest()
+        //public async Task SendBigFileToContactTest()
         //{
         //    EnsureNumberToSendMessageSet();
 
@@ -144,7 +162,7 @@
         //}
 
         [Fact]
-        public virtual async Task DownloadFileFromContactTest()
+        public async Task DownloadFileFromContactTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -194,7 +212,7 @@
         }
 
         [Fact]
-        public virtual async Task DownloadFileFromWrongLocationTest()
+        public async Task DownloadFileFromWrongLocationTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -224,7 +242,7 @@
         }
 
         [Fact]
-        public virtual async Task FloodExceptionShouldNotCauseCannotReadPackageLengthError()
+        public async Task FloodExceptionShouldNotCauseCannotReadPackageLengthError()
         {
             for (var i = 0; i < 50; i++)
                 try
@@ -239,7 +257,7 @@
         }
 
         [Fact]
-        public virtual async Task GetAutoUpdatesTest()
+        public async Task GetAutoUpdatesTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -260,7 +278,7 @@
         }
 
         [Fact]
-        public virtual async Task GetManualUpdatesTest()
+        public async Task GetManualUpdatesTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -278,7 +296,7 @@
         }
 
         [Fact]
-        public virtual async Task SendMessageByUserNameTest()
+        public async Task SendMessageByUserNameTest()
         {
             UserNameToSendMessage = Environment.GetEnvironmentVariable(nameof(UserNameToSendMessage));
             if (string.IsNullOrWhiteSpace(UserNameToSendMessage))
@@ -320,7 +338,7 @@
         }
 
         [Fact]
-        public virtual async Task SendMessageParallelTest()
+        public async Task SendMessageParallelTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -341,7 +359,7 @@
         }
 
         [Fact]
-        public virtual async Task SendMessageTest()
+        public async Task SendMessageTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -353,7 +371,7 @@
         }
 
         [Fact]
-        public virtual async Task SendMessageToChannelTest()
+        public async Task SendMessageToChannelTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -364,7 +382,7 @@
         }
 
         [Fact]
-        public virtual async Task SendPhotoToContactTest()
+        public async Task SendPhotoToContactTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
@@ -385,7 +403,7 @@
         }
 
         [Fact]
-        public virtual async Task SignUpNewUser()
+        public async Task SignUpNewUser()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {

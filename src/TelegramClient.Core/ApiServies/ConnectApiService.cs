@@ -7,6 +7,7 @@
     using log4net;
 
     using OpenTl.Schema;
+    using OpenTl.Schema.Auth;
     using OpenTl.Schema.Help;
 
     using TelegramClient.Core.ApiServies.Interfaces;
@@ -128,6 +129,16 @@
             Log.Debug("Third step is done");
 
             return step3Response;
+        }
+
+        public async Task LogOut()
+        {
+            var request = new RequestLogOut();
+            SendService.SendRequestAsync(request).ConfigureAwait(false);
+            
+            await SessionStore.Remove().ConfigureAwait(false);
+            ClientSettings.Session.AuthKey = null;
+
         }
     }
 }

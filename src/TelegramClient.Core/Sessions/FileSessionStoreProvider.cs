@@ -36,6 +36,8 @@
 
             if (_fileStream.Length == 0)
             {
+                _semaphore.Release();
+                
                 return null;
             }
 
@@ -66,7 +68,8 @@
             if (File.Exists(_sessionFile))
             {
                 _fileStream.Dispose();
-
+                _fileStream = null;
+                
                 File.Delete(_sessionFile);
             }
 

@@ -43,17 +43,7 @@
                                         {
                                             PhoneNumber = phoneNumber
                                         };
-            while (true)
-            {
-                try
-                {
-                    return await SenderService.SendRequestAsync(authCheckPhoneRequest).ConfigureAwait(false);
-                }
-                catch (PhoneMigrationException e)
-                {
-                    await ConnectApiService.ReconnectToDcAsync(e.Dc).ConfigureAwait(false);
-                }
-            }
+            return await SenderService.SendRequestAsync(authCheckPhoneRequest).ConfigureAwait(false);
         }
 
         public bool IsUserAuthorized()
@@ -117,17 +107,7 @@
                               ApiId = ClientSettings.AppId,
                               ApiHash = ClientSettings.AppHash
                           };
-            while (true)
-            {
-                try
-                {
-                    return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
-                }
-                catch (PhoneMigrationException ex)
-                {
-                    await ConnectApiService.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
-                }
-            }
+            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
         }
 
         public async Task<TUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName, string lastName)

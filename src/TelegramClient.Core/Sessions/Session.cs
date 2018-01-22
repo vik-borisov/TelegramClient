@@ -45,6 +45,11 @@
         
         public static Session FromBytes(byte[] buffer)
         {
+            if (buffer == null)
+            {
+                return null;
+            }
+            
             using (var stream = new MemoryStream(buffer))
             using (var reader = new BinaryReader(stream))
             {

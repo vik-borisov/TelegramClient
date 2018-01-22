@@ -38,6 +38,17 @@
             }
         }
 
+        public void ReturnException(Exception exception)
+        {
+            Log.Error($"All requests was processed with error", exception);
+
+            foreach (var value in _resultCallbacks.Values)
+            {
+
+                value.SetException(exception);
+            }
+        }
+
         public void ReturnResult(long requestId, object obj)
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
