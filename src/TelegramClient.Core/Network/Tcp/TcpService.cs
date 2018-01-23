@@ -13,7 +13,7 @@
     [SingleInstance(typeof(ITcpService))]
     internal class TcpService : ITcpService
     {
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1,1);
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         private TcpClient _tcpClient;
 
@@ -28,6 +28,10 @@
         public async Task<Stream> Receieve()
         {
             await EnsureClientConnected().ConfigureAwait(false);
+
+
+
+
 
             return _tcpClient.GetStream();
         }
@@ -69,19 +73,16 @@
                     await _semaphore.WaitAsync();
                     var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
 
-                    if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
+                    if (!_tcpClient.Connected || _tcpClient.Client == null || !_tcpClient.Client.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                     {
-                        if (!_tcpClient.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
+                        if (_tcpClient != null)
                         {
-                            if (_tcpClient != null)
-                            {
-                                _tcpClient.Dispose();
-                                _tcpClient = null;
-                            }
+                            _tcpClient.Dispose();
+                            _tcpClient = null;
                         }
-
-                        _semaphore.Release();
                     }
+
+                    _semaphore.Release();
                 }
             }
         }
