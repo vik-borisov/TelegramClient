@@ -63,7 +63,7 @@
 
         private async Task ConnectAsync(bool forceAuth)
         {
-            if (ClientSettings.Session.AuthKey == null || forceAuth)
+            if (ClientSettings.Session.AuthKey == null || ClientSettings.Session.AuthKey.Data.Length == 0 || forceAuth)
             {
                 var result = await DoAuthentication().ConfigureAwait(false);
                 ClientSettings.Session.AuthKey = result.AuthKey;

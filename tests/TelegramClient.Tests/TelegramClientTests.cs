@@ -265,15 +265,13 @@
                 var user = await GetUser(client);
 
                 // Register AFTER connecting
-                client.UpdatesService.RecieveUpdates += update =>
-                {
-                };
+                client.UpdatesService.RecieveUpdates += async update => await Task.Delay(1000);
 
                 await SendMessage(client, user);
                 await SendMessage(client, user);
                 await SendMessage(client, user);
                 await SendMessage(client, user);
-                await Task.Delay(4000);
+                await Task.Delay(15000);
             }
         }
 

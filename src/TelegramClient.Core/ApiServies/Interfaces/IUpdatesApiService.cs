@@ -5,7 +5,7 @@
     using OpenTl.Schema;
     using OpenTl.Schema.Updates;
 
-    public delegate void UpdateHandler(IUpdates update);
+    public delegate Task UpdateHandler(IUpdates update);
 
     public interface IUpdatesApiService
     {
@@ -19,6 +19,6 @@
 
     internal interface IUpdatesApiServiceRaiser
     {
-        void OnUpdateRecieve(IUpdates message);
+        Task OnUpdateRecieve(IUpdates message);
     }
 }
