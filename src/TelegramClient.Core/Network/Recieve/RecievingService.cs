@@ -64,8 +64,8 @@ namespace TelegramClient.Core.Network.Recieve
                     var recieveData = await TcpTransport.Receieve();
 
                     var decodedData = DecodeMessage(recieveData);
-
-                    Log.Debug($"Recieve message with remote id: {decodedData.Item2}");
+					
+                    Log.Debug($"Receive message with remote id: {decodedData.Item2}");
 
                     ProcessReceivedMessage(decodedData.Item1);
 
@@ -73,7 +73,7 @@ namespace TelegramClient.Core.Network.Recieve
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Recieve message failed", e);
+                    Log.Error("Receive message failed", e);
                 }
             }
         }

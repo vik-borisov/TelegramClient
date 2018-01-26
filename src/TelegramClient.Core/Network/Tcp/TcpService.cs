@@ -9,6 +9,7 @@
 
 	using TelegramClient.Core.IoC;
 	using TelegramClient.Core.Settings;
+	using TelegramClient.Core.Helpers;
 
 	[SingleInstance(typeof(ITcpService))]
 	internal class TcpService : ITcpService
@@ -27,12 +28,7 @@
 
 		public async Task<Stream> Receieve()
 		{
-			await EnsureClientConnected().ConfigureAwait(false);
-
-
-
-
-
+			await EnsureClientConnected().ConfigureAwait(false); 
 			return _tcpClient.GetStream();
 		}
 
@@ -51,35 +47,38 @@
 			}
 		}
 
-		private async Task EnsureClientConnected()
+		private async Task Reconnect()
 		{
 			var session = ClientSettings.Session;
+			_tcpClient = new TcpClient();
+			await _tcpClient.ConnectAsync(session.ServerAddress, session.Port).ConfigureAwait(false);
+		}
 
+		private async Task EnsureClientConnected()
+		{
 			if (_tcpClient == null)
 			{
 				await _semaphore.WaitAsync().ConfigureAwait(false);
 				if (_tcpClient == null)
 				{
-					_tcpClient = new TcpClient();
-					await _tcpClient.ConnectAsync(session.ServerAddress, session.Port).ConfigureAwait(false);
+					await this.Reconnect().ConfigureAwait(false);
 				}
-
 				_semaphore.Release();
 			}
 			else
 			{
-				if (!_tcpClient.Connected)
+				if (!_tcpClient.IsConnected())
 				{
 					await _semaphore.WaitAsync();
 					var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
+					var session = ClientSettings.Session;
 
-					if (!_tcpClient.Connected || _tcpClient.Client == null || !_tcpClient.Client.Connected || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
+					if (!_tcpClient.IsConnected() || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
 					{
-						if (_tcpClient != null)
-						{
-							_tcpClient.Dispose();
-							_tcpClient = null;
-						}
+						_tcpClient.Dispose();
+						_tcpClient = null;
+
+						await this.Reconnect().ConfigureAwait(false);
 					}
 
 					_semaphore.Release();

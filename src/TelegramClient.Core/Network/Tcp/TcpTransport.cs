@@ -116,22 +116,22 @@
 		private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
 		{
 			_queue.Enqueue(Tuple.Create(packet, tcs));
-			 
-			Task.Run(async () =>
+			SendAllMessagesFromQueue();
+		}
+
+		private async void SendAllMessagesFromQueue()
+		{
+			await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
 			{
-				await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
+				if (!_queue.IsEmpty)
 				{
-					if (!_queue.IsEmpty)
-					{
-						await (SendFromQueue().ContinueWith(task => _semaphoreSlim.Release())).ConfigureAwait(false);
-					}
-					else
-					{
-						_semaphoreSlim.Release();
-					}
-				}).ConfigureAwait(false);
-			});
-			
+					await (SendFromQueue().ContinueWith(task => _semaphoreSlim.Release())).ConfigureAwait(false);
+				}
+				else
+				{
+					_semaphoreSlim.Release();
+				}
+			}).ConfigureAwait(false);
 		}
 
 		private async Task SendFromQueue()
