@@ -63,7 +63,7 @@
         }
 
 
-        public async void SendAllMessagesFromQueue()
+        public async Task SendAllMessagesFromQueue()
         {
             await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
              {

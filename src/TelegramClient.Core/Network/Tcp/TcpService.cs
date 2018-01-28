@@ -52,7 +52,6 @@
         {
             this._tcpClient = new TcpClient();
             await this._tcpClient.ConnectAsync(ClientSettings.Session.ServerAddress, ClientSettings.Session.Port).ConfigureAwait(false);
-            this._tcpClient.GetStream().WriteTimeout = 500;
         }
 
         private async Task EnsureClientConnected()
@@ -87,7 +86,7 @@
 
         public bool IsTcpClientConnected()
         {
-            if (this._tcpClient == null || !(this._tcpClient.Connected || (this._tcpClient.Client == null || !(this._tcpClient.Client.Connected)
+            if (this._tcpClient == null || !this._tcpClient.Connected || this._tcpClient.Client == null || ! this._tcpClient.Client.Connected)
             {
                 return false;
             }

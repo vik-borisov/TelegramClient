@@ -138,7 +138,7 @@
             SendAllMessagesFromQueue();
         }
 
-        private async void SendAllMessagesFromQueue()
+        private async Task SendAllMessagesFromQueue()
         {
             await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
             {
@@ -166,7 +166,8 @@
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Process message failed", e);
+                    Log.Error("Failed to process the message", e);
+                    item.Item2.SetException(e);
                 }
             }
         }
