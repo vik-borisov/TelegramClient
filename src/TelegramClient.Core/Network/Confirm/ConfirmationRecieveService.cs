@@ -16,6 +16,7 @@ namespace TelegramClient.Core.Network.Confirm
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
             {
                 tsc.SetResult(true);
+                _waitConfirm.TryRemove(requestId, out var ignored);
             }
         }
 
@@ -24,6 +25,7 @@ namespace TelegramClient.Core.Network.Confirm
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
             {
                 tsc.SetException(exception);
+                _waitConfirm.TryRemove(requestId, out var ignored);
             }
         }
 

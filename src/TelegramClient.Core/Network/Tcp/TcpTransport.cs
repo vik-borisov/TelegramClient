@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.ComponentModel;
+    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -33,67 +34,85 @@
         public async Task<byte[]> Receieve()
         {
             var stream = await TcpService.Receieve().ConfigureAwait(false);
-
-            var packetLengthBytes = new byte[4];
-            var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4).ConfigureAwait(false);
-
-            if (readLenghtBytes != 4)
+            try
             {
-                throw new InvalidOperationException("Couldn't read the packet length");
+                var packetLengthBytes = new byte[4];
+                var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4).ConfigureAwait(false);
+
+                if (readLenghtBytes != 4)
+                {
+                    throw new InvalidOperationException("Couldn't read the packet length");
+                }
+
+                var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
+
+                var seqBytes = new byte[4];
+                var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4).ConfigureAwait(false);
+
+                if (readSeqBytes != 4)
+                {
+                    throw new InvalidOperationException("Couldn't read the sequence");
+                }
+
+                var mesSeqNo = BitConverter.ToInt32(seqBytes, 0);
+
+                Log.Debug($"Recieve message with seq_no {mesSeqNo}");
+
+                if (packetLength < 12)
+                {
+                    throw new InvalidOperationException("Invalid packet length");
+                }
+
+                var readBytes = 0;
+                var body = new byte[packetLength - 12];
+                var neededToRead = packetLength - 12;
+
+                do
+                {
+                    var bodyByte = new byte[packetLength - 12];
+                    var availableBytes = await stream.ReadAsync(bodyByte, 0, neededToRead).ConfigureAwait(false);
+
+                    neededToRead -= availableBytes;
+                    Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
+                    readBytes += availableBytes;
+                }
+                while (readBytes < packetLength - 12 && stream.CanRead && stream.DataAvailable);
+
+                var crcBytes = new byte[4];
+                var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4).ConfigureAwait(false);
+                if (readCrcBytes != 4)
+                {
+                    throw new InvalidOperationException("Couldn't read the crc");
+                }
+
+                var checksum = BitConverter.ToInt32(crcBytes, 0);
+
+                var rv = new byte[packetLengthBytes.Length + seqBytes.Length + body.Length];
+
+                Buffer.BlockCopy(packetLengthBytes, 0, rv, 0, packetLengthBytes.Length);
+                Buffer.BlockCopy(seqBytes, 0, rv, packetLengthBytes.Length, seqBytes.Length);
+                Buffer.BlockCopy(body, 0, rv, packetLengthBytes.Length + seqBytes.Length, body.Length);
+                var crc32 = new Crc32();
+                crc32.SlurpBlock(rv, 0, rv.Length);
+                var validChecksum = crc32.Crc32Result;
+
+                if (checksum != validChecksum)
+                {
+                    throw new InvalidOperationException("invalid checksum! skip");
+                }
+
+                return body;
+            }
+            catch
+            {
+                var buffer = new byte[4];
+                while (stream.CanRead && stream.DataAvailable)
+                {
+                    await stream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
+                }
+                throw;
             }
 
-            var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
-
-            var seqBytes = new byte[4];
-            var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4).ConfigureAwait(false);
-
-            if (readSeqBytes != 4)
-            {
-                throw new InvalidOperationException("Couldn't read the sequence");
-            }
-
-            var mesSeqNo = BitConverter.ToInt32(seqBytes, 0);
-
-            Log.Debug($"Recieve message with seq_no {mesSeqNo}");
-
-            var readBytes = 0;
-            var body = new byte[packetLength - 12];
-            var neededToRead = packetLength - 12;
-
-            do
-            {
-                var bodyByte = new byte[packetLength - 12];
-                var availableBytes = await stream.ReadAsync(bodyByte, 0, neededToRead).ConfigureAwait(false);
-                neededToRead -= availableBytes;
-                Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
-                readBytes += availableBytes;
-            }
-            while (readBytes != packetLength - 12);
-
-            var crcBytes = new byte[4];
-            var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4).ConfigureAwait(false);
-            if (readCrcBytes != 4)
-            {
-                throw new InvalidOperationException("Couldn't read the crc");
-            }
-
-            var checksum = BitConverter.ToInt32(crcBytes, 0);
-
-            var rv = new byte[packetLengthBytes.Length + seqBytes.Length + body.Length];
-
-            Buffer.BlockCopy(packetLengthBytes, 0, rv, 0, packetLengthBytes.Length);
-            Buffer.BlockCopy(seqBytes, 0, rv, packetLengthBytes.Length, seqBytes.Length);
-            Buffer.BlockCopy(body, 0, rv, packetLengthBytes.Length + seqBytes.Length, body.Length);
-            var crc32 = new Crc32();
-            crc32.SlurpBlock(rv, 0, rv.Length);
-            var validChecksum = crc32.Crc32Result;
-
-            if (checksum != validChecksum)
-            {
-                throw new InvalidOperationException("invalid checksum! skip");
-            }
-
-            return body;
         }
 
         public Task Send(byte[] packet)

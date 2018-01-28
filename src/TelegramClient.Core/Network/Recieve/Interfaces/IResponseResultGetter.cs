@@ -4,6 +4,6 @@
 
     internal interface IResponseResultGetter
     {
-        Task<object> Recieve(long requestId);
+        Task<object> Receive(long requestId);
     }
 }

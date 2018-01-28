@@ -26,7 +26,7 @@
             GC.SuppressFinalize(this);
         }
 
-        public async Task<Stream> Receieve()
+        public async Task<NetworkStream> Receieve()
         {
             await EnsureClientConnected().ConfigureAwait(false);
             return _tcpClient.GetStream();
@@ -36,6 +36,7 @@
         {
             await EnsureClientConnected().ConfigureAwait(false);
             await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length).ConfigureAwait(false);
+            _tcpClient.GetStream().Flush();
         }
 
         private void Dispose(bool disposing)
@@ -49,9 +50,9 @@
 
         private async Task Reconnect()
         {
-            var session = ClientSettings.Session;
-            _tcpClient = new TcpClient();
-            await _tcpClient.ConnectAsync(session.ServerAddress, session.Port).ConfigureAwait(false);
+            this._tcpClient = new TcpClient();
+            await this._tcpClient.ConnectAsync(ClientSettings.Session.ServerAddress, ClientSettings.Session.Port).ConfigureAwait(false);
+            this._tcpClient.GetStream().WriteTimeout = 500;
         }
 
         private async Task EnsureClientConnected()
@@ -67,23 +68,39 @@
             }
             else
             {
-                if (!_tcpClient.IsConnected())
+                if (!this.IsTcpClientConnected())
                 {
-                    await _semaphore.WaitAsync();
+                    await _semaphore.WaitAsync().ConfigureAwait(false);
                     var endpoint = (IPEndPoint)_tcpClient.Client.RemoteEndPoint;
                     var session = ClientSettings.Session;
 
-                    if (!_tcpClient.IsConnected() || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
+                    if (!this.IsTcpClientConnected() || endpoint.Address.ToString() != session.ServerAddress || endpoint.Port != session.Port)
                     {
                         _tcpClient.Dispose();
                         _tcpClient = null;
-
                         await this.Reconnect().ConfigureAwait(false);
                     }
-
                     _semaphore.Release();
                 }
             }
+        }
+
+        public bool IsTcpClientConnected()
+        {
+            if (this._tcpClient == null || !(this._tcpClient.Connected || (this._tcpClient.Client == null || !(this._tcpClient.Client.Connected)
+            {
+                return false;
+            }
+
+            if (this._tcpClient.Client.Poll(0, SelectMode.SelectRead))
+            {
+                byte[] buff = new byte[1];
+                if (this._tcpClient.Client.Receive(buff, SocketFlags.Peek) == 0)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         ~TcpService()

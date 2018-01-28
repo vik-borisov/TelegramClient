@@ -17,7 +17,7 @@
 
         private readonly ConcurrentDictionary<long, TaskCompletionSource<object>> _resultCallbacks = new ConcurrentDictionary<long, TaskCompletionSource<object>>();
 
-        public Task<object> Recieve(long requestId)
+        public Task<object> Receive(long requestId)
         {
             var tcs = new TaskCompletionSource<object>();
 
@@ -31,6 +31,7 @@
             {
                 callback.SetException(exception);
                 Log.Error($"Request was processed with error", exception);
+                _resultCallbacks.TryRemove(requestId, out var response);
             }
             else
             {
@@ -43,6 +44,7 @@
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
                 callback.SetResult(obj);
+                _resultCallbacks.TryRemove(requestId, out var response);
             }
             else
             {

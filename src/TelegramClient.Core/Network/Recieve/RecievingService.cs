@@ -61,7 +61,7 @@ namespace TelegramClient.Core.Network.Recieve
             {
                 try
                 {
-                    var recieveData = await TcpTransport.Receieve();
+                    var recieveData = await TcpTransport.Receieve().ConfigureAwait(false);
 
                     var decodedData = DecodeMessage(recieveData);
 					
