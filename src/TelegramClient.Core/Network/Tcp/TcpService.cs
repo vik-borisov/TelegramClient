@@ -35,8 +35,7 @@
         public async Task Send(byte[] encodedMessage)
         {
             await EnsureClientConnected().ConfigureAwait(false);
-            await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length).ConfigureAwait(false);
-            _tcpClient.GetStream().Flush();
+            await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length).ConfigureAwait(false);  
         }
 
         private void Dispose(bool disposing)
@@ -91,14 +90,6 @@
                 return false;
             }
 
-            if (this._tcpClient.Client.Poll(0, SelectMode.SelectRead))
-            {
-                byte[] buff = new byte[1];
-                if (this._tcpClient.Client.Receive(buff, SocketFlags.Peek) == 0)
-                {
-                    return false;
-                }
-            }
             return true;
         }
 
