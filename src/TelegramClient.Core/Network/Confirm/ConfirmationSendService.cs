@@ -20,7 +20,7 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ConfirmationSendService));
 
-        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1,1);
+        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         private readonly ConcurrentQueue<long> _waitSendConfirmation = new ConcurrentQueue<long>();
 
@@ -42,9 +42,9 @@
                     Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
 
                     var message = new TMsgsAck
-                                  {
-                                      MsgIds = new TVector<long>(msgs.ToArray())
-                                  };
+                    {
+                        MsgIds = new TVector<long>(msgs.ToArray())
+                    };
 
                     await MtProtoSender.Send(message);
                 }
@@ -59,17 +59,34 @@
         {
             _waitSendConfirmation.Enqueue(messageId);
 
-            _semaphoreSlim.WaitAsync().ContinueWith(_ =>
-            {
-                if (!_waitSendConfirmation.IsEmpty)
-                {
-                    SendFromQueue().ContinueWith(task => _semaphoreSlim.Release());
-                }
-                else
-                {
-                    _semaphoreSlim.Release();
-                }
-            });
+            SendAllMessagesFromQueue();
+        }
+
+
+        public async Task SendAllMessagesFromQueue()
+        {
+            await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
+             {
+                 if (!_waitSendConfirmation.IsEmpty)
+                 {
+					 try
+					 {
+						 await SendFromQueue().ConfigureAwait(false);
+					 }
+					 catch(Exception ex)
+					 {
+						 Log.Error("Failed to send message", ex);
+					 }
+					 finally
+					 {
+						 _semaphoreSlim.Release();
+					 }
+                 }
+                 else
+                 {
+                     _semaphoreSlim.Release();
+                 }
+             }).ConfigureAwait(false);
         }
     }
 }
