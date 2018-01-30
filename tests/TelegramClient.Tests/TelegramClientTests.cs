@@ -21,6 +21,7 @@
     using TelegramClient.Core;
     using TelegramClient.Core.Exceptions;
     using TelegramClient.Core.Network.Exceptions;
+    using TelegramClient.Core.Sessions;
 
     using Xunit;
     using Xunit.Abstractions;
@@ -64,9 +65,9 @@
         }
 
         [Fact]
-        public virtual async Task AuthUser()
+        public async Task AuthUser()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -100,13 +101,14 @@
 
                 Assert.NotNull(user);
                 Assert.True(client.AuthService.IsUserAuthorized());
-                Thread.Sleep(1000);
+                await Task.Delay(1000);
             }
         }
 
-        public virtual async Task CheckPhones()
+        [Fact]
+        public async Task CheckPhones()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -115,12 +117,29 @@
             }
         }
 
+        [Fact]
+        public async Task LogOut()
+        {
+            using (var client = await NewClient().ConfigureAwait(false))
+            {
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client);
+
+                await client.ConnectService.LogOut().ConfigureAwait(false);
+
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client);
+            }
+        }
+        
         //[Fact]
-        //public virtual async Task SendBigFileToContactTest()
+        //public async Task SendBigFileToContactTest()
         //{
         //    EnsureNumberToSendMessageSet();
 
-        //   using (var client = NewClient())
+        //   using (var client = await NewClient().ConfigureAwait(false))
         //{
 
         //    await client.ConnectAsync();
@@ -143,9 +162,9 @@
         //}
 
         [Fact]
-        public virtual async Task DownloadFileFromContactTest()
+        public async Task DownloadFileFromContactTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -193,9 +212,9 @@
         }
 
         [Fact]
-        public virtual async Task DownloadFileFromWrongLocationTest()
+        public async Task DownloadFileFromWrongLocationTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -223,7 +242,7 @@
         }
 
         [Fact]
-        public virtual async Task FloodExceptionShouldNotCauseCannotReadPackageLengthError()
+        public async Task FloodExceptionShouldNotCauseCannotReadPackageLengthError()
         {
             for (var i = 0; i < 50; i++)
                 try
@@ -233,34 +252,33 @@
                 catch (FloodException floodException)
                 {
                     Console.WriteLine($"FLOODEXCEPTION: {floodException}");
-                    Thread.Sleep(floodException.TimeToWait);
+                    await Task.Delay(floodException.TimeToWait);
                 }
         }
 
         [Fact]
-        public virtual async Task GetAutoUpdatesTest()
+        public async Task GetAutoUpdatesTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
-                client.UpdatesService.RecieveUpdates += update =>
-                {
-                };
-
                 await client.ConnectService.ConnectAsync();
                 var user = await GetUser(client);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
 
-                Thread.Sleep(2000);
+                // Register AFTER connecting
+                client.UpdatesService.RecieveUpdates += async update => await Task.Delay(1000);
+
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await Task.Delay(15000);
             }
         }
 
         [Fact]
-        public virtual async Task GetManualUpdatesTest()
+        public async Task GetManualUpdatesTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -276,7 +294,7 @@
         }
 
         [Fact]
-        public virtual async Task SendMessageByUserNameTest()
+        public async Task SendMessageByUserNameTest()
         {
             UserNameToSendMessage = Environment.GetEnvironmentVariable(nameof(UserNameToSendMessage));
             if (string.IsNullOrWhiteSpace(UserNameToSendMessage))
@@ -285,7 +303,7 @@
                     $"Please fill the '{nameof(UserNameToSendMessage)}' setting in appsettings.json file first");
             }
 
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -312,15 +330,15 @@
                 }
 
                 await client.MessagesService.SendTypingAsync(new TInputPeerUser { UserId = user.Id });
-                Thread.Sleep(3000);
+                await Task.Delay(3000);
                 await client.MessagesService.SendMessageAsync(new TInputPeerUser { UserId = user.Id }, "TEST");
             }
         }
 
         [Fact]
-        public virtual async Task SendMessageParallelTest()
+        public async Task SendMessageParallelTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
                 var user = await GetUser(client);
@@ -339,9 +357,9 @@
         }
 
         [Fact]
-        public virtual async Task SendMessageTest()
+        public async Task SendMessageTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -351,9 +369,9 @@
         }
 
         [Fact]
-        public virtual async Task SendMessageToChannelTest()
+        public async Task SendMessageToChannelTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -362,9 +380,9 @@
         }
 
         [Fact]
-        public virtual async Task SendPhotoToContactTest()
+        public async Task SendPhotoToContactTest()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -383,9 +401,9 @@
         }
 
         [Fact]
-        public virtual async Task SignUpNewUser()
+        public async Task SignUpNewUser()
         {
-            using (var client = NewClient())
+            using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
 
@@ -504,11 +522,19 @@
                          .FirstOrDefault(x => x.Phone == normalizedNumber);
         }
 
-        private ITelegramClient NewClient()
+        private async Task<ITelegramClient> NewClient()
         {
             try
             {
-                return ClientFactory.BuildClient(ApiId, ApiHash, ServerAddress, ServerPort);
+                var settings = new FactorySettings
+                               {
+                                   Hash = ApiHash,
+                                   Id = ApiId,
+                                   ServerAddress = ServerAddress,
+                                   ServerPort = ServerPort,
+                                   StoreProvider = new FileSessionStoreProvider("session")
+                               };
+                return await ClientFactory.BuildClient(settings).ConfigureAwait(false);
             }
             catch (MissingApiConfigurationException ex)
             {

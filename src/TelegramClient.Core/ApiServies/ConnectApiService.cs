@@ -7,6 +7,7 @@
     using log4net;
 
     using OpenTl.Schema;
+    using OpenTl.Schema.Auth;
     using OpenTl.Schema.Help;
 
     using TelegramClient.Core.ApiServies.Interfaces;
@@ -62,13 +63,13 @@
 
         private async Task ConnectAsync(bool forceAuth)
         {
-            if (ClientSettings.Session.AuthKey == null || forceAuth)
+            if (ClientSettings.Session.AuthKey == null || ClientSettings.Session.AuthKey.Data.Length == 0 || forceAuth)
             {
                 var result = await DoAuthentication().ConfigureAwait(false);
                 ClientSettings.Session.AuthKey = result.AuthKey;
                 ClientSettings.Session.TimeOffset = result.TimeOffset;
 
-                SessionStore.Save();
+                await SessionStore.Save().ConfigureAwait(false);
             }
 
             ProtoRecieveService.StartReceiving();
@@ -128,6 +129,16 @@
             Log.Debug("Third step is done");
 
             return step3Response;
+        }
+
+        public async Task LogOut()
+        {
+            var request = new RequestLogOut();
+            SendService.SendRequestAsync(request).ConfigureAwait(false);
+            
+            await SessionStore.Remove().ConfigureAwait(false);
+            ClientSettings.Session.AuthKey = null;
+
         }
     }
 }

@@ -31,9 +31,12 @@
             return await SenderService.SendRequestAsync(getDiffRequest).ConfigureAwait(false);
         }
 
-        public void OnUpdateRecieve(IUpdates message)
+        public async Task OnUpdateRecieve(IUpdates message)
         {
-            RecieveUpdates?.Invoke(message);
+            if (RecieveUpdates != null)
+            {
+                await RecieveUpdates.Invoke(message).ConfigureAwait(false);
+            }
         }
 
         public event UpdateHandler RecieveUpdates;

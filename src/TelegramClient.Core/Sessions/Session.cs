@@ -9,13 +9,13 @@
     using TelegramClient.Core.MTProto;
     using TelegramClient.Core.MTProto.Crypto;
 
-    public class Session : ISession
+    internal class Session : ISession
     {
         private readonly object _syncObject = new object();
 
         private int _msgIdInc;
 
-        public string SessionUserId { get; set; }
+        private static readonly Random Random = new Random();
 
         public string ServerAddress { get; set; }
 
@@ -35,8 +35,21 @@
 
         private int SessionSeqNo { get; set; }
 
-        public static Session FromBytes(byte[] buffer, string sessionUserId)
+        public static Session Create()
         {
+            return new Session
+                   {
+                       Id = ((ulong)Random.Next() << 32) | (ulong)Random.Next(),
+                   };
+        }
+        
+        public static Session FromBytes(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                return null;
+            }
+            
             using (var stream = new MemoryStream(buffer))
             using (var reader = new BinaryReader(stream))
             {
@@ -67,7 +80,6 @@
                            SessionSeqNo = sequence,
                            SessionExpires = sessionExpires,
                            User = tlUser,
-                           SessionUserId = sessionUserId,
                            ServerAddress = serverAddress,
                            Port = port
                        };

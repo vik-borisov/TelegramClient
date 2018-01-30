@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -17,9 +18,18 @@
 
         private readonly ConcurrentDictionary<long, TaskCompletionSource<object>> _resultCallbacks = new ConcurrentDictionary<long, TaskCompletionSource<object>>();
 
-        public Task<object> Recieve(long requestId)
+        public Task<object> Receive(long requestId)
         {
             var tcs = new TaskCompletionSource<object>();
+
+            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token;
+
+            token.Register(() =>
+            {
+                Log.Error($"Message response result timed out for messageid '{requestId}'");
+                _resultCallbacks.TryRemove(requestId, out var ignored);
+                tcs.TrySetCanceled(token);
+            });
 
             _resultCallbacks[requestId] = tcs;
             return tcs.Task;
@@ -29,8 +39,9 @@
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
-                callback.SetException(exception);
+                callback.TrySetException(exception);
                 Log.Error($"Request was processed with error", exception);
+                _resultCallbacks.TryRemove(requestId, out var response);
             }
             else
             {
@@ -38,11 +49,23 @@
             }
         }
 
+        public void ReturnException(Exception exception)
+        {
+            Log.Error($"All requests was processed with error", exception);
+
+            foreach (var value in _resultCallbacks.Values)
+            {
+
+                value.SetException(exception);
+            }
+        }
+
         public void ReturnResult(long requestId, object obj)
         {
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
-                callback.SetResult(obj);
+                callback.TrySetResult(obj);
+                _resultCallbacks.TryRemove(requestId, out var response);
             }
             else
             {

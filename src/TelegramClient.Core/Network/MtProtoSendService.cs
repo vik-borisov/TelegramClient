@@ -37,7 +37,7 @@
 
             await TcpTransport.Send(preparedData).ConfigureAwait(false);
 
-            SessionStore.Save();
+            await SessionStore.Save().ConfigureAwait(false);
 
             var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
 

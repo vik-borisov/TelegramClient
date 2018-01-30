@@ -55,17 +55,17 @@ namespace TelegramClient.Core.Network.Recieve
             }
         }
 
-        private async void StartRecievingTask(CancellationToken cancellationToken)
+        private async Task StartRecievingTask(CancellationToken cancellationToken)
         {
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    var recieveData = await TcpTransport.Receieve();
+                    var recieveData = await TcpTransport.Receieve().ConfigureAwait(false);
 
                     var decodedData = DecodeMessage(recieveData);
-
-                    Log.Debug($"Recieve message with remote id: {decodedData.Item2}");
+					
+                    Log.Debug($"Receive message with remote id: {decodedData.Item2}");
 
                     ProcessReceivedMessage(decodedData.Item1);
 
@@ -73,7 +73,7 @@ namespace TelegramClient.Core.Network.Recieve
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Recieve message failed", e);
+                    Log.Error("Receive message failed", e);
                 }
             }
         }

@@ -8,8 +8,6 @@ namespace TelegramClient.Core.Sessions
 
     internal interface ISession
     {
-        string SessionUserId { get; set; }
-
         string ServerAddress { get; set; }
 
         int Port { get; set; }
