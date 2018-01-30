@@ -16,15 +16,15 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
 
-        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1,1);
-        
+        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+
         private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>>();
 
         private int _messageSeqNo;
 
         public ITcpService TcpService { get; set; }
 
-  public void Dispose()
+        public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -117,19 +117,23 @@
         {
             _queue.Enqueue(Tuple.Create(packet, tcs));
 
-            _semaphoreSlim.WaitAsync().ContinueWith(_ =>
+            Task.Run(async () =>
             {
-                if (!_queue.IsEmpty)
+                await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
                 {
-                    SendFromQueue().ContinueWith(task => _semaphoreSlim.Release());
-                }
-                else
-                {
-                    _semaphoreSlim.Release();
-                }
+                    if (!_queue.IsEmpty)
+                    {
+                        await (SendFromQueue().ContinueWith(task => _semaphoreSlim.Release())).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        _semaphoreSlim.Release();
+                    }
+                }).ConfigureAwait(false);
             });
+
         }
-        
+
         private async Task SendFromQueue()
         {
             while (!_queue.IsEmpty)
