@@ -551,11 +551,11 @@
 
         private static async Task SendMessageToChannel(ITelegramClient client)
         {
-            var dialogs = (TDialogs)await client.MessagesService.GetUserDialogsAsync();
+            var dialogs = (TDialogsSlice)await client.MessagesService.GetUserDialogsAsync();
 
             var chat = dialogs.Chats.Items
                               .OfType<TChannel>()
-                              .FirstOrDefault(c => c.Title == "Виктор Борисов");
+                              .FirstOrDefault(c => c.Title == "Test");
 
             await client.MessagesService.SendMessageAsync(
                 new TInputPeerChannel
