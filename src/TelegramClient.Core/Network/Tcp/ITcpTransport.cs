@@ -7,6 +7,7 @@
     {
         Task<byte[]> Receieve();
 
+        Task Disconnect();
         Task Send(byte[] packet);
     }
 }

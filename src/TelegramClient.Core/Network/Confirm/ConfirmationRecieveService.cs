@@ -36,13 +36,16 @@ namespace TelegramClient.Core.Network.Confirm
         public Task WaitForConfirm(long messageId)
         {
             var tsc = new TaskCompletionSource<bool>();
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token;
+            var token = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
 
             token.Register(() =>
             {
-                Log.Error($"Message confirmation timed out for messageid '{messageId}'");
-                _waitConfirm.TryRemove(messageId, out var ignored);
-                tsc.TrySetCanceled(token);
+                if(!tsc.Task.IsCompleted)
+                {
+                    Log.Warn($"Message confirmation timed out for messageid '{messageId}'");
+                    _waitConfirm.TryRemove(messageId, out var ignored);
+                    tsc.TrySetCanceled(token);
+                }
             });
 
             _waitConfirm.TryAdd(messageId, tsc);
