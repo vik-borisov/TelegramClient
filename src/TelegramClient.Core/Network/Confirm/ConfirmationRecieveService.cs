@@ -20,7 +20,7 @@ namespace TelegramClient.Core.Network.Confirm
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
             {
                 tsc.TrySetResult(true);
-                _waitConfirm.TryRemove(requestId, out var ignored);
+                _waitConfirm.TryRemove(requestId, out var _);
             }
         }
 
@@ -29,7 +29,7 @@ namespace TelegramClient.Core.Network.Confirm
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
             {
                 tsc.TrySetException(exception);
-                _waitConfirm.TryRemove(requestId, out var ignored);
+                _waitConfirm.TryRemove(requestId, out var _);
             }
         }
 
@@ -43,7 +43,7 @@ namespace TelegramClient.Core.Network.Confirm
                 if(!tsc.Task.IsCompleted)
                 {
                     Log.Warn($"Message confirmation timed out for messageid '{messageId}'");
-                    _waitConfirm.TryRemove(messageId, out var ignored);
+                    _waitConfirm.TryRemove(messageId, out var _);
                     tsc.TrySetCanceled(token);
                 }
             });
