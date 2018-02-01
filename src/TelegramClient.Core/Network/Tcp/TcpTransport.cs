@@ -31,8 +31,7 @@
 
         public async Task<byte[]> Receieve()
         { 
-            try
-            {
+             
                 CancellationToken cancellationToken = default(CancellationToken);
                 var packetLengthBytes = new byte[4];
                 var readLenghtBytes = await this.TcpService.Read(packetLengthBytes, 0, 4, cancellationToken).ConfigureAwait(false);
@@ -99,14 +98,7 @@
                     throw new InvalidOperationException("invalid checksum! skip");
                 }
 
-                return body;
-            } 
-            catch
-            { 
-                await this.Disconnect();
-                throw;
-            }
-
+                return body; 
         }
 
      
