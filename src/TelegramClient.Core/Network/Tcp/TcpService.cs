@@ -16,8 +16,7 @@
     {
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
         private TcpClient _tcpClient;
-
-        private static readonly ILog Log = LogManager.GetLogger(typeof(TcpService));
+         
         public IClientSettings ClientSettings { get; set; }
 
         public void Dispose()
