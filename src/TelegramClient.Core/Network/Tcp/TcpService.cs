@@ -66,8 +66,8 @@
                     if (!this.IsTcpClientConnected())
                     {
                         var previouslyConnected = this._tcpClient != null;
-                        await this.Disconnect();
-                        await this.Connect();
+                        await this.Disconnect().ConfigureAwait(false);
+                        await this.Connect().ConfigureAwait(false);
                         if (previouslyConnected)
                         {
                             throw new DisconnectedException();

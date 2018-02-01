@@ -2,7 +2,7 @@
 
 namespace TelegramClient.Core.Network.Exceptions
 {
-    internal class DisconnectedException : Exception
+    public class DisconnectedException : Exception
     {
     }
 }
