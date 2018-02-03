@@ -40,9 +40,12 @@ namespace TelegramClient.Core.Network.Confirm
 
             token.Register(() =>
             {
-                Log.Error($"Message confirmation timed out for messageid '{messageId}'");
-                _waitConfirm.TryRemove(messageId, out var _);
-                tsc.TrySetCanceled(token);
+                if(!tsc.Task.IsCompleted)
+                {
+                    Log.Warn($"Message confirmation timed out for messageid '{messageId}'");
+                    _waitConfirm.TryRemove(messageId, out var _);
+                    tsc.TrySetCanceled(token);
+                }
             });
 
             _waitConfirm.TryAdd(messageId, tsc);

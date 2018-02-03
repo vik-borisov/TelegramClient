@@ -2,13 +2,10 @@
 {
     using System;
     using System.Collections.Concurrent;
-    using System.ComponentModel;
-    using System.Net.Sockets;
     using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
-
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Utils;
 
@@ -21,8 +18,8 @@
 
         private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>>();
 
-        private int _messageSeqNo;
-
+        private int _messageSequenceNumber;
+         
         public ITcpService TcpService { get; set; }
 
         public void Dispose()
@@ -31,13 +28,13 @@
             GC.SuppressFinalize(this);
         }
 
+
         public async Task<byte[]> Receieve()
-        {
-            var stream = await TcpService.Receieve().ConfigureAwait(false);
-            try
-            {
+        { 
+             
+                CancellationToken cancellationToken = default(CancellationToken);
                 var packetLengthBytes = new byte[4];
-                var readLenghtBytes = await stream.ReadAsync(packetLengthBytes, 0, 4).ConfigureAwait(false);
+                var readLenghtBytes = await this.TcpService.Read(packetLengthBytes, 0, 4, cancellationToken).ConfigureAwait(false);
 
                 if (readLenghtBytes != 4)
                 {
@@ -47,7 +44,7 @@
                 var packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
                 var seqBytes = new byte[4];
-                var readSeqBytes = await stream.ReadAsync(seqBytes, 0, 4).ConfigureAwait(false);
+                var readSeqBytes = await this.TcpService.Read(seqBytes, 0, 4, cancellationToken).ConfigureAwait(false);
 
                 if (readSeqBytes != 4)
                 {
@@ -70,16 +67,16 @@
                 do
                 {
                     var bodyByte = new byte[packetLength - 12];
-                    var availableBytes = await stream.ReadAsync(bodyByte, 0, neededToRead).ConfigureAwait(false);
+                    var availableBytes = await this.TcpService.Read(bodyByte, 0, neededToRead, cancellationToken).ConfigureAwait(false);
 
                     neededToRead -= availableBytes;
                     Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
                     readBytes += availableBytes;
                 }
-                while (readBytes < packetLength - 12 && stream.CanRead && stream.DataAvailable);
+                while (readBytes < packetLength - 12);
 
                 var crcBytes = new byte[4];
-                var readCrcBytes = await stream.ReadAsync(crcBytes, 0, 4).ConfigureAwait(false);
+                var readCrcBytes = await this.TcpService.Read(crcBytes, 0, 4, cancellationToken).ConfigureAwait(false);
                 if (readCrcBytes != 4)
                 {
                     throw new InvalidOperationException("Couldn't read the crc");
@@ -101,19 +98,19 @@
                     throw new InvalidOperationException("invalid checksum! skip");
                 }
 
-                return body;
-            }
-            catch
-            {
-                var buffer = new byte[4];
-                while (stream.CanRead && stream.DataAvailable)
-                {
-                    await stream.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false);
-                }
-                throw;
-            }
-
+                return body; 
         }
+
+     
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                TcpService?.Dispose();
+            }
+        }
+
 
         public Task Send(byte[] packet)
         {
@@ -124,27 +121,19 @@
             return tcs.Task;
         }
 
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                TcpService?.Dispose();
-            }
-        }
-
         private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
         {
             _queue.Enqueue(Tuple.Create(packet, tcs));
-            SendAllMessagesFromQueue();
+            SendAllMessagesFromQueue(default(CancellationToken));
         }
 
-        private async Task SendAllMessagesFromQueue()
+        private async Task SendAllMessagesFromQueue(CancellationToken cancellationToken)
         {
             await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
             {
                 if (!_queue.IsEmpty)
                 {
-                    await (SendFromQueue().ContinueWith(task => _semaphoreSlim.Release())).ConfigureAwait(false);
+                    await (SendFromQueue(cancellationToken).ContinueWith(task => _semaphoreSlim.Release())).ConfigureAwait(false);
                 }
                 else
                 {
@@ -153,7 +142,7 @@
             }).ConfigureAwait(false);
         }
 
-        private async Task SendFromQueue()
+        private async Task SendFromQueue(CancellationToken cancellationToken)
         {
             while (!_queue.IsEmpty)
             {
@@ -161,7 +150,7 @@
 
                 try
                 {
-                    await SendPacket(item.Item1).ConfigureAwait(false);
+                    await  SendPacket(item.Item1, cancellationToken).ConfigureAwait(false);
                     item.Item2.SetResult(true);
                 }
                 catch (Exception e)
@@ -172,15 +161,20 @@
             }
         }
 
-        private async Task SendPacket(byte[] packet)
+        public async Task SendPacket(byte[] packet, CancellationToken cancelationToken)
         {
-            var mesSeqNo = _messageSeqNo++;
-
-            Log.Debug($"Send message with seq_no {mesSeqNo}");
-
-            var tcpMessage = new TcpMessage(mesSeqNo, packet);
+            var messageSequenceNumber = _messageSequenceNumber++;
+            Log.Debug($"Sending message with seq_no {messageSequenceNumber}");
+            var tcpMessage = new TcpMessage(messageSequenceNumber, packet);
             var encodedMessage = tcpMessage.Encode();
-            await TcpService.Send(encodedMessage).ConfigureAwait(false);
+            await this.TcpService.Send(encodedMessage, cancelationToken).ConfigureAwait(false);
+        }
+
+
+        public async Task Disconnect()
+        {
+            this._messageSequenceNumber = 0;
+            await this.TcpService.Disconnect().ConfigureAwait(false);
         }
 
         ~TcpTransport()

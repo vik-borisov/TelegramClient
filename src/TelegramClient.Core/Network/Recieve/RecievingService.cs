@@ -12,11 +12,13 @@ namespace TelegramClient.Core.Network.Recieve
     using Newtonsoft.Json;
 
     using OpenTl.Schema;
+    using OpenTl.Schema.Help;
     using OpenTl.Schema.Serialization;
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto.Crypto;
     using TelegramClient.Core.Network.Confirm;
+    using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
     using TelegramClient.Core.Network.Tcp;
@@ -40,6 +42,12 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IGZipPackedHandler ZipPackedHandler { get; set; }
 
+        public IMtProtoSender Sender { get; set; }
+
+        public IResponseResultGetter ResponseResultGetter { get; set; }
+
+
+
         public void Dispose()
         {
             _recievingTokenSource?.Cancel();
@@ -51,7 +59,7 @@ namespace TelegramClient.Core.Network.Recieve
             if (_recievingTokenSource == null)
             {
                 _recievingTokenSource = new CancellationTokenSource();
-                StartRecievingTask(_recievingTokenSource.Token);    
+                StartRecievingTask(_recievingTokenSource.Token);
             }
         }
 
@@ -64,7 +72,7 @@ namespace TelegramClient.Core.Network.Recieve
                     var recieveData = await TcpTransport.Receieve().ConfigureAwait(false);
 
                     var decodedData = DecodeMessage(recieveData);
-					
+
                     Log.Debug($"Receive message with remote id: {decodedData.Item2}");
 
                     ProcessReceivedMessage(decodedData.Item1);
@@ -73,7 +81,39 @@ namespace TelegramClient.Core.Network.Recieve
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Receive message failed", e);
+                    Log.Error("Receive message failed. Reconnecting", e);
+
+                    var request = new RequestInvokeWithLayer
+                    {
+                        Layer = SchemaInfo.SchemaVersion,
+                        Query = new RequestInitConnection
+                        {
+                            ApiId = ClientSettings.AppId,
+                            AppVersion = "1.0.0",
+                            DeviceModel = "PC",
+                            LangCode = "en",
+                            LangPack = "tdesktop",
+                            Query = new RequestGetConfig(),
+                            SystemLangCode = "en",
+                            SystemVersion = "Win 10.0"
+                        }
+                    };
+
+
+                    try
+                    {
+                        await this.TcpTransport.Disconnect();
+                        var sendTask = await Sender.Send(request).ConfigureAwait(false);
+                        ResponseResultGetter.Receive(sendTask.Item2).ContinueWith(async task =>
+                        {
+                            await sendTask.Item1.ConfigureAwait(false);
+                        });
+                    }
+                    catch
+                    {
+                        Log.Error("Failed to reconnect", e);
+                    }
+
                 }
             }
         }

@@ -22,13 +22,16 @@
         {
             var tcs = new TaskCompletionSource<object>();
 
-            var token = new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token;
+            var token = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
 
             token.Register(() =>
             {
-                Log.Error($"Message response result timed out for messageid '{requestId}'");
-                _resultCallbacks.TryRemove(requestId, out var ignored);
-                tcs.TrySetCanceled(token);
+                if(!tcs.Task.IsCompleted)
+                {
+                    Log.Warn($"Message response result timed out for messageid '{requestId}'");
+                    _resultCallbacks.TryRemove(requestId, out var ignored);
+                    tcs.TrySetCanceled(token);
+                }
             });
 
             _resultCallbacks[requestId] = tcs;
