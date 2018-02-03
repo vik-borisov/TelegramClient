@@ -11,15 +11,21 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSessionStoreProvider));
 
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
         private readonly string _sessionFile;
 
         private FileStream _fileStream;
 
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1,1);
-
         public FileSessionStoreProvider(string sessionTag)
         {
             _sessionFile = $"{sessionTag}.dat";
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public async Task<byte[]> LoadSession()
@@ -37,7 +43,7 @@
             if (_fileStream.Length == 0)
             {
                 _semaphore.Release();
-                
+
                 return null;
             }
 
@@ -46,6 +52,19 @@
             _semaphore.Release();
 
             return buffer;
+        }
+
+        public Task RemoveSession()
+        {
+            if (File.Exists(_sessionFile))
+            {
+                _fileStream.Dispose();
+                _fileStream = null;
+
+                File.Delete(_sessionFile);
+            }
+
+            return Task.FromResult(true);
         }
 
         public async Task SaveSession(byte[] session)
@@ -63,34 +82,6 @@
             _semaphore.Release();
         }
 
-        public Task RemoveSession()
-        {
-            if (File.Exists(_sessionFile))
-            {
-                _fileStream.Dispose();
-                _fileStream = null;
-                
-                File.Delete(_sessionFile);
-            }
-
-            return Task.FromResult(true);
-        }
-
-        private async Task EnsureStreamOpen()
-        {
-            if (_fileStream == null)
-            {
-                await _semaphore.WaitAsync();
-         
-                if (_fileStream == null)
-                {
-                    _fileStream = new FileStream(_sessionFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                }
-
-                _semaphore.Release();
-            }
-        }
-
         private void Dispose(bool disposing)
         {
             if (disposing)
@@ -99,10 +90,19 @@
             }
         }
 
-        public void Dispose()
+        private async Task EnsureStreamOpen()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            if (_fileStream == null)
+            {
+                await _semaphore.WaitAsync();
+
+                if (_fileStream == null)
+                {
+                    _fileStream = new FileStream(_sessionFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                }
+
+                _semaphore.Release();
+            }
         }
 
         ~FileSessionStoreProvider()

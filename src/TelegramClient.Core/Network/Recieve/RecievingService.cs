@@ -2,7 +2,6 @@ namespace TelegramClient.Core.Network.Recieve
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -46,8 +45,6 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IResponseResultGetter ResponseResultGetter { get; set; }
 
-
-
         public void Dispose()
         {
             _recievingTokenSource?.Cancel();
@@ -60,61 +57,6 @@ namespace TelegramClient.Core.Network.Recieve
             {
                 _recievingTokenSource = new CancellationTokenSource();
                 StartRecievingTask(_recievingTokenSource.Token);
-            }
-        }
-
-        private async Task StartRecievingTask(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    var recieveData = await TcpTransport.Receieve().ConfigureAwait(false);
-
-                    var decodedData = DecodeMessage(recieveData);
-
-                    Log.Debug($"Receive message with remote id: {decodedData.Item2}");
-
-                    ProcessReceivedMessage(decodedData.Item1);
-
-                    ConfirmationSendService.AddForSend(decodedData.Item2);
-                }
-                catch (Exception e)
-                {
-                    Log.Error("Receive message failed. Reconnecting", e);
-
-                    var request = new RequestInvokeWithLayer
-                    {
-                        Layer = SchemaInfo.SchemaVersion,
-                        Query = new RequestInitConnection
-                        {
-                            ApiId = ClientSettings.AppId,
-                            AppVersion = "1.0.0",
-                            DeviceModel = "PC",
-                            LangCode = "en",
-                            LangPack = "tdesktop",
-                            Query = new RequestGetConfig(),
-                            SystemLangCode = "en",
-                            SystemVersion = "Win 10.0"
-                        }
-                    };
-
-
-                    try
-                    {
-                        await this.TcpTransport.Disconnect();
-                        var sendTask = await Sender.Send(request).ConfigureAwait(false);
-                        ResponseResultGetter.Receive(sendTask.Item2).ContinueWith(async task =>
-                        {
-                            await sendTask.Item1.ConfigureAwait(false);
-                        });
-                    }
-                    catch
-                    {
-                        Log.Error("Failed to reconnect", e);
-                    }
-
-                }
             }
         }
 
@@ -195,6 +137,60 @@ namespace TelegramClient.Core.Network.Recieve
                     }
 
                     break;
+            }
+        }
+
+        private async Task StartRecievingTask(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var recieveData = await TcpTransport.Receieve().ConfigureAwait(false);
+
+                    var decodedData = DecodeMessage(recieveData);
+
+                    Log.Debug($"Receive message with remote id: {decodedData.Item2}");
+
+                    ProcessReceivedMessage(decodedData.Item1);
+
+                    ConfirmationSendService.AddForSend(decodedData.Item2);
+                }
+                catch (Exception e)
+                {
+                    Log.Error("Receive message failed. Reconnecting", e);
+
+                    var request = new RequestInvokeWithLayer
+                                  {
+                                      Layer = SchemaInfo.SchemaVersion,
+                                      Query = new RequestInitConnection
+                                              {
+                                                  ApiId = ClientSettings.AppId,
+                                                  AppVersion = "1.0.0",
+                                                  DeviceModel = "PC",
+                                                  LangCode = "en",
+                                                  LangPack = "tdesktop",
+                                                  Query = new RequestGetConfig(),
+                                                  SystemLangCode = "en",
+                                                  SystemVersion = "Win 10.0"
+                                              }
+                                  };
+
+                    try
+                    {
+                        await TcpTransport.Disconnect();
+                        var sendTask = await Sender.Send(request).ConfigureAwait(false);
+                        ResponseResultGetter.Receive(sendTask.Item2).ContinueWith(
+                            async task =>
+                            {
+                                await sendTask.Item1.ConfigureAwait(false);
+                            });
+                    }
+                    catch
+                    {
+                        Log.Error("Failed to reconnect", e);
+                    }
+                }
             }
         }
     }

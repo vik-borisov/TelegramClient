@@ -34,9 +34,9 @@
 
     public class LogOutputTester : IDisposable
     {
-        private readonly IAppenderAttachable _attachable;
-
         private readonly TestOutputAppender _appender;
+
+        private readonly IAppenderAttachable _attachable;
 
         protected LogOutputTester(ITestOutputHelper output)
         {

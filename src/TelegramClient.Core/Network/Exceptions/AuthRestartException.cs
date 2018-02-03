@@ -2,8 +2,7 @@
 {
     using System;
 
-    public class AuthRestartException: Exception
+    public class AuthRestartException : Exception
     {
-        
     }
 }

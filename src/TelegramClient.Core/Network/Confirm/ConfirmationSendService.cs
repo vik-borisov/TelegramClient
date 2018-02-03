@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -26,6 +25,40 @@
 
         public IMtProtoSender MtProtoSender { get; set; }
 
+        public void AddForSend(long messageId)
+        {
+            _waitSendConfirmation.Enqueue(messageId);
+
+            SendAllMessagesFromQueue();
+        }
+
+        public async Task SendAllMessagesFromQueue()
+        {
+            await _semaphoreSlim.WaitAsync().ContinueWith(
+                async _ =>
+                {
+                    if (!_waitSendConfirmation.IsEmpty)
+                    {
+                        try
+                        {
+                            await SendFromQueue().ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error("Failed to send message", ex);
+                        }
+                        finally
+                        {
+                            _semaphoreSlim.Release();
+                        }
+                    }
+                    else
+                    {
+                        _semaphoreSlim.Release();
+                    }
+                }).ConfigureAwait(false);
+        }
+
         private async Task SendFromQueue()
         {
             while (!_waitSendConfirmation.IsEmpty)
@@ -42,9 +75,9 @@
                     Log.Debug($"Sending confirmation for messages {string.Join(",", msgs.Select(m => m.ToString()))}");
 
                     var message = new TMsgsAck
-                    {
-                        MsgIds = new TVector<long>(msgs.ToArray())
-                    };
+                                  {
+                                      MsgIds = new TVector<long>(msgs.ToArray())
+                                  };
 
                     await MtProtoSender.Send(message);
                 }
@@ -53,40 +86,6 @@
                     Log.Error("Process message failed", e);
                 }
             }
-        }
-
-        public void AddForSend(long messageId)
-        {
-            _waitSendConfirmation.Enqueue(messageId);
-
-            SendAllMessagesFromQueue();
-        }
-
-
-        public async Task SendAllMessagesFromQueue()
-        {
-            await _semaphoreSlim.WaitAsync().ContinueWith(async _ =>
-             {
-                 if (!_waitSendConfirmation.IsEmpty)
-                 {
-					 try
-					 {
-						 await SendFromQueue().ConfigureAwait(false);
-					 }
-					 catch(Exception ex)
-					 {
-						 Log.Error("Failed to send message", ex);
-					 }
-					 finally
-					 {
-						 _semaphoreSlim.Release();
-					 }
-                 }
-                 else
-                 {
-                     _semaphoreSlim.Release();
-                 }
-             }).ConfigureAwait(false);
         }
     }
 }

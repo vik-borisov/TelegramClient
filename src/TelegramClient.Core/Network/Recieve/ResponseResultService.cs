@@ -24,15 +24,16 @@
 
             var token = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
 
-            token.Register(() =>
-            {
-                if(!tcs.Task.IsCompleted)
+            token.Register(
+                () =>
                 {
-                    Log.Warn($"Message response result timed out for messageid '{requestId}'");
-                    _resultCallbacks.TryRemove(requestId, out var ignored);
-                    tcs.TrySetCanceled(token);
-                }
-            });
+                    if (!tcs.Task.IsCompleted)
+                    {
+                        Log.Warn($"Message response result timed out for messageid '{requestId}'");
+                        _resultCallbacks.TryRemove(requestId, out var ignored);
+                        tcs.TrySetCanceled(token);
+                    }
+                });
 
             _resultCallbacks[requestId] = tcs;
             return tcs.Task;
@@ -58,7 +59,6 @@
 
             foreach (var value in _resultCallbacks.Values)
             {
-
                 value.SetException(exception);
             }
         }

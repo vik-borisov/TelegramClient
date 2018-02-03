@@ -13,7 +13,6 @@
     using TelegramClient.Core.ApiServies.Interfaces;
     using TelegramClient.Core.Auth;
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
     using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Sessions;
@@ -39,6 +38,15 @@
         public Task ConnectAsync()
         {
             return ConnectAsync(false);
+        }
+
+        public async Task LogOut()
+        {
+            var request = new RequestLogOut();
+            SendService.SendRequestAsync(request).ConfigureAwait(false);
+
+            await SessionStore.Remove().ConfigureAwait(false);
+            ClientSettings.Session.AuthKey = null;
         }
 
         public Task ReAuthenticateAsync()
@@ -129,16 +137,6 @@
             Log.Debug("Third step is done");
 
             return step3Response;
-        }
-
-        public async Task LogOut()
-        {
-            var request = new RequestLogOut();
-            SendService.SendRequestAsync(request).ConfigureAwait(false);
-            
-            await SessionStore.Remove().ConfigureAwait(false);
-            ClientSettings.Session.AuthKey = null;
-
         }
     }
 }

@@ -42,14 +42,14 @@ namespace TelegramClient.Core.Utils
     {
         private const int BufferSize = 8192;
 
-        private uint[] _crc32Table;
-
         // private member vars
         private readonly uint _dwPolynomial;
 
-        private uint _register = 0xFFFFFFFFU;
-
         private readonly bool _reverseBits;
+
+        private uint[] _crc32Table;
+
+        private uint _register = 0xFFFFFFFFU;
 
         /// <summary>Indicates the total number of bytes applied to the CRC.</summary>
         public long TotalBytesRead { get; private set; }

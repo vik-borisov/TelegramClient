@@ -34,7 +34,7 @@
             Guard.That(factorySettings.ServerAddress).IsNotNullOrWhiteSpace();
             Guard.That(factorySettings.ServerPort).IsPositive();
             Guard.That(factorySettings.StoreProvider).IsNotNull();
-            
+
             var settings = container.Resolve<IClientSettings>();
 
             settings.AppId = factorySettings.Id;
@@ -43,7 +43,7 @@
             container.Register(Component.For<ISessionStoreProvider>().Instance(factorySettings.StoreProvider));
 
             var sessionStore = container.Resolve<ISessionStore>();
-            
+
             settings.Session = await TryLoadOrCreateNew(sessionStore, factorySettings).ConfigureAwait(false);
         }
 
@@ -77,7 +77,7 @@
         private static async Task<ISession> TryLoadOrCreateNew(ISessionStore sessionStore, IFactorySettings factorySettings)
         {
             var session = await sessionStore.Load().ConfigureAwait(false) ?? Session.Create();
-            
+
             session.ServerAddress = factorySettings.ServerAddress;
             session.Port = factorySettings.ServerPort;
 

@@ -13,7 +13,6 @@
 
     using TelegramClient.Core.ApiServies.Interfaces;
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
 

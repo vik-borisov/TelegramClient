@@ -3,14 +3,11 @@
     using System;
     using System.Threading.Tasks;
 
-    using Castle.DynamicProxy.Generators.Emitters;
-
     using log4net;
 
     using OpenTl.Schema;
 
     using TelegramClient.Core.ApiServies.Interfaces;
-    using TelegramClient.Core.Exceptions;
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Interfaces;
@@ -26,7 +23,7 @@
         public IResponseResultGetter ResponseResultGetter { get; set; }
 
         public Lazy<IConnectApiService> ConnectApiService { get; set; }
-        
+
         public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute)
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
@@ -35,11 +32,11 @@
             {
                 try
                 {
-                    return (TResult) await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                    return (TResult)await SendAndRecieve(methodToExecute).ConfigureAwait(false);
                 }
                 catch (BadServerSaltException)
                 {
-                    return (TResult) await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                    return (TResult)await SendAndRecieve(methodToExecute).ConfigureAwait(false);
                 }
                 catch (AuthRestartException)
                 {
@@ -57,7 +54,7 @@
             var sendTask = await Sender.Send(methodToExecute).ConfigureAwait(false);
             var response = await ResponseResultGetter.Receive(sendTask.Item2);
             await sendTask.Item1.ConfigureAwait(false);
-            return response; 
+            return response;
         }
     }
 }

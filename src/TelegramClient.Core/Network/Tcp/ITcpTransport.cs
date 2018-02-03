@@ -5,9 +5,10 @@
 
     internal interface ITcpTransport : IDisposable
     {
+        Task Disconnect();
+
         Task<byte[]> Receieve();
 
-        Task Disconnect();
         Task Send(byte[] packet);
     }
 }

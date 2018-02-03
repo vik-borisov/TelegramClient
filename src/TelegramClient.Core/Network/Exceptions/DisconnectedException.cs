@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace TelegramClient.Core.Network.Exceptions
+﻿namespace TelegramClient.Core.Network.Exceptions
 {
+    using System;
+
     public class DisconnectedException : Exception
     {
     }

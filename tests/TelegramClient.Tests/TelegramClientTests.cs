@@ -4,7 +4,6 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -117,23 +116,6 @@
             }
         }
 
-        [Fact]
-        public async Task LogOut()
-        {
-            using (var client = await NewClient().ConfigureAwait(false))
-            {
-                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
-
-                await GetUser(client);
-
-                await client.ConnectService.LogOut().ConfigureAwait(false);
-
-                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
-
-                await GetUser(client);
-            }
-        }
-        
         //[Fact]
         //public async Task SendBigFileToContactTest()
         //{
@@ -290,6 +272,23 @@
                 var updates = await client.UpdatesService.GetUpdates(currentState);
 
                 Assert.IsNotType<IEmpty>(updates);
+            }
+        }
+
+        [Fact]
+        public async Task LogOut()
+        {
+            using (var client = await NewClient().ConfigureAwait(false))
+            {
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client);
+
+                await client.ConnectService.LogOut().ConfigureAwait(false);
+
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client);
             }
         }
 

@@ -11,11 +11,11 @@
 
     internal class Session : ISession
     {
+        private static readonly Random Random = new Random();
+
         private readonly object _syncObject = new object();
 
         private int _msgIdInc;
-
-        private static readonly Random Random = new Random();
 
         public string ServerAddress { get; set; }
 
@@ -39,17 +39,17 @@
         {
             return new Session
                    {
-                       Id = ((ulong)Random.Next() << 32) | (ulong)Random.Next(),
+                       Id = ((ulong)Random.Next() << 32) | (ulong)Random.Next()
                    };
         }
-        
+
         public static Session FromBytes(byte[] buffer)
         {
             if (buffer == null)
             {
                 return null;
             }
-            
+
             using (var stream = new MemoryStream(buffer))
             using (var reader = new BinaryReader(stream))
             {

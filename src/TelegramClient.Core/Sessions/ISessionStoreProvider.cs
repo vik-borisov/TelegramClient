@@ -3,12 +3,12 @@
     using System;
     using System.Threading.Tasks;
 
-    public interface ISessionStoreProvider: IDisposable
+    public interface ISessionStoreProvider : IDisposable
     {
         Task<byte[]> LoadSession();
 
-        Task SaveSession(byte[] session);
-        
         Task RemoveSession();
+
+        Task SaveSession(byte[] session);
     }
 }

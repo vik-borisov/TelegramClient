@@ -6,10 +6,10 @@
     {
         Task ConnectAsync();
 
+        Task LogOut();
+
         Task ReAuthenticateAsync();
 
         Task ReconnectToDcAsync(int dcId);
-
-        Task LogOut();
     }
 }

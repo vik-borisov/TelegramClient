@@ -6,8 +6,8 @@ namespace TelegramClient.Core.Sessions
     {
         Task<ISession> Load();
 
-        Task Save();
-
         Task Remove();
+
+        Task Save();
     }
 }
