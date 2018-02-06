@@ -7,6 +7,9 @@ namespace TelegramClient.Core.Network.Confirm
 
     using log4net;
 
+    using Microsoft.Extensions.Caching.Memory;
+    using Microsoft.Extensions.Options;
+
     using TelegramClient.Core.IoC;
 
     [SingleInstance(typeof(IConfirmationRecieveService))]
@@ -16,6 +19,13 @@ namespace TelegramClient.Core.Network.Confirm
 
         private readonly ConcurrentDictionary<long, TaskCompletionSource<bool>> _waitConfirm = new ConcurrentDictionary<long, TaskCompletionSource<bool>>();
 
+        private readonly IMemoryCache _tokensCache;
+
+        public ConfirmationRecieveService()
+        {
+            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromSeconds(10)), }));
+        }
+        
         public void ConfirmRequest(long requestId)
         {
             if (_waitConfirm.TryGetValue(requestId, out var tsc))
@@ -38,7 +48,8 @@ namespace TelegramClient.Core.Network.Confirm
         {
             var tsc = new TaskCompletionSource<bool>();
             var token = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
-
+            _tokensCache.Set(messageId, token);
+            
             token.Register(
                 () =>
                 {

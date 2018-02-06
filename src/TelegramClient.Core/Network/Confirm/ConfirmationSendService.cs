@@ -45,7 +45,7 @@
                         }
                         catch (Exception ex)
                         {
-                            Log.Error("Failed to send message", ex);
+                            Log.Error("Failed to send confim message", ex);
                         }
                         finally
                         {

@@ -19,10 +19,12 @@
 
         public IClientSettings ClientSettings { get; set; }
 
-        public async Task Connect()
+        private async Task Connect()
         {
             _tcpClient = new TcpClient();
+            
             await _tcpClient.ConnectAsync(ClientSettings.Session.ServerAddress, ClientSettings.Session.Port).ConfigureAwait(false);
+            
             _tcpClient.GetStream().ReadTimeout = (int)TimeSpan.FromMinutes(1).TotalMilliseconds;
         }
 
@@ -65,12 +67,14 @@
         public async Task<int> Read(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             await CheckConnectionState().ConfigureAwait(false);
-            return await _tcpClient.GetStream().ReadAsync(buffer, offset, count);
+            
+            return await _tcpClient.GetStream().ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task Send(byte[] encodedMessage, CancellationToken cancellationToken)
         {
             await CheckConnectionState().ConfigureAwait(false);
+            
             await _tcpClient.GetStream().WriteAsync(encodedMessage, 0, encodedMessage.Length, cancellationToken).ConfigureAwait(false);
         }
 
@@ -79,13 +83,17 @@
             if (!IsTcpClientConnected())
             {
                 await _semaphore.WaitAsync().ConfigureAwait(false);
+                
                 try
                 {
                     if (!IsTcpClientConnected())
                     {
                         var previouslyConnected = _tcpClient != null;
+                        
                         await Disconnect().ConfigureAwait(false);
+                        
                         await Connect().ConfigureAwait(false);
+                        
                         if (previouslyConnected)
                         {
                             throw new DisconnectedException();

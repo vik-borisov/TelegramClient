@@ -7,6 +7,9 @@
 
     using log4net;
 
+    using Microsoft.Extensions.Caching.Memory;
+    using Microsoft.Extensions.Options;
+
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Recieve.Interfaces;
 
@@ -18,19 +21,30 @@
 
         private readonly ConcurrentDictionary<long, TaskCompletionSource<object>> _resultCallbacks = new ConcurrentDictionary<long, TaskCompletionSource<object>>();
 
+        private readonly IMemoryCache _tokensCache;
+
+        public ResponseResultService()
+        {
+            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromSeconds(10)), }));
+        }
+        
         public Task<object> Receive(long requestId)
         {
             var tcs = new TaskCompletionSource<object>();
 
             var token = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
 
+            _tokensCache.Set(requestId, token);
+            
             token.Register(
                 () =>
                 {
                     if (!tcs.Task.IsCompleted)
                     {
                         Log.Warn($"Message response result timed out for messageid '{requestId}'");
-                        _resultCallbacks.TryRemove(requestId, out var ignored);
+                        
+                        _resultCallbacks.TryRemove(requestId, out var _);
+                        
                         tcs.TrySetCanceled(token);
                     }
                 });
@@ -44,7 +58,9 @@
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
                 callback.TrySetException(exception);
+                
                 Log.Error($"Request was processed with error", exception);
+                
                 _resultCallbacks.TryRemove(requestId, out var response);
             }
             else
