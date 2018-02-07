@@ -33,7 +33,6 @@
             Guard.That(factorySettings.Hash).IsNotNullOrWhiteSpace();
             Guard.That(factorySettings.ServerAddress).IsNotNullOrWhiteSpace();
             Guard.That(factorySettings.ServerPort).IsPositive();
-            Guard.That(factorySettings.StoreProvider).IsNotNull();
 
             var settings = container.Resolve<IClientSettings>();
 

@@ -253,6 +253,14 @@
                 await SendMessage(client, user);
                 await SendMessage(client, user);
                 await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
+                await SendMessage(client, user);
                 await Task.Delay(15000);
             }
         }

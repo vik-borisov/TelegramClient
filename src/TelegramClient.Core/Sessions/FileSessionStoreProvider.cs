@@ -7,6 +7,8 @@
 
     using log4net;
 
+    using NullGuard;
+
     public class FileSessionStoreProvider : ISessionStoreProvider
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(FileSessionStoreProvider));
@@ -28,6 +30,7 @@
             GC.SuppressFinalize(this);
         }
 
+        [return:AllowNull]
         public async Task<byte[]> LoadSession()
         {
             Log.Debug($"Load session for sessionTag = {_sessionFile}");
