@@ -7,9 +7,6 @@ namespace TelegramClient.Core.Network.Confirm
 
     using log4net;
 
-    using Microsoft.Extensions.Caching.Memory;
-    using Microsoft.Extensions.Options;
-
     using TelegramClient.Core.IoC;
 
     [SingleInstance(typeof(IConfirmationRecieveService))]
@@ -17,53 +14,52 @@ namespace TelegramClient.Core.Network.Confirm
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ConfirmationRecieveService));
 
-        private readonly ConcurrentDictionary<long, TaskCompletionSource<bool>> _waitConfirm = new ConcurrentDictionary<long, TaskCompletionSource<bool>>();
+        private readonly ConcurrentDictionary<long, (Timer, TaskCompletionSource<bool>)> _waitConfirm = new ConcurrentDictionary<long, (Timer, TaskCompletionSource<bool>)>();
 
-        private readonly IMemoryCache _tokensCache;
-
-        public ConfirmationRecieveService()
-        {
-            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromMinutes(1)), }));
-        }
-        
         public void ConfirmRequest(long requestId)
         {
-            if (_waitConfirm.TryGetValue(requestId, out var tsc))
+            if (_waitConfirm.TryGetValue(requestId, out var data))
             {
-                tsc.TrySetResult(true);
+                (Timer timer, TaskCompletionSource<bool> tcs) = data;
+                timer.Dispose();
+                
+                tcs.TrySetResult(true);
                 _waitConfirm.TryRemove(requestId, out var _);
             }
         }
 
         public void RequestWithException(long requestId, Exception exception)
         {
-            if (_waitConfirm.TryGetValue(requestId, out var tsc))
+            if (_waitConfirm.TryGetValue(requestId, out var data))
             {
-                tsc.TrySetException(exception);
+                (Timer timer, TaskCompletionSource<bool> tcs) = data;
+                timer.Dispose();
+                
+                tcs.TrySetException(exception);
+                
                 _waitConfirm.TryRemove(requestId, out var _);
             }
         }
 
         public Task WaitForConfirm(long messageId)
         {
-            var tsc = new TaskCompletionSource<bool>();
-            var token = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
-            _tokensCache.Set(messageId, token);
+            var tcs = new TaskCompletionSource<bool>();
             
-            token.Register(
-                () =>
+            var timer = new Timer( _ =>
                 {
-                    if (!tsc.Task.IsCompleted)
+                    if (!tcs.Task.IsCompleted)
                     {
                         Log.Warn($"Message confirmation timed out for messageid '{messageId}'");
+                        
                         _waitConfirm.TryRemove(messageId, out var _);
-                        tsc.TrySetCanceled(token);
+                        
+                        tcs.TrySetCanceled(new CancellationTokenSource().Token);
                     }
-                });
+                }, null, TimeSpan.FromMinutes(1), TimeSpan.Zero);
 
-            _waitConfirm.TryAdd(messageId, tsc);
+            _waitConfirm.TryAdd(messageId, (timer, tcs));
 
-            return tsc.Task;
+            return tcs.Task;
         }
     }
 }

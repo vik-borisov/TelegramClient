@@ -7,9 +7,6 @@
 
     using log4net;
 
-    using Microsoft.Extensions.Caching.Memory;
-    using Microsoft.Extensions.Options;
-
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Recieve.Interfaces;
 
@@ -19,44 +16,35 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(ResponseResultService));
 
-        private readonly ConcurrentDictionary<long, TaskCompletionSource<object>> _resultCallbacks = new ConcurrentDictionary<long, TaskCompletionSource<object>>();
+        private readonly ConcurrentDictionary<long, (Timer, TaskCompletionSource<object>)> _resultCallbacks = new ConcurrentDictionary<long, (Timer, TaskCompletionSource<object>)>();
 
-        private readonly IMemoryCache _tokensCache;
-
-        public ResponseResultService()
-        {
-            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromMinutes(1)), }));
-        }
-        
-        public Task<object> Receive(long requestId)
+      public Task<object> Receive(long requestId)
         {
             var tcs = new TaskCompletionSource<object>();
 
-            var token = new CancellationTokenSource(TimeSpan.FromMinutes(1)).Token;
-
-            _tokensCache.Set(requestId, token);
-            
-            token.Register(
-                () =>
+            var timer = new Timer( _ =>
+            {
+                if (!tcs.Task.IsCompleted)
                 {
-                    if (!tcs.Task.IsCompleted)
-                    {
-                        Log.Warn($"Message response result timed out for messageid '{requestId}'");
+                    Log.Warn($"Message confirmation timed out for messageid '{requestId}'");
                         
-                        _resultCallbacks.TryRemove(requestId, out var _);
+                    _resultCallbacks.TryRemove(requestId, out var _);
                         
-                        tcs.TrySetCanceled(token);
-                    }
-                });
+                    tcs.TrySetCanceled(new CancellationTokenSource().Token);
+                }
+            }, null, TimeSpan.FromMinutes(1), TimeSpan.Zero);
 
-            _resultCallbacks[requestId] = tcs;
+            _resultCallbacks[requestId] = (timer, tcs);
             return tcs.Task;
         }
 
         public void ReturnException(long requestId, Exception exception)
         {
-            if (_resultCallbacks.TryGetValue(requestId, out var callback))
+            if (_resultCallbacks.TryGetValue(requestId, out var data))
             {
+                (Timer timer, TaskCompletionSource<object> callback) = data;
+                timer.Dispose();
+                
                 callback.TrySetException(exception);
                 
                 Log.Error($"Request was processed with error", exception);
@@ -73,16 +61,20 @@
         {
             Log.Error($"All requests was processed with error", exception);
 
-            foreach (var value in _resultCallbacks.Values)
+            foreach ((Timer timer, TaskCompletionSource<object> callback) in _resultCallbacks.Values)
             {
-                value.SetException(exception);
+                timer.Dispose();
+                callback.TrySetException(exception);
             }
         }
 
         public void ReturnResult(long requestId, object obj)
         {
-            if (_resultCallbacks.TryGetValue(requestId, out var callback))
+            if (_resultCallbacks.TryGetValue(requestId, out var data))
             {
+                (Timer timer, TaskCompletionSource<object> callback) = data;
+                timer.Dispose();
+                
                 callback.TrySetResult(obj);
                 
                 _resultCallbacks.TryRemove(requestId, out var _);
