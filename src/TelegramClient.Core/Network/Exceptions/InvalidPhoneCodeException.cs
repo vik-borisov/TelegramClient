@@ -1,4 +1,4 @@
-﻿namespace TelegramClient.Core.Exceptions
+﻿namespace TelegramClient.Core.Network.Exceptions
 {
     using System;
 

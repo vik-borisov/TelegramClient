@@ -25,7 +25,7 @@
 
         public ResponseResultService()
         {
-            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromSeconds(10)), }));
+            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromMinutes(1)), }));
         }
         
         public Task<object> Receive(long requestId)
@@ -84,7 +84,8 @@
             if (_resultCallbacks.TryGetValue(requestId, out var callback))
             {
                 callback.TrySetResult(obj);
-                _resultCallbacks.TryRemove(requestId, out var response);
+                
+                _resultCallbacks.TryRemove(requestId, out var _);
             }
             else
             {

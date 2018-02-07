@@ -23,7 +23,7 @@ namespace TelegramClient.Core.Network.Confirm
 
         public ConfirmationRecieveService()
         {
-            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromSeconds(10)), }));
+            _tokensCache = new MemoryCache(new OptionsManager<MemoryCacheOptions>(new []{new ConfigureOptions<MemoryCacheOptions>(options => options.ExpirationScanFrequency = TimeSpan.FromMinutes(1)), }));
         }
         
         public void ConfirmRequest(long requestId)

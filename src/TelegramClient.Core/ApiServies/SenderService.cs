@@ -42,7 +42,7 @@
                 {
                     await ConnectApiService.Value.ReAuthenticateAsync().ConfigureAwait(false);
                 }
-                catch (PhoneMigrationException ex)
+                catch (DataCenterMigrationException ex)
                 {
                     await ConnectApiService.Value.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
                 }
