@@ -1,9 +1,12 @@
 ﻿namespace TelegramClient.Core.Network
 {
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
+
+    using NullGuard;
 
     using TelegramClient.Core.Helpers;
     using TelegramClient.Core.IoC;
@@ -20,11 +23,11 @@
 
         public IClientSettings ClientSettings { get; set; }
 
-        public async Task<byte[]> SendAndReceive(byte[] data)
+        public async Task<byte[]> SendAndReceive(byte[] data, CancellationToken cancellationToken = default(CancellationToken))
         {
             var preparedPacket = PrepareToSend(data);
 
-            await TcpTransport.Send(preparedPacket).ConfigureAwait(false);
+            await TcpTransport.Send(preparedPacket, cancellationToken).ConfigureAwait(false);
 
             var result = await TcpTransport.Receieve().ConfigureAwait(false);
 

@@ -5,7 +5,7 @@ namespace TelegramClient.Core.Network.Interfaces
     using OpenTl.Schema;
 
     internal interface IMtProtoSender
-    {
+    { 
         Task<(Task, long)> SendWithConfim(IObject obj);
 
         Task<long> SendWithoutConfirm(IObject obj);

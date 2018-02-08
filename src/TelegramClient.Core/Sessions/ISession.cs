@@ -1,6 +1,7 @@
 namespace TelegramClient.Core.Sessions
 {
     using System;
+    using System.Threading.Tasks;
 
     using OpenTl.Schema;
 
@@ -26,7 +27,7 @@ namespace TelegramClient.Core.Sessions
 
         long GenerateMsgId();
 
-        Tuple<long, int> GenerateMsgIdAndSeqNo(bool confirmed);
+        Task<(long, int)> GenerateMsgIdAndSeqNo(bool confirmed);
 
         byte[] ToBytes();
     }

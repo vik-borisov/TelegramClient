@@ -2,6 +2,7 @@
 {
     using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -51,28 +52,27 @@
 
         private async Task<long> Send(IObject obj)
         {
-            var preparedData = PrepareToSend(obj, out var mesId);
+            (byte[] preparedData, long mesId) = await PrepareToSend(obj).ConfigureAwait(false);
 
-            await TcpTransport.Send(preparedData).ConfigureAwait(false);
+            await TcpTransport.Send(preparedData, cancellationToken).ConfigureAwait(false);
 
             await SessionStore.Save().ConfigureAwait(false);
 
             return mesId;
         }
 
-        private MemoryStream MakeMemory(int len)
+        private static MemoryStream MakeMemory(int len)
         {
             return new MemoryStream(new byte[len], 0, len, true, true);
         }
 
-        private byte[] PrepareToSend(IObject obj, out long mesId)
+        private async Task<(byte[], long)> PrepareToSend(IObject obj)
         {
             var packet = Serializer.SerializeObject(obj);
 
-            var genResult = ClientSettings.Session.GenerateMsgIdAndSeqNo(obj is IRequest);
-            mesId = genResult.Item1;
+            (long mesId, int seqNo) = await ClientSettings.Session.GenerateMsgIdAndSeqNo(obj is IRequest).ConfigureAwait(false);
 
-            Log.Debug($"Send message with Id = {mesId} and seqNo = {genResult.Item2}");
+            Log.Debug($"Send message with Id = {mesId} and seqNo = {seqNo}");
 
             byte[] msgKey;
             byte[] ciphertext;
@@ -85,7 +85,7 @@
                     plaintextWriter.Write(ClientSettings.Session.Salt);
                     plaintextWriter.Write(ClientSettings.Session.Id);
                     plaintextWriter.Write(mesId);
-                    plaintextWriter.Write(genResult.Item2);
+                    plaintextWriter.Write(seqNo);
                     plaintextWriter.Write(packet.Length);
                     plaintextWriter.Write(packet);
 
@@ -110,7 +110,7 @@
                     writer.Write(msgKey);
                     writer.Write(ciphertext);
 
-                    return ciphertextPacket.ToArray();
+                    return (ciphertextPacket.ToArray(), mesId);
                 }
             }
         }

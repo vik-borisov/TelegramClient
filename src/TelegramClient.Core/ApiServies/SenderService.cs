@@ -51,11 +51,11 @@
 
         private async Task<object> SendAndRecieve(IObject methodToExecute)
         {
-            var sendTask = await Sender.SendWithConfim(methodToExecute).ConfigureAwait(false);
+            (Task sendTask, long mesId) = await Sender.Send(methodToExecute).ConfigureAwait(false);
             
-            var response = await ResponseResultGetter.Receive(sendTask.Item2).ConfigureAwait(false);
+            var response = await ResponseResultGetter.Receive(mesId).ConfigureAwait(false);
             
-            await sendTask.Item1.ConfigureAwait(false);
+            await sendTask.ConfigureAwait(false);
             
             return response;
         }

@@ -7,6 +7,8 @@
 
     using log4net;
 
+    using NullGuard;
+
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Utils;
 
@@ -15,7 +17,10 @@
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(TcpTransport));
 
-        private readonly ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>> _queue = new ConcurrentQueue<Tuple<byte[], TaskCompletionSource<bool>>>();
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
+        private readonly ConcurrentQueue<(byte[], TaskCompletionSource<bool>, CancellationToken)> _messageQueue =
+            new ConcurrentQueue<(byte[], TaskCompletionSource<bool>, CancellationToken)>();
 
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
@@ -106,11 +111,11 @@
             return body;
         }
 
-        public Task Send(byte[] packet)
+        public Task Send(byte[] packet, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            PushToQueue(packet, tcs);
+            PushToQueue(packet, tcs, cancellationToken);
 
             return tcs.Task;
         }
@@ -118,9 +123,13 @@
         public async Task SendPacket(byte[] packet, CancellationToken cancelationToken)
         {
             var messageSequenceNumber = _messageSequenceNumber++;
+
             Log.Debug($"Sending message with seq_no {messageSequenceNumber}");
+
             var tcpMessage = new TcpMessage(messageSequenceNumber, packet);
+
             var encodedMessage = tcpMessage.Encode();
+
             await TcpService.Send(encodedMessage, cancelationToken).ConfigureAwait(false);
         }
 
@@ -128,47 +137,47 @@
         {
             if (disposing)
             {
+                _cancellationTokenSource?.Cancel();
                 TcpService?.Dispose();
             }
         }
 
-        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs)
+        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs, [AllowNull] CancellationToken cancellationToken)
         {
-            _queue.Enqueue(Tuple.Create(packet, tcs));
-            SendAllMessagesFromQueue(default(CancellationToken));
+            _messageQueue.Enqueue((packet, tcs, cancellationToken));
+            SendAllMessagesFromQueue().ConfigureAwait(false);
         }
 
-        private async Task SendAllMessagesFromQueue(CancellationToken cancellationToken)
+        private async Task SendAllMessagesFromQueue()
         {
-            await _semaphoreSlim.WaitAsync().ContinueWith(
-                async _ =>
-                {
-                    if (!_queue.IsEmpty)
-                    {
-                        await SendFromQueue(cancellationToken).ContinueWith(task => _semaphoreSlim.Release()).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        _semaphoreSlim.Release();
-                    }
-                }).ConfigureAwait(false);
-        }
-
-        private async Task SendFromQueue(CancellationToken cancellationToken)
-        {
-            while (!_queue.IsEmpty)
+            await _semaphoreSlim.WaitAsync();
+            if (!_messageQueue.IsEmpty)
             {
-                _queue.TryDequeue(out var item);
+                await SendFromQueue().ContinueWith(task => _semaphoreSlim.Release()).ConfigureAwait(false);
+            }
+            else
+            {
+                _semaphoreSlim.Release();
+            }
+        }
+
+        private async Task SendFromQueue()
+        {
+            while (!_messageQueue.IsEmpty)
+            {
+                _messageQueue.TryDequeue(out var item);
+                (byte[] message, TaskCompletionSource<bool> tcs, CancellationToken token) = item;
 
                 try
                 {
-                    await SendPacket(item.Item1, cancellationToken).ConfigureAwait(false);
-                    item.Item2.SetResult(true);
+                    await SendPacket(message, token).ConfigureAwait(false);
+                    tcs.SetResult(true);
                 }
                 catch (Exception e)
                 {
                     Log.Error("Failed to process the message", e);
-                    item.Item2.SetException(e);
+
+                    tcs.SetException(e);
                 }
             }
         }
