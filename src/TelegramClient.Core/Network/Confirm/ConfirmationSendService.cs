@@ -29,7 +29,7 @@
         {
             _waitSendConfirmation.Enqueue(messageId);
 
-            SendAllMessagesFromQueue();
+            SendAllMessagesFromQueue().ConfigureAwait(false);
         }
 
         public async Task SendAllMessagesFromQueue()
@@ -79,11 +79,11 @@
                                       MsgIds = new TVector<long>(msgs.ToArray())
                                   };
 
-                    await MtProtoSender.Send(message);
+                    await MtProtoSender.SendWithoutConfirm(message);
                 }
                 catch (Exception e)
                 {
-                    Log.Error("Process message failed", e);
+                    Log.Error("Sending confirmation for messages failed", e);
                 }
             }
         }

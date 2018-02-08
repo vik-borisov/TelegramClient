@@ -31,7 +31,25 @@
 
         public ISessionStore SessionStore { get; set; }
 
-        public async Task<Tuple<Task, long>> Send(IObject obj)
+        public async Task<(Task, long)> SendWithConfim(IObject obj)
+        {
+            Log.Debug($"Send with confirm {obj}");
+            
+            var mesId =  await Send(obj).ConfigureAwait(false);
+
+            var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
+
+            return (waitTask, mesId);
+        }
+        
+        public async Task<long> SendWithoutConfirm(IObject obj)
+        {
+            Log.Debug($"Send without confirm {obj}");
+
+            return await Send(obj).ConfigureAwait(false);
+        }
+
+        private async Task<long> Send(IObject obj)
         {
             var preparedData = PrepareToSend(obj, out var mesId);
 
@@ -39,9 +57,7 @@
 
             await SessionStore.Save().ConfigureAwait(false);
 
-            var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
-
-            return Tuple.Create(waitTask, mesId);
+            return mesId;
         }
 
         private MemoryStream MakeMemory(int len)

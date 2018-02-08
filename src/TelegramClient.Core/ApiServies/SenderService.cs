@@ -51,7 +51,7 @@
 
         private async Task<object> SendAndRecieve(IObject methodToExecute)
         {
-            var sendTask = await Sender.Send(methodToExecute).ConfigureAwait(false);
+            var sendTask = await Sender.SendWithConfim(methodToExecute).ConfigureAwait(false);
             
             var response = await ResponseResultGetter.Receive(sendTask.Item2).ConfigureAwait(false);
             

@@ -26,7 +26,7 @@
             {
                 if (!tcs.Task.IsCompleted)
                 {
-                    Log.Warn($"Message confirmation timed out for messageid '{requestId}'");
+                    Log.Warn($"Message response result timed out for messageid '{requestId}'");
                         
                     _resultCallbacks.TryRemove(requestId, out var _);
                         

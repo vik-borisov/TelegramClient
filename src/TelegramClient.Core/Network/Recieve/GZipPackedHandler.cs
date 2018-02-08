@@ -5,6 +5,8 @@
 
     using log4net;
 
+    using Newtonsoft.Json;
+
     using OpenTl.Schema;
     using OpenTl.Schema.Serialization;
 
@@ -18,8 +20,6 @@
 
         public IObject HandleGZipPacked(TgZipPacked obj)
         {
-            Log.Debug($"Recived Gzip message");
-
             using (var decompressStream = new MemoryStream())
             {
                 using (var stream = new MemoryStream(obj.PackedData))
@@ -32,7 +32,15 @@
 
                 using (var reader = new BinaryReader(decompressStream))
                 {
-                    return Serializer.DeserializeObject(reader);
+                    var unzippedObj = Serializer.DeserializeObject(reader);
+
+                    if (Log.IsDebugEnabled)
+                    {
+                        var jObject = JsonConvert.SerializeObject(unzippedObj);
+                        Log.Debug($"Recived Gzip message {unzippedObj}: {jObject}");
+                    }
+
+                    return unzippedObj;
                 }
             }
         }
