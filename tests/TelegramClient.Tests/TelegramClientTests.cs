@@ -284,6 +284,21 @@
         }
 
         [Fact]
+        public async Task ForLongOperation()
+        {
+            using (var client = await NewClient().ConfigureAwait(false))
+            {
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client);
+
+                var tsc = new TaskCompletionSource<bool>();
+
+                await tsc.Task;
+            }
+        }
+        
+        [Fact]
         public async Task LogOut()
         {
             using (var client = await NewClient().ConfigureAwait(false))

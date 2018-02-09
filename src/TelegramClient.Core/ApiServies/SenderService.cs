@@ -1,6 +1,7 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -24,7 +25,7 @@
 
         public Lazy<IConnectApiService> ConnectApiService { get; set; }
 
-        public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute)
+        public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute, CancellationToken cancellationToken = default(CancellationToken))
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
@@ -32,11 +33,11 @@
             {
                 try
                 {
-                    return (TResult)await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                    return (TResult)await SendAndRecieve(methodToExecute, cancellationToken).ConfigureAwait(false);
                 }
                 catch (BadServerSaltException)
                 {
-                    return (TResult)await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                    return (TResult)await SendAndRecieve(methodToExecute, cancellationToken).ConfigureAwait(false);
                 }
                 catch (AuthRestartException)
                 {
@@ -49,9 +50,9 @@
             }
         }
 
-        private async Task<object> SendAndRecieve(IObject methodToExecute)
+        private async Task<object> SendAndRecieve(IObject methodToExecute, CancellationToken cancellationToken)
         {
-            (Task sendTask, long mesId) = await Sender.Send(methodToExecute).ConfigureAwait(false);
+            (Task sendTask, long mesId) = await Sender.SendWithConfim(methodToExecute, cancellationToken).ConfigureAwait(false);
             
             var response = await ResponseResultGetter.Receive(mesId).ConfigureAwait(false);
             

@@ -79,7 +79,7 @@
                                       MsgIds = new TVector<long>(msgs.ToArray())
                                   };
 
-                    await MtProtoSender.SendWithoutConfirm(message);
+                    await MtProtoSender.SendWithoutConfirm(message, CancellationToken.None);
                 }
                 catch (Exception e)
                 {

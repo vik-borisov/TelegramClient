@@ -180,7 +180,7 @@ namespace TelegramClient.Core.Network.Recieve
                     {
                         await TcpTransport.Disconnect().ConfigureAwait(false);
                         
-                        var sendTask = await Sender.SendWithConfim(request).ConfigureAwait(false);
+                        var sendTask = await Sender.SendWithConfim(request, CancellationToken.None).ConfigureAwait(false);
                         
                         ResponseResultGetter.Receive(sendTask.Item2).ContinueWith(
                             async task =>

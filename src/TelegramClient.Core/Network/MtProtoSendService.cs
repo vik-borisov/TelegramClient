@@ -32,25 +32,25 @@
 
         public ISessionStore SessionStore { get; set; }
 
-        public async Task<(Task, long)> SendWithConfim(IObject obj)
+        public async Task<(Task, long)> SendWithConfim(IObject obj, CancellationToken cancellationToken)
         {
             Log.Debug($"Send with confirm {obj}");
             
-            var mesId =  await Send(obj).ConfigureAwait(false);
+            var mesId =  await Send(obj, cancellationToken).ConfigureAwait(false);
 
             var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
 
             return (waitTask, mesId);
         }
         
-        public async Task<long> SendWithoutConfirm(IObject obj)
+        public async Task<long> SendWithoutConfirm(IObject obj, CancellationToken cancellationToken)
         {
             Log.Debug($"Send without confirm {obj}");
 
-            return await Send(obj).ConfigureAwait(false);
+            return await Send(obj, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task<long> Send(IObject obj)
+        private async Task<long> Send(IObject obj, CancellationToken cancellationToken)
         {
             (byte[] preparedData, long mesId) = await PrepareToSend(obj).ConfigureAwait(false);
 
