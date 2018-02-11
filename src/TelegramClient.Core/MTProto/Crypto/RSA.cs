@@ -50,7 +50,9 @@
                     var paddedCiphertext = new byte[256];
                     var padding = 256 - ciphertext.Length;
                     for (var i = 0; i < padding; i++)
+                    {
                         paddedCiphertext[i] = 0;
+                    }
                     ciphertext.CopyTo(paddedCiphertext, padding);
                     return paddedCiphertext;
                 }

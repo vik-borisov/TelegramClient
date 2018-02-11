@@ -45,7 +45,7 @@
             GC.SuppressFinalize(this);
         }
 
-        public bool IsTcpClientConnected()
+        private bool IsTcpClientConnected()
         {
             if (_tcpClient == null || !_tcpClient.Connected ||
                 _tcpClient.Client == null || !_tcpClient.Client.Connected)

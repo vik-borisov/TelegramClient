@@ -1,8 +1,10 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
+    using System;
     using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using BarsGroup.CodeGuard;
@@ -29,12 +31,12 @@
 
         public ISessionStore SessionStore { get; set; }
 
-        public async Task<IPassword> GetPasswordSetting()
+        public async Task<IPassword> GetPasswordSetting(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await SenderService.SendRequestAsync(new RequestGetPassword()).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(new RequestGetPassword(), cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<ICheckedPhone> IsPhoneRegisteredAsync(string phoneNumber)
+        public async Task<ICheckedPhone> IsPhoneRegisteredAsync(string phoneNumber, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
 
@@ -42,7 +44,15 @@
                                         {
                                             PhoneNumber = phoneNumber
                                         };
-            return await SenderService.SendRequestAsync(authCheckPhoneRequest).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(authCheckPhoneRequest, cancellationToken).ConfigureAwait(false);
+        }
+
+        public void EnsureUserAuthorized()
+        {
+            if (!IsUserAuthorized())
+            {
+                throw new InvalidOperationException("Authorize user first!");
+            }
         }
 
         public bool IsUserAuthorized()
@@ -50,7 +60,7 @@
             return ClientSettings.Session.User != null;
         }
 
-        public async Task<TUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code)
+        public async Task<TUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
             Guard.That(phoneCodeHash, nameof(phoneCodeHash)).IsNotNullOrWhiteSpace();
@@ -63,7 +73,7 @@
                               PhoneCode = code
                           };
 
-            var result = (TAuthorization)await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            var result = (TAuthorization)await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
 
             var user = result.User.Cast<TUser>();
 
@@ -72,7 +82,7 @@
             return user;
         }
 
-        public async Task<TUser> MakeAuthWithPasswordAsync(TPassword password, string passwordStr)
+        public async Task<TUser> MakeAuthWithPasswordAsync(TPassword password, string passwordStr, CancellationToken cancellationToken = default(CancellationToken))
         {
             var passwordBytes = Encoding.UTF8.GetBytes(passwordStr);
             var rv = password.CurrentSalt.Concat(passwordBytes).Concat(password.CurrentSalt);
@@ -87,7 +97,7 @@
                           {
                               PasswordHash = passwordHash
                           };
-            var result = (TAuthorization)await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            var result = (TAuthorization)await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
 
             var user = result.User.As<TUser>();
 
@@ -96,7 +106,7 @@
             return user;
         }
 
-        public async Task<ISentCode> SendCodeRequestAsync(string phoneNumber)
+        public async Task<ISentCode> SendCodeRequestAsync(string phoneNumber, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guard.That(phoneNumber, nameof(phoneNumber)).IsNotNullOrWhiteSpace();
 
@@ -106,10 +116,10 @@
                               ApiId = ClientSettings.AppId,
                               ApiHash = ClientSettings.AppHash
                           };
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<TUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName, string lastName)
+        public async Task<TUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName, string lastName, CancellationToken cancellationToken = default(CancellationToken))
         {
             var request = new RequestSignUp
                           {
@@ -119,7 +129,7 @@
                               FirstName = firstName,
                               LastName = lastName
                           };
-            var result = (TAuthorization)await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            var result = (TAuthorization)await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
 
             var user = result.User.Cast<TUser>();
 

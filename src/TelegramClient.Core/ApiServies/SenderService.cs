@@ -1,6 +1,7 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -24,7 +25,7 @@
 
         public Lazy<IConnectApiService> ConnectApiService { get; set; }
 
-        public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute)
+        public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute, CancellationToken cancellationToken = default(CancellationToken))
         {
             Log.Debug($"Send message of the constructor {methodToExecute}");
 
@@ -32,32 +33,20 @@
             {
                 try
                 {
-                    return (TResult)await SendAndRecieve(methodToExecute).ConfigureAwait(false);
+                    return (TResult)await await Sender.SendAndWaitResponse(methodToExecute, cancellationToken).ConfigureAwait(false);
                 }
                 catch (BadServerSaltException)
                 {
-                    return (TResult)await SendAndRecieve(methodToExecute).ConfigureAwait(false);
                 }
                 catch (AuthRestartException)
                 {
-                    await ConnectApiService.Value.ReAuthenticateAsync().ConfigureAwait(false);
+                    await ConnectApiService.Value.ReAuthenticateAsync();
                 }
                 catch (DataCenterMigrationException ex)
                 {
-                    await ConnectApiService.Value.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
+                    await ConnectApiService.Value.ReconnectToDcAsync(ex.Dc);
                 }
             }
-        }
-
-        private async Task<object> SendAndRecieve(IObject methodToExecute)
-        {
-            var sendTask = await Sender.SendWithConfim(methodToExecute).ConfigureAwait(false);
-            
-            var response = await ResponseResultGetter.Receive(sendTask.Item2).ConfigureAwait(false);
-            
-            await sendTask.Item1.ConfigureAwait(false);
-            
-            return response;
         }
     }
 }

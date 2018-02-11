@@ -1488,7 +1488,6 @@
 
             int[] zVal = null;
             int[] yAccum = null;
-            int[] yVal;
 
             // Montgomery exponentiation is only possible if the modulus is odd,
             // but AFAIK, this is always the case for crypto algo's
@@ -1539,7 +1538,7 @@
                 yAccum = new int[m._magnitude.Length * 2];
             }
 
-            yVal = new int[m._magnitude.Length];
+            var yVal = new int[m._magnitude.Length];
 
             //
             // from LSW to MSW

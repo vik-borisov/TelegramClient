@@ -1,5 +1,6 @@
 ﻿namespace TelegramClient.Core.ApiServies.Interfaces
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     using OpenTl.Schema;
@@ -8,18 +9,20 @@
 
     public interface IAuthApiService
     {
-        Task<IPassword> GetPasswordSetting();
+        Task<IPassword> GetPasswordSetting(CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<ICheckedPhone> IsPhoneRegisteredAsync(string phoneNumber);
+        Task<ICheckedPhone> IsPhoneRegisteredAsync(string phoneNumber, CancellationToken cancellationToken = default(CancellationToken));
 
         bool IsUserAuthorized();
 
-        Task<TUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code);
+        void EnsureUserAuthorized();
 
-        Task<TUser> MakeAuthWithPasswordAsync(TPassword password, string passwordStr);
+        Task<TUser> MakeAuthAsync(string phoneNumber, string phoneCodeHash, string code, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<ISentCode> SendCodeRequestAsync(string phoneNumber);
+        Task<TUser> MakeAuthWithPasswordAsync(TPassword password, string passwordStr, CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<TUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName, string lastName);
+        Task<ISentCode> SendCodeRequestAsync(string phoneNumber, CancellationToken cancellationToken = default(CancellationToken));
+
+        Task<TUser> SignUpAsync(string phoneNumber, string phoneCodeHash, string code, string firstName, string lastName, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

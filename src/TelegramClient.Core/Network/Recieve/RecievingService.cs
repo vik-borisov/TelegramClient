@@ -43,11 +43,9 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IMtProtoSender Sender { get; set; }
 
-        public IResponseResultGetter ResponseResultGetter { get; set; }
-
         public void Dispose()
         {
-            _recievingTokenSource?.Cancel();
+            _recievingTokenSource?.Dispose();
             TcpTransport?.Dispose();
         }
 
@@ -180,13 +178,7 @@ namespace TelegramClient.Core.Network.Recieve
                     {
                         await TcpTransport.Disconnect().ConfigureAwait(false);
                         
-                        var sendTask = await Sender.SendWithConfim(request).ConfigureAwait(false);
-                        
-                        ResponseResultGetter.Receive(sendTask.Item2).ContinueWith(
-                            async task =>
-                            {
-                                await sendTask.Item1.ConfigureAwait(false);
-                            });
+                        await Sender.SendAndWaitResponse(request, CancellationToken.None).ConfigureAwait(false);
                     }
                     catch
                     {

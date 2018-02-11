@@ -5,6 +5,7 @@
     using System.IO;
     using System.Security.Cryptography;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using OpenTl.Schema;
@@ -30,7 +31,7 @@
 
         public IClientSettings ClientSettings { get; set; }
 
-        public async Task<IFile> GetFile(IInputFileLocation location, int offset = 0)
+        public async Task<IFile> GetFile(IInputFileLocation location, int offset = 0, CancellationToken cancellationToken = default(CancellationToken))
         {
             int filePartSize;
             if (location is TInputDocumentFileLocation)
@@ -50,7 +51,8 @@
                                Location = location,
                                Limit = filePartSize,
                                Offset = offset
-                           }).ConfigureAwait(false);
+                           },
+                           cancellationToken).ConfigureAwait(false);
             }
             catch (FileMigrationException ex)
             {
@@ -58,7 +60,8 @@
                                                                new RequestExportAuthorization
                                                                {
                                                                    DcId = ex.Dc
-                                                               }).ConfigureAwait(false);
+                                                               },
+                                                               cancellationToken).ConfigureAwait(false);
 
                 var authKey = ClientSettings.Session.AuthKey;
                 var timeOffset = ClientSettings.Session.TimeOffset;
@@ -71,8 +74,9 @@
                     {
                         Bytes = exportedAuth.Bytes,
                         Id = exportedAuth.Id
-                    }).ConfigureAwait(false);
-                var result = await GetFile(location, offset).ConfigureAwait(false);
+                    },
+                    cancellationToken).ConfigureAwait(false);
+                var result = await GetFile(location, offset, cancellationToken).ConfigureAwait(false);
 
                 ClientSettings.Session.AuthKey = authKey;
                 ClientSettings.Session.TimeOffset = timeOffset;
@@ -84,7 +88,7 @@
             }
         }
 
-        public async Task<IInputFile> UploadFile(string name, StreamReader reader)
+        public async Task<IInputFile> UploadFile(string name, StreamReader reader, CancellationToken cancellationToken = default(CancellationToken))
         {
             const long TenMb = 10 * 1024 * 1024;
             var isBigFileUpload = reader.BaseStream.Length >= TenMb;
@@ -108,7 +112,8 @@
                             FilePart = partNumber,
                             Bytes = part,
                             FileTotalParts = partsCount
-                        }).ConfigureAwait(false);
+                        },
+                        cancellationToken).ConfigureAwait(false);
                 }
                 else
                 {
@@ -118,7 +123,8 @@
                             FileId = fileId,
                             FilePart = partNumber,
                             Bytes = part
-                        }).ConfigureAwait(false);
+                        },
+                        cancellationToken).ConfigureAwait(false);
                 }
 
                 partNumber++;

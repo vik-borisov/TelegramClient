@@ -2,6 +2,8 @@
 {
     using System;
     using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     using OpenTl.Schema;
     using OpenTl.Schema.Serialization;
@@ -13,7 +15,7 @@
     {
         private static readonly Random Random = new Random();
 
-        private readonly object _syncObject = new object();
+        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
 
         private int _msgIdInc;
 
@@ -107,11 +109,18 @@
             return newMessageId;
         }
 
-        public Tuple<long, int> GenerateMsgIdAndSeqNo(bool confirmed)
+        public async Task<(long, int)> GenerateMsgIdAndSeqNo(bool confirmed)
         {
-            lock (_syncObject)
+            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
+
+            try
             {
-                return Tuple.Create(GenerateMsgId(), GenerateSeqNo(confirmed));
+                return (GenerateMsgId(), GenerateSeqNo(confirmed));
+
+            }
+            finally
+            {
+                _semaphoreSlim.Release();
             }
         }
 

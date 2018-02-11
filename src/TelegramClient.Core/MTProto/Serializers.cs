@@ -71,7 +71,9 @@
                 }
 
                 for (var i = 0; i < padding; i++)
+                {
                     binaryWriter.Write((byte)0);
+                }
 
                 return binaryWriter;
             }

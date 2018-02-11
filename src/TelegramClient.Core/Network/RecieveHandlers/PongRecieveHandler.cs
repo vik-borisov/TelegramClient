@@ -19,17 +19,14 @@
 
         public Type[] HandleCodes { get; } = { typeof(TPong) };
 
-        public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
-
         public void HandleResponce(IObject obj)
         {
             var message = obj.Cast<TPong>();
-            ConfirmationRecieveService.ConfirmRequest(message.MsgId);
 
             if (Log.IsDebugEnabled)
             {
                 var jMessages = JsonConvert.SerializeObject(message);
-                Log.Debug($"Handle pong for request = {message}");
+                Log.Debug($"Handle pong for request = {jMessages}");
             }
         }
     }

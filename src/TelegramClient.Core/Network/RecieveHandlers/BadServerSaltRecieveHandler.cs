@@ -7,8 +7,8 @@
     using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
+    using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
     using TelegramClient.Core.Settings;
 
@@ -19,7 +19,7 @@
 
         public Type[] HandleCodes { get; } = { typeof(TBadServerSalt) };
 
-        public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
+        public IResponseResultSetter ResponseResultSetter { get; set; }
 
         public IClientSettings ClientSettings { get; set; }
 
@@ -31,7 +31,7 @@
 
             ClientSettings.Session.Salt = message.NewServerSalt;
 
-            ConfirmationRecieveService.RequestWithException(message.BadMsgId, new BadServerSaltException());
+            ResponseResultSetter.ReturnException(message.BadMsgId, new BadServerSaltException());
         }
     }
 }

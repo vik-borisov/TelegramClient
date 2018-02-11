@@ -1,7 +1,7 @@
-﻿namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Send
 {
-    using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -11,8 +11,8 @@
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto.Crypto;
-    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
@@ -27,52 +27,50 @@
 
         public IClientSettings ClientSettings { get; set; }
 
-        public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
-
         public ISessionStore SessionStore { get; set; }
 
-        public async Task<(Task, long)> SendWithConfim(IObject obj)
-        {
-            Log.Debug($"Send with confirm {obj}");
-            
-            var mesId =  await Send(obj).ConfigureAwait(false);
-
-            var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
-
-            return (waitTask, mesId);
-        }
+        public IResponseResultGetter ResponseResultGetter { get; set; }
         
-        public async Task<long> SendWithoutConfirm(IObject obj)
+        public async Task<long> Send(IObject obj, CancellationToken cancellationToken)
         {
-            Log.Debug($"Send without confirm {obj}");
+            Log.Debug($"Send object {obj}");
 
-            return await Send(obj).ConfigureAwait(false);
-        }
+            (byte[] preparedData, long mesId) = await PrepareToSend(obj).ConfigureAwait(false);
 
-        private async Task<long> Send(IObject obj)
-        {
-            var preparedData = PrepareToSend(obj, out var mesId);
-
-            await TcpTransport.Send(preparedData).ConfigureAwait(false);
+            await TcpTransport.Send(preparedData, cancellationToken).ConfigureAwait(false);
 
             await SessionStore.Save().ConfigureAwait(false);
 
             return mesId;
         }
+        
+        public async Task<Task<object>> SendAndWaitResponse(IObject obj, CancellationToken cancellationToken)
+        {
+            Log.Debug($"Send object and wait for a response {obj}");
 
-        private MemoryStream MakeMemory(int len)
+            (byte[] preparedData, long mesId) = await PrepareToSend(obj).ConfigureAwait(false);
+
+            var responseTask = ResponseResultGetter.Receive(mesId, cancellationToken);
+            
+            await TcpTransport.Send(preparedData, cancellationToken).ConfigureAwait(false);
+
+            await SessionStore.Save().ConfigureAwait(false);
+
+            return responseTask;
+        }
+
+        private static MemoryStream MakeMemory(int len)
         {
             return new MemoryStream(new byte[len], 0, len, true, true);
         }
 
-        private byte[] PrepareToSend(IObject obj, out long mesId)
+        private async Task<(byte[], long)> PrepareToSend(IObject obj)
         {
             var packet = Serializer.SerializeObject(obj);
 
-            var genResult = ClientSettings.Session.GenerateMsgIdAndSeqNo(obj is IRequest);
-            mesId = genResult.Item1;
+            (long mesId, int seqNo) = await ClientSettings.Session.GenerateMsgIdAndSeqNo(obj is IRequest).ConfigureAwait(false);
 
-            Log.Debug($"Send message with Id = {mesId} and seqNo = {genResult.Item2}");
+            Log.Debug($"Send message with Id = {mesId} and seqNo = {seqNo}");
 
             byte[] msgKey;
             byte[] ciphertext;
@@ -85,7 +83,7 @@
                     plaintextWriter.Write(ClientSettings.Session.Salt);
                     plaintextWriter.Write(ClientSettings.Session.Id);
                     plaintextWriter.Write(mesId);
-                    plaintextWriter.Write(genResult.Item2);
+                    plaintextWriter.Write(seqNo);
                     plaintextWriter.Write(packet.Length);
                     plaintextWriter.Write(packet);
 
@@ -110,7 +108,7 @@
                     writer.Write(msgKey);
                     writer.Write(ciphertext);
 
-                    return ciphertextPacket.ToArray();
+                    return (ciphertextPacket.ToArray(), mesId);
                 }
             }
         }

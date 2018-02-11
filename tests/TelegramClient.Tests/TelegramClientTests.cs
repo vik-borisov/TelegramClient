@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -15,6 +16,7 @@
     using OpenTl.Schema.Auth;
     using OpenTl.Schema.Contacts;
     using OpenTl.Schema.Messages;
+    using OpenTl.Schema.Updates;
     using OpenTl.Schema.Upload;
 
     using TelegramClient.Core;
@@ -68,9 +70,9 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                var sentCode = (TSentCode)await client.AuthService.SendCodeRequestAsync(NumberToAuthenticate);
+                var sentCode = (TSentCode)await client.AuthService.SendCodeRequestAsync(NumberToAuthenticate).ConfigureAwait(false);
                 var code = CodeToAuthenticate; // you can change code in debugger too
 
                 if (string.IsNullOrWhiteSpace(code))
@@ -82,14 +84,14 @@
                 TUser user;
                 try
                 {
-                    user = await client.AuthService.MakeAuthAsync(NumberToAuthenticate, sentCode.PhoneCodeHash, code);
+                    user = await client.AuthService.MakeAuthAsync(NumberToAuthenticate, sentCode.PhoneCodeHash, code).ConfigureAwait(false);
                 }
                 catch (CloudPasswordNeededException)
                 {
                     var password = (TPassword)await client.AuthService.GetPasswordSetting();
                     var passwordStr = PasswordToAuthenticate;
 
-                    user = await client.AuthService.MakeAuthWithPasswordAsync(password, passwordStr);
+                    user = await client.AuthService.MakeAuthWithPasswordAsync(password, passwordStr).ConfigureAwait(false);
                 }
                 catch (InvalidPhoneCodeException ex)
                 {
@@ -109,9 +111,9 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                var result = await client.AuthService.IsPhoneRegisteredAsync(NumberToAuthenticate);
+                var result = await client.AuthService.IsPhoneRegisteredAsync(NumberToAuthenticate).ConfigureAwait(false);
                 Assert.True(result.PhoneRegistered);
             }
         }
@@ -148,9 +150,9 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                var result = await client.ContactsService.GetContactsAsync();
+                var result = await client.ContactsService.GetContactsAsync().ConfigureAwait(false);
 
                 var user = result.Cast<TContacts>().Users.Items
                                  .OfType<TUser>()
@@ -187,7 +189,8 @@
                                       AccessHash = document.AccessHash,
                                       Id = document.Id,
                                       Version = document.Version
-                                  });
+                                  })
+                                          .ConfigureAwait(false);
 
                 Assert.True(resFile.Cast<TFileCdnRedirect>().EncryptionIv.Length > 0);
             }
@@ -198,9 +201,9 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                var result = await client.ContactsService.GetContactsAsync();
+                var result = await client.ContactsService.GetContactsAsync().ConfigureAwait(false);
 
                 var user = result.Cast<TContacts>().Users.Items
                                  .OfType<TUser>()
@@ -215,9 +218,10 @@
                                       LocalId = photoLocation.LocalId,
                                       Secret = photoLocation.Secret,
                                       VolumeId = photoLocation.VolumeId
-                                  });
+                                  })
+                                          .ConfigureAwait(false);
 
-                var res = await client.MessagesService.GetUserDialogsAsync();
+                await client.MessagesService.GetUserDialogsAsync().ConfigureAwait(false);
 
                 Assert.True(resFile.Cast<TFile>().Bytes.Length > 0);
             }
@@ -227,15 +231,17 @@
         public async Task FloodExceptionShouldNotCauseCannotReadPackageLengthError()
         {
             for (var i = 0; i < 50; i++)
+            {
                 try
                 {
-                    await CheckPhones();
+                    await CheckPhones().ConfigureAwait(false);
                 }
                 catch (FloodException floodException)
                 {
                     Console.WriteLine($"FLOODEXCEPTION: {floodException}");
-                    await Task.Delay(floodException.TimeToWait);
+                    await Task.Delay(floodException.TimeToWait).ConfigureAwait(false);
                 }
+            }
         }
 
         [Fact]
@@ -243,25 +249,25 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
-                var user = await GetUser(client);
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+                var user = await GetUser(client).ConfigureAwait(false);
 
                 // Register AFTER connecting
-                client.UpdatesService.RecieveUpdates += async update => await Task.Delay(1000);
+                client.UpdatesService.RecieveUpdates += async update => await Task.Delay(1000).ConfigureAwait(false);
 
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await SendMessage(client, user);
-                await Task.Delay(15000);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
+                await Task.Delay(5000).ConfigureAwait(false);
             }
         }
 
@@ -270,19 +276,34 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                var currentState = await client.UpdatesService.GetCurrentState();
+                var currentState = await client.UpdatesService.GetCurrentState().ConfigureAwait(false);
 
-                var user = await GetUser(client);
-                await SendMessage(client, user);
+                var user = await GetUser(client).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
 
-                var updates = await client.UpdatesService.GetUpdates(currentState);
+                var updates = await client.UpdatesService.GetUpdates(currentState).ConfigureAwait(false);
 
-                Assert.IsNotType<IEmpty>(updates);
+                Assert.IsNotType<TDifferenceEmpty>(updates);
             }
         }
 
+        [Fact]
+        public async Task ForLongOperation()
+        {
+            using (var client = await NewClient().ConfigureAwait(false))
+            {
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                await GetUser(client).ConfigureAwait(false);
+
+                var tsc = new TaskCompletionSource<bool>();
+
+                await tsc.Task.ConfigureAwait(false);
+            }
+        }
+        
         [Fact]
         public async Task LogOut()
         {
@@ -290,13 +311,13 @@
             {
                 await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                await GetUser(client);
+                await GetUser(client).ConfigureAwait(false);
 
                 await client.ConnectService.LogOut().ConfigureAwait(false);
 
                 await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                await GetUser(client);
+                await GetUser(client).ConfigureAwait(false);
             }
         }
 
@@ -312,7 +333,7 @@
 
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
                 var result = await client.ContactsService.SearchUserAsync(UserNameToSendMessage);
 
@@ -347,8 +368,8 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
-                var user = await GetUser(client);
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+                var user = await GetUser(client).ConfigureAwait(false);
 
                 var m1 = SendMessage(client, user);
                 var m2 = SendMessage(client, user);
@@ -364,14 +385,34 @@
         }
 
         [Fact]
+        public async Task SendMessageWithCancelTest()
+        {
+            using (var client = await NewClient().ConfigureAwait(false))
+            {
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
+
+                var user = await GetUser(client).ConfigureAwait(false);
+
+                var cts = new CancellationTokenSource();
+                var task = SendMessage(client, user, cts.Token);
+
+                cts.Cancel();
+                
+                await Assert.ThrowsAsync<TaskCanceledException>(async () => await task.ConfigureAwait(false));
+                
+                await SendMessage(client, user, CancellationToken.None).ConfigureAwait(false);
+            }
+        }
+        
+        [Fact]
         public async Task SendMessageTest()
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                var user = await GetUser(client);
-                await SendMessage(client, user);
+                var user = await GetUser(client).ConfigureAwait(false);
+                await SendMessage(client, user).ConfigureAwait(false);
             }
         }
 
@@ -380,9 +421,9 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
-                await SendMessageToChannel(client);
+                await SendMessageToChannel(client).ConfigureAwait(false);
             }
         }
 
@@ -391,7 +432,7 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
                 var result = await client.ContactsService.GetContactsAsync();
 
@@ -412,7 +453,7 @@
         {
             using (var client = await NewClient().ConfigureAwait(false))
             {
-                await client.ConnectService.ConnectAsync();
+                await client.ConnectService.ConnectAsync().ConfigureAwait(false);
 
                 var sentCode = await client.AuthService.SendCodeRequestAsync(NotRegisteredNumberToSignUp);
                 var code = "";
@@ -551,9 +592,9 @@
             }
         }
 
-        private async Task SendMessage(ITelegramClient client, TUser user)
+        private async Task<IUpdates> SendMessage(ITelegramClient client, TUser user, CancellationToken cancellationToken = default (CancellationToken))
         {
-            await client.MessagesService.SendMessageAsync(new TInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next());
+           return await client.MessagesService.SendMessageAsync(new TInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next(), cancellationToken);
         }
 
         private static async Task SendMessageToChannel(ITelegramClient client)
