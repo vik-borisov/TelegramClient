@@ -150,7 +150,7 @@
 
         private async Task SendAllMessagesFromQueue()
         {
-            await _semaphoreSlim.WaitAsync();
+            await _semaphoreSlim.WaitAsync().ConfigureAwait(false);
             if (!_messageQueue.IsEmpty)
             {
                 await SendFromQueue().ContinueWith(task => _semaphoreSlim.Release()).ConfigureAwait(false);
