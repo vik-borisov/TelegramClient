@@ -76,7 +76,7 @@
 
             await EnsureStreamOpen();
 
-            await _semaphore.WaitAsync();
+            await _semaphore.WaitAsync().ConfigureAwait(false);
 
             _fileStream.Position = 0;
             await _fileStream.WriteAsync(session, 0, session.Length).ConfigureAwait(false);
