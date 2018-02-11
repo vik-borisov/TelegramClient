@@ -249,7 +249,7 @@
                 var user = await GetUser(client);
 
                 // Register AFTER connecting
-                client.UpdatesService.RecieveUpdates += async update => await Task.Delay(1000);
+                client.UpdatesService.RecieveUpdates += async update => await Task.Delay(1000).ConfigureAwait(false);
 
                 await SendMessage(client, user);
                 await SendMessage(client, user);
@@ -419,7 +419,7 @@
             {
                 await client.ConnectService.ConnectAsync();
 
-                await SendMessageToChannel(client);
+                await SendMessageToChannel(client).ConfigureAwait(false);
             }
         }
 

@@ -43,11 +43,9 @@ namespace TelegramClient.Core.Network.Recieve
 
         public IMtProtoSender Sender { get; set; }
 
-        public IResponseResultGetter ResponseResultGetter { get; set; }
-
         public void Dispose()
         {
-            _recievingTokenSource?.Cancel();
+            _recievingTokenSource?.Dispose();
             TcpTransport?.Dispose();
         }
 
