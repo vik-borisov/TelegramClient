@@ -296,7 +296,7 @@
 
                 var tsc = new TaskCompletionSource<bool>();
 
-                await tsc.Task;
+                await tsc.Task.ConfigureAwait(false);
             }
         }
         
@@ -394,9 +394,9 @@
 
                 cts.Cancel();
                 
-                await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
+                await Assert.ThrowsAsync<TaskCanceledException>(async () => await task.ConfigureAwait(false));
                 
-                await SendMessage(client, user, CancellationToken.None);
+                await SendMessage(client, user, CancellationToken.None).ConfigureAwait(false);
             }
         }
         
