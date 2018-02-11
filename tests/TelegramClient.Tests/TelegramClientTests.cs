@@ -219,7 +219,7 @@
                                       VolumeId = photoLocation.VolumeId
                                   });
 
-                var res = await client.MessagesService.GetUserDialogsAsync();
+                await client.MessagesService.GetUserDialogsAsync();
 
                 Assert.True(resFile.Cast<TFile>().Bytes.Length > 0);
             }
@@ -229,6 +229,7 @@
         public async Task FloodExceptionShouldNotCauseCannotReadPackageLengthError()
         {
             for (var i = 0; i < 50; i++)
+            {
                 try
                 {
                     await CheckPhones();
@@ -236,8 +237,9 @@
                 catch (FloodException floodException)
                 {
                     Console.WriteLine($"FLOODEXCEPTION: {floodException}");
-                    await Task.Delay(floodException.TimeToWait);
+                    await Task.Delay(floodException.TimeToWait).ConfigureAwait(false);
                 }
+            }
         }
 
         [Fact]
