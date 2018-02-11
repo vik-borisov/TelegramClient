@@ -20,17 +20,15 @@
 
     public class Step2DhExchange
     {
-        public byte[] NewNonce;
+        private readonly byte[] _newNonce;
 
         public Step2DhExchange()
         {
-            NewNonce = new byte[32];
+            _newNonce = new byte[32];
         }
 
         public Step2Response FromBytes(byte[] response)
         {
-            byte[] encryptedAnswer;
-
             using (var responseStream = new MemoryStream(response, false))
             {
                 using (var responseReader = new BinaryReader(responseStream))
@@ -69,14 +67,14 @@
 					}
 					*/
 
-                    encryptedAnswer = Serializers.Bytes.Read(responseReader);
+                    var encryptedAnswer = Serializers.Bytes.Read(responseReader);
 
                     return new Step2Response
                            {
                                EncryptedAnswer = encryptedAnswer,
                                ServerNonce = serverNonceFromServer,
                                Nonce = nonceFromServer,
-                               NewNonce = NewNonce
+                               NewNonce = _newNonce
                            };
                 }
             }
@@ -84,7 +82,7 @@
 
         public byte[] ToBytes(byte[] nonce, byte[] serverNonce, List<byte[]> fingerprints, BigInteger pq)
         {
-            new Random().NextBytes(NewNonce);
+            new Random().NextBytes(_newNonce);
 
             var pqPair = Factorizator.Factorize(pq);
 
@@ -100,7 +98,7 @@
                     Serializers.Bytes.Write(pqInnerDataWriter, pqPair.Max.ToByteArrayUnsigned());
                     pqInnerDataWriter.Write(nonce);
                     pqInnerDataWriter.Write(serverNonce);
-                    pqInnerDataWriter.Write(NewNonce);
+                    pqInnerDataWriter.Write(_newNonce);
 
                     byte[] ciphertext = null;
                     byte[] targetFingerprint = null;

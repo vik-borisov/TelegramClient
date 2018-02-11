@@ -18,21 +18,15 @@
             _q = q;
         }
 
-        public FactorizedPair(long p, long q)
-        {
-            _p = BigInteger.ValueOf(p);
-            _q = BigInteger.ValueOf(q);
-        }
-
         public override string ToString()
         {
             return string.Format("P: {0}, Q: {1}", _p, _q);
         }
     }
 
-    public class Factorizator
+    public static class Factorizator
     {
-        public static Random Random = new Random();
+        private static readonly Random Random = new Random();
 
         public static FactorizedPair Factorize(BigInteger pq)
         {
@@ -50,7 +44,7 @@
             // return null;
         }
 
-        public static long FindSmallMultiplierLopatin(long what)
+        private static long FindSmallMultiplierLopatin(long what)
         {
             long g = 0;
             for (var i = 0; i < 3; i++)
@@ -107,7 +101,7 @@
             return Math.Min(p, g);
         }
 
-        public static long Gcd(long a, long b)
+        private static long Gcd(long a, long b)
         {
             while (a != 0 && b != 0)
             {
