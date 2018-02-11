@@ -267,7 +267,7 @@
                 await SendMessage(client, user).ConfigureAwait(false);
                 await SendMessage(client, user).ConfigureAwait(false);
                 await SendMessage(client, user).ConfigureAwait(false);
-                await Task.Delay(5000);
+                await Task.Delay(5000).ConfigureAwait(false);
             }
         }
 

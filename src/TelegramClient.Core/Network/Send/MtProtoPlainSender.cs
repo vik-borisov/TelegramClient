@@ -47,7 +47,7 @@
                 });
         }
 
-        private byte[] ProcessReceivedMessage(byte[] recievedMessage)
+        private static byte[] ProcessReceivedMessage(byte[] recievedMessage)
         {
             using (var memoryStream = new MemoryStream(recievedMessage))
             using (var binaryReader = new BinaryReader(memoryStream))
