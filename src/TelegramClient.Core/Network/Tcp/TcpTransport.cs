@@ -142,7 +142,7 @@
             }
         }
 
-        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs, [AllowNull] CancellationToken cancellationToken)
+        private void PushToQueue(byte[] packet, TaskCompletionSource<bool> tcs, CancellationToken cancellationToken)
         {
             _messageQueue.Enqueue((packet, tcs, cancellationToken));
             SendAllMessagesFromQueue().ConfigureAwait(false);
