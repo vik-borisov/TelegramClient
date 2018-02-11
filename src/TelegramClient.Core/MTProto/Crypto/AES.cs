@@ -1302,10 +1302,6 @@
             return BlockSize;
         }
 
-        public void Reset()
-        {
-        }
-
         private void DecryptBlock(
             uint[,] kw)
         {

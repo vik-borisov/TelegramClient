@@ -24,12 +24,6 @@
             _sessionFile = $"{sessionTag}.dat";
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
         [return:AllowNull]
         public async Task<byte[]> LoadSession()
         {
@@ -85,20 +79,11 @@
             _semaphore.Release();
         }
 
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _semaphore?.Dispose();
-                _fileStream?.Dispose();
-            }
-        }
-
         private async Task EnsureStreamOpen()
         {
             if (_fileStream == null)
             {
-                await _semaphore.WaitAsync();
+                await _semaphore.WaitAsync().ConfigureAwait(false);
 
                 if (_fileStream == null)
                 {
@@ -109,9 +94,10 @@
             }
         }
 
-        ~FileSessionStoreProvider()
+        public void Dispose()
         {
-            Dispose(false);
+            _semaphore?.Dispose();
+            _fileStream?.Dispose();
         }
     }
 }
