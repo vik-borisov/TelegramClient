@@ -1,5 +1,6 @@
 ﻿namespace TelegramClient.Core.ApiServies.Interfaces
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     using OpenTl.Schema;
@@ -9,11 +10,10 @@
 
     public interface IUpdatesApiService
     {
-        Task<IState> GetCurrentState();
+        Task<IState> GetCurrentState(CancellationToken cancellationToken = default(CancellationToken));
 
-        Task<IDifference> GetUpdates(IState currentState);
+        Task<IDifference> GetUpdates(IState currentState, CancellationToken cancellationToken = default(CancellationToken));
 
-        //
         event UpdateHandler RecieveUpdates;
     }
 

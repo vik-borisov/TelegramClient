@@ -9,7 +9,6 @@
 
     using TelegramClient.Core.Exceptions;
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Exceptions;
     using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
@@ -20,8 +19,6 @@
         private static readonly ILog Log = LogManager.GetLogger(typeof(RpcResultRecieveHandler));
 
         public Type[] HandleCodes { get; } = { typeof(TRpcResult) };
-
-        public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
 
         public IResponseResultSetter ResponseResultSetter { get; set; }
 
@@ -34,8 +31,6 @@
             var message = obj.Cast<TRpcResult>();
 
             Log.Debug($"Process RpcResult  with request id = '{message.ReqMsgId}'");
-
-            ConfirmationRecieveService.ConfirmRequest(message.ReqMsgId);
 
             switch (message.Result)
             {

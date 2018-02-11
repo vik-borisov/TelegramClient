@@ -18,10 +18,22 @@
 
         private readonly ConcurrentDictionary<long, (Timer, TaskCompletionSource<object>)> _resultCallbacks = new ConcurrentDictionary<long, (Timer, TaskCompletionSource<object>)>();
 
-      public Task<object> Receive(long requestId)
+      public Task<object> Receive(long requestId, CancellationToken cancellationToken)
         {
             var tcs = new TaskCompletionSource<object>();
 
+            if (cancellationToken != default(CancellationToken))
+            {
+                cancellationToken.Register(
+                    () =>
+                    {
+                        if (!tcs.Task.IsCompleted)
+                        {
+                            tcs.TrySetCanceled(cancellationToken);
+                        }
+                    });
+            }
+            
             var timer = new Timer( _ =>
             {
                 if (!tcs.Task.IsCompleted)
@@ -30,7 +42,7 @@
                         
                     _resultCallbacks.TryRemove(requestId, out var _);
                         
-                    tcs.TrySetCanceled(new CancellationTokenSource().Token);
+                    tcs.TrySetCanceled(cancellationToken);
                 }
             }, null, TimeSpan.FromMinutes(1), TimeSpan.Zero);
 

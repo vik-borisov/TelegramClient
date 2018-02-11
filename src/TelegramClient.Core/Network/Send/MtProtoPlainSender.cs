@@ -1,12 +1,10 @@
-﻿namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Send
 {
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
-
-    using NullGuard;
 
     using TelegramClient.Core.Helpers;
     using TelegramClient.Core.IoC;

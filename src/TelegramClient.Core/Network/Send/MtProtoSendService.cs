@@ -1,6 +1,5 @@
-﻿namespace TelegramClient.Core.Network
+﻿namespace TelegramClient.Core.Network.Send
 {
-    using System;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -12,8 +11,8 @@
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.MTProto.Crypto;
-    using TelegramClient.Core.Network.Confirm;
     using TelegramClient.Core.Network.Interfaces;
+    using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.Tcp;
     using TelegramClient.Core.Sessions;
     using TelegramClient.Core.Settings;
@@ -28,30 +27,14 @@
 
         public IClientSettings ClientSettings { get; set; }
 
-        public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
-
         public ISessionStore SessionStore { get; set; }
 
-        public async Task<(Task, long)> SendWithConfim(IObject obj, CancellationToken cancellationToken)
-        {
-            Log.Debug($"Send with confirm {obj}");
-            
-            var mesId =  await Send(obj, cancellationToken).ConfigureAwait(false);
-
-            var waitTask = ConfirmationRecieveService.WaitForConfirm(mesId);
-
-            return (waitTask, mesId);
-        }
+        public IResponseResultGetter ResponseResultGetter { get; set; }
         
-        public async Task<long> SendWithoutConfirm(IObject obj, CancellationToken cancellationToken)
+        public async Task<long> Send(IObject obj, CancellationToken cancellationToken)
         {
-            Log.Debug($"Send without confirm {obj}");
+            Log.Debug($"Send object {obj}");
 
-            return await Send(obj, cancellationToken).ConfigureAwait(false);
-        }
-
-        private async Task<long> Send(IObject obj, CancellationToken cancellationToken)
-        {
             (byte[] preparedData, long mesId) = await PrepareToSend(obj).ConfigureAwait(false);
 
             await TcpTransport.Send(preparedData, cancellationToken).ConfigureAwait(false);
@@ -59,6 +42,21 @@
             await SessionStore.Save().ConfigureAwait(false);
 
             return mesId;
+        }
+        
+        public async Task<Task<object>> SendAndWaitResponse(IObject obj, CancellationToken cancellationToken)
+        {
+            Log.Debug($"Send object and wait for a response {obj}");
+
+            (byte[] preparedData, long mesId) = await PrepareToSend(obj).ConfigureAwait(false);
+
+            var responseTask = ResponseResultGetter.Receive(mesId, cancellationToken);
+            
+            await TcpTransport.Send(preparedData, cancellationToken).ConfigureAwait(false);
+
+            await SessionStore.Save().ConfigureAwait(false);
+
+            return responseTask;
         }
 
         private static MemoryStream MakeMemory(int len)

@@ -4,6 +4,7 @@
     using System.Diagnostics;
     using System.IO;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -15,6 +16,7 @@
     using OpenTl.Schema.Auth;
     using OpenTl.Schema.Contacts;
     using OpenTl.Schema.Messages;
+    using OpenTl.Schema.Updates;
     using OpenTl.Schema.Upload;
 
     using TelegramClient.Core;
@@ -279,7 +281,7 @@
 
                 var updates = await client.UpdatesService.GetUpdates(currentState);
 
-                Assert.IsNotType<IEmpty>(updates);
+                Assert.IsNotType<TDifferenceEmpty>(updates);
             }
         }
 
@@ -378,6 +380,26 @@
             }
         }
 
+        [Fact]
+        public async Task SendMessageWithCancelTest()
+        {
+            using (var client = await NewClient().ConfigureAwait(false))
+            {
+                await client.ConnectService.ConnectAsync();
+
+                var user = await GetUser(client);
+
+                var cts = new CancellationTokenSource();
+                var task = SendMessage(client, user, cts.Token);
+
+                cts.Cancel();
+                
+                await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
+                
+                await SendMessage(client, user, CancellationToken.None);
+            }
+        }
+        
         [Fact]
         public async Task SendMessageTest()
         {
@@ -566,9 +588,9 @@
             }
         }
 
-        private async Task SendMessage(ITelegramClient client, TUser user)
+        private async Task<IUpdates> SendMessage(ITelegramClient client, TUser user, CancellationToken cancellationToken = default (CancellationToken))
         {
-            await client.MessagesService.SendMessageAsync(new TInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next());
+           return await client.MessagesService.SendMessageAsync(new TInputPeerUser { UserId = user.Id }, "TEST_" + Random.Next(), cancellationToken);
         }
 
         private static async Task SendMessageToChannel(ITelegramClient client)

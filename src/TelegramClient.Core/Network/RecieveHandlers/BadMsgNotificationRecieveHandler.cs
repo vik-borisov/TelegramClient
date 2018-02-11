@@ -7,7 +7,7 @@
     using OpenTl.Schema;
 
     using TelegramClient.Core.IoC;
-    using TelegramClient.Core.Network.Confirm;
+    using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 
     [SingleInstance(typeof(IRecieveHandler))]
@@ -17,7 +17,7 @@
 
         public Type[] HandleCodes { get; } = { typeof(TBadMsgNotification) };
 
-        public IConfirmationRecieveService ConfirmationRecieveService { get; set; }
+        public IResponseResultSetter ResponseResultSetter { get; set; }
 
         public void HandleResponce(IObject obj)
         {
@@ -74,8 +74,8 @@
             }
 
             Log.Error($"Handle a bad message notification for request id = {message.BadMsgId}", exception);
-
-            ConfirmationRecieveService.RequestWithException(message.BadMsgId, exception);
+            
+            ResponseResultSetter.ReturnException(message.BadMsgId, exception);
         }
     }
 }

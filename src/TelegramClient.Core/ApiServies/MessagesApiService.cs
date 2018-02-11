@@ -1,6 +1,7 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using OpenTl.Schema;
@@ -28,9 +29,9 @@
         ///     Returns a <see cref="IUpdates" /> object contains info on one message with auxiliary data and data on the
         ///     current state of updates.
         /// </returns>
-        public async Task<IUpdates> AddChatUserAsync(int chatId, IInputUser user, int limit)
+        public async Task<IUpdates> AddChatUserAsync(int chatId, IInputUser user, int limit, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var request = new RequestAddChatUser
                           {
@@ -39,16 +40,16 @@
                               FwdLimit = limit
                           };
 
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Creates a new chat.</summary>
         /// <param name="title">Chat name</param>
         /// <param name="users">List of user IDs to be invited</param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during an action.</returns>
-        public async Task<IUpdates> CreateChatAsync(string title, TVector<IInputUser> users)
+        public async Task<IUpdates> CreateChatAsync(string title, TVector<IInputUser> users, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var request = new RequestCreateChat
                           {
@@ -56,16 +57,16 @@
                               Users = users
                           };
 
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Deletes a user from a chat and sends a service message on it.</summary>
         /// <param name="chatId">Chat's identifier</param>
         /// <param name="user">User ID to be deleted</param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during the action.</returns>
-        public async Task<IUpdates> DeleteChatUser(int chatId, IInputUser user)
+        public async Task<IUpdates> DeleteChatUser(int chatId, IInputUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var request = new RequestDeleteChatUser
                           {
@@ -73,7 +74,7 @@
                               UserId = user
                           };
 
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Deletes communication history.</summary>
@@ -84,9 +85,9 @@
         /// </param>
         /// <param name="justClear">Delete as non-recoverable or just clear the history</param>
         /// <returns>Returns a <see cref="IAffectedHistory" /> object containing a affected history</returns>
-        public async Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear)
+        public async Task<IAffectedHistory> DeleteHistoryAsync(IInputPeer peer, int maxId, bool justClear, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var deleteHistory = new RequestDeleteHistory
                                 {
@@ -95,16 +96,16 @@
                                     MaxId = maxId
                                 };
 
-            return await SenderService.SendRequestAsync(deleteHistory).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(deleteHistory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Deletes messages by their IDs.</summary>
         /// <param name="ids">Identifiers of messages</param>
         /// <param name="revoke">Delete messages for everyone</param>
         /// <returns>Returns a <see cref="IAffectedMessages" /> object containing a affected messages</returns>
-        public async Task<IAffectedMessages> DeleteMessagesAsync(TVector<int> ids, bool revoke)
+        public async Task<IAffectedMessages> DeleteMessagesAsync(TVector<int> ids, bool revoke, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var deleteMessages = new RequestDeleteMessages
                                  {
@@ -112,16 +113,16 @@
                                      Revoke = revoke
                                  };
 
-            return await SenderService.SendRequestAsync(deleteMessages).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(deleteMessages, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Changes chat photo and sends a service message on it.</summary>
         /// <param name="chatId">Chat's identifier</param>
         /// <param name="photo">Photo to be set</param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during an action.</returns>
-        public async Task<IUpdates> EditChatPhoto(int chatId, IInputChatPhoto photo)
+        public async Task<IUpdates> EditChatPhoto(int chatId, IInputChatPhoto photo, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var request = new RequestEditChatPhoto
                           {
@@ -129,16 +130,16 @@
                               Photo = photo
                           };
 
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Chanages chat name and sends a service message on it.</summary>
         /// <param name="chatId">Chat's identifier</param>
         /// <param name="title">New chat name, different from the old one</param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during an action.</returns>
-        public async Task<IUpdates> EditChatTitle(int chatId, string title)
+        public async Task<IUpdates> EditChatTitle(int chatId, string title, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var request = new RequestEditChatTitle
                           {
@@ -146,16 +147,16 @@
                               Title = title
                           };
 
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Forwards single messages.</summary>
         /// <param name="peer">User or chat where a message will be forwarded</param>
         /// <param name="messageId">Forwarded message ID</param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during an action.</returns>
-        public async Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId)
+        public async Task<IUpdates> ForwardMessageAsync(IInputPeer peer, int messageId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var forwardMessage = new RequestForwardMessage
                                  {
@@ -164,7 +165,7 @@
                                      RandomId = TlHelpers.GenerateRandomLong()
                                  };
 
-            return await SenderService.SendRequestAsync(forwardMessage).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(forwardMessage, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Forwards messages by their IDs.</summary>
@@ -174,9 +175,9 @@
         /// <param name="silent"></param>
         /// <param name="withMyScore"></param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during an action.</returns>
-        public async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore)
+        public async Task<IUpdates> ForwardMessagesAsync(IInputPeer fromPeer, IInputPeer toPeer, TVector<int> ids, bool silent, bool withMyScore, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var forwardMessages = new RequestForwardMessages
                                   {
@@ -189,36 +190,36 @@
                                       RandomId = TlHelpers.GenerateRandomTVectorLong(ids.Items.Count)
                                   };
 
-            return await SenderService.SendRequestAsync(forwardMessages);
+            return await SenderService.SendRequestAsync(forwardMessages, cancellationToken);
         }
 
         /// <summary>Returns chat basic info on their IDs.</summary>
         /// <param name="ids">Identifiers of chats</param>
         /// <returns>Object contains list of chats with auxiliary data.</returns>
-        public async Task<IChats> GetChatsAsync(TVector<int> ids)
+        public async Task<IChats> GetChatsAsync(TVector<int> ids, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var request = new RequestGetChats { Id = ids };
 
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Returns full chat info according to its ID.</summary>
         /// <param name="chatId">Chat's identifier</param>
         /// <returns>Object contains extended info on chat with auxiliary data.</returns>
-        public async Task<IChatFull> GetFullChatAsync(int chatId)
+        public async Task<IChatFull> GetFullChatAsync(int chatId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var request = new RequestGetFullChat { ChatId = chatId };
 
-            return await SenderService.SendRequestAsync(request).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(request, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<IMessages> GetHistoryAsync(IInputPeer peer, int offset, int maxId, int limit)
+        public async Task<IMessages> GetHistoryAsync(IInputPeer peer, int offset, int maxId, int limit, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var req = new RequestGetHistory
                       {
@@ -227,27 +228,27 @@
                           MaxId = maxId,
                           Limit = limit
                       };
-            return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(req, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Returns the list of messages by their IDs.</summary>
         /// <param name="ids">Identifiers of messages</param>
         /// <returns>Object contains list of messages</returns>
-        public async Task<IMessages> GetMessagesAsync(TVector<int> ids)
+        public async Task<IMessages> GetMessagesAsync(TVector<int> ids, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var getMessagesRequest = new RequestGetMessages
                                      {
                                          Id = ids
                                      };
 
-            return await SenderService.SendRequestAsync(getMessagesRequest).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(getMessagesRequest, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<IDialogs> GetUserDialogsAsync(int limit = 100)
+        public async Task<IDialogs> GetUserDialogsAsync(int limit = 100, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var getDialogs = new RequestGetDialogs
                              {
@@ -256,7 +257,7 @@
                                  Limit = limit
                              };
 
-            return await SenderService.SendRequestAsync(getDialogs).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(getDialogs, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Marks message history as read.</summary>
@@ -266,9 +267,9 @@
         ///     be read
         /// </param>
         /// <returns>Returns a <see cref="IAffectedMessages" /> object containing a affected messages</returns>
-        public async Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId)
+        public async Task<IAffectedMessages> ReadHistoryAsync(IInputPeer peer, int maxId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var readHistory = new RequestReadHistory
                               {
@@ -276,47 +277,47 @@
                                   MaxId = maxId
                               };
 
-            return await SenderService.SendRequestAsync(readHistory).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(readHistory, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Notifies the sender about the recipient having listened a voice message or watched a video.</summary>
         /// <param name="ids">Identifiers of messages</param>
         /// <returns>Returns a <see cref="IAffectedMessages" /> object containing a affected messages</returns>
-        public async Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids)
+        public async Task<IAffectedMessages> ReadMessageContentsAsync(TVector<int> ids, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var readMessageContents = new RequestReadMessageContents
                                       {
                                           Id = ids
                                       };
 
-            return await SenderService.SendRequestAsync(readMessageContents).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(readMessageContents, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Confirms receipt of messages by a client, cancels PUSH-notification sending.</summary>
         /// <param name="maxId">Maximum message ID available in a client.</param>
         /// <returns>The method returns the list of message IDs, for which PUSH-notifications were cancelled.</returns>
         /// TODO: interface?
-        public async Task<TVector<TReceivedNotifyMessage>> ReceivedMessagesAsync(int maxId)
+        public async Task<TVector<TReceivedNotifyMessage>> ReceivedMessagesAsync(int maxId, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var receivedMessages = new RequestReceivedMessages
                                    {
                                        MaxId = maxId
                                    };
 
-            return await SenderService.SendRequestAsync(receivedMessages).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(receivedMessages, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Sends a non-text message.</summary>
         /// <param name="peer">User or group to receive the message</param>
         /// <param name="media">Message contents</param>
         /// <returns>Returns a <see cref="IUpdates" /> object containing a service message sent during the action.</returns>
-        public async Task<IUpdates> SendMediaAsync(IInputPeer peer, IInputMedia media)
+        public async Task<IUpdates> SendMediaAsync(IInputPeer peer, IInputMedia media, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             var sendMedia = new RequestSendMedia
                             {
@@ -327,14 +328,14 @@
                                 ClearDraft = false
                             };
 
-            return await SenderService.SendRequestAsync(sendMedia).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(sendMedia, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Send text message to peer</summary>
         /// <returns>Object contains list of updates.</returns>
-        public async Task<IUpdates> SendMessageAsync(IInputPeer peer, string message)
+        public async Task<IUpdates> SendMessageAsync(IInputPeer peer, string message, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             return await SenderService.SendRequestAsync(
                        new RequestSendMessage
@@ -342,10 +343,11 @@
                            Peer = peer,
                            Message = message,
                            RandomId = TlHelpers.GenerateRandomLong()
-                       }).ConfigureAwait(false);
+                       },
+                       cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<bool> SendTypingAsync(IInputPeer peer)
+        public async Task<bool> SendTypingAsync(IInputPeer peer, CancellationToken cancellationToken = default(CancellationToken))
         {
             var req = new RequestSetTyping
                       {
@@ -353,7 +355,7 @@
                           Peer = peer
                       };
 
-            return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(req, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<IUpdates> SendUploadedDocument(
@@ -361,9 +363,10 @@
             IInputFile file,
             string caption,
             string mimeType,
-            TVector<IDocumentAttribute> attributes)
+            TVector<IDocumentAttribute> attributes,
+            CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             return await SenderService.SendRequestAsync(
                        new RequestSendMedia
@@ -379,12 +382,13 @@
                                        Attributes = attributes
                                    },
                            Peer = peer
-                       }).ConfigureAwait(false);
+                       },
+                       cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<IUpdates> SendUploadedPhoto(IInputPeer peer, IInputFile file, string caption)
+        public async Task<IUpdates> SendUploadedPhoto(IInputPeer peer, IInputFile file, string caption, CancellationToken cancellationToken = default(CancellationToken))
         {
-            EnsureUserAuthorized();
+            AuthApiService.EnsureUserAuthorized();
 
             return await SenderService.SendRequestAsync(
                        new RequestSendMedia
@@ -398,15 +402,9 @@
                                        Caption = caption
                                    },
                            Peer = peer
-                       }).ConfigureAwait(false);
+                       },
+                       cancellationToken).ConfigureAwait(false);
         }
 
-        private void EnsureUserAuthorized()
-        {
-            if (!AuthApiService.IsUserAuthorized())
-            {
-                throw new InvalidOperationException("Authorize user first!");
-            }
-        }
     }
 }

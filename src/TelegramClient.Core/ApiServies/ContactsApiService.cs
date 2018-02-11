@@ -1,6 +1,7 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
     using System;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using OpenTl.Schema.Contacts;
@@ -15,31 +16,21 @@
 
         public ISenderService SenderService { get; set; }
 
-        public async Task<IContacts> GetContactsAsync()
+        public async Task<IContacts> GetContactsAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             EnsureUserAuthorized();
 
             var req = new RequestGetContacts { Hash = 0 };
 
-            return await SenderService.SendRequestAsync(req).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        ///     Serch user or chat. API: contacts.search#11f812d8 q:string limit:int = contacts.Found; By default the limit is
-        ///     10.
-        /// </summary>
-        /// <param name="q">User or chat name</param>
-        /// <returns></returns>
-        public Task<IFound> SearchUserAsync(string q)
-        {
-            return SearchUserAsync(q, 10);
+            return await SenderService.SendRequestAsync(req, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>Serch user or chat. API: contacts.search#11f812d8 q:string limit:int = contacts.Found;</summary>
         /// <param name="q">User or chat name</param>
         /// <param name="limit">Max result count</param>
+        /// <param name="cancellationToken">A cancellation token</param>
         /// <returns></returns>
-        public async Task<IFound> SearchUserAsync(string q, int limit)
+        public async Task<IFound> SearchUserAsync(string q, int limit = 10, CancellationToken cancellationToken = default(CancellationToken))
         {
             EnsureUserAuthorized();
 
@@ -49,7 +40,7 @@
                         Limit = limit
                     };
 
-            return await SenderService.SendRequestAsync(r).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(r, cancellationToken).ConfigureAwait(false);
         }
 
         private void EnsureUserAuthorized()

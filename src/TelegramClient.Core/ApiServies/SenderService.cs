@@ -33,32 +33,20 @@
             {
                 try
                 {
-                    return (TResult)await SendAndRecieve(methodToExecute, cancellationToken).ConfigureAwait(false);
+                    return (TResult)await await Sender.SendAndWaitResponse(methodToExecute, cancellationToken).ConfigureAwait(false);
                 }
                 catch (BadServerSaltException)
                 {
-                    return (TResult)await SendAndRecieve(methodToExecute, cancellationToken).ConfigureAwait(false);
                 }
                 catch (AuthRestartException)
                 {
-                    await ConnectApiService.Value.ReAuthenticateAsync().ConfigureAwait(false);
+                    await ConnectApiService.Value.ReAuthenticateAsync();
                 }
                 catch (DataCenterMigrationException ex)
                 {
-                    await ConnectApiService.Value.ReconnectToDcAsync(ex.Dc).ConfigureAwait(false);
+                    await ConnectApiService.Value.ReconnectToDcAsync(ex.Dc);
                 }
             }
-        }
-
-        private async Task<object> SendAndRecieve(IObject methodToExecute, CancellationToken cancellationToken)
-        {
-            (Task sendTask, long mesId) = await Sender.SendWithConfim(methodToExecute, cancellationToken).ConfigureAwait(false);
-            
-            var response = await ResponseResultGetter.Receive(mesId).ConfigureAwait(false);
-            
-            await sendTask.ConfigureAwait(false);
-            
-            return response;
         }
     }
 }

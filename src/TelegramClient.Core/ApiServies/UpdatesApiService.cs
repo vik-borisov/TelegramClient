@@ -1,5 +1,6 @@
 ﻿namespace TelegramClient.Core.ApiServies
 {
+    using System.Threading;
     using System.Threading.Tasks;
 
     using OpenTl.Schema;
@@ -14,12 +15,12 @@
     {
         public ISenderService SenderService { get; set; }
 
-        public async Task<IState> GetCurrentState()
+        public async Task<IState> GetCurrentState(CancellationToken cancellationToken = default(CancellationToken))
         {
-            return await SenderService.SendRequestAsync(new RequestGetState()).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(new RequestGetState(), cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<IDifference> GetUpdates(IState currentState)
+        public async Task<IDifference> GetUpdates(IState currentState, CancellationToken cancellationToken = default(CancellationToken))
         {
             var getDiffRequest = new RequestGetDifference
                                  {
@@ -28,7 +29,7 @@
                                      Date = currentState.Date
                                  };
 
-            return await SenderService.SendRequestAsync(getDiffRequest).ConfigureAwait(false);
+            return await SenderService.SendRequestAsync(getDiffRequest, cancellationToken).ConfigureAwait(false);
         }
 
         public async Task OnUpdateRecieve(IUpdates message)
