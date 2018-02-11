@@ -248,7 +248,7 @@
             using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
-                var user = await GetUser(client);
+                var user = await GetUser(client).ConfigureAwait(false);
 
                 // Register AFTER connecting
                 client.UpdatesService.RecieveUpdates += async update => await Task.Delay(1000).ConfigureAwait(false);
@@ -278,7 +278,7 @@
 
                 var currentState = await client.UpdatesService.GetCurrentState();
 
-                var user = await GetUser(client);
+                var user = await GetUser(client).ConfigureAwait(false);
                 await SendMessage(client, user);
 
                 var updates = await client.UpdatesService.GetUpdates(currentState);
@@ -367,7 +367,7 @@
             using (var client = await NewClient().ConfigureAwait(false))
             {
                 await client.ConnectService.ConnectAsync();
-                var user = await GetUser(client);
+                var user = await GetUser(client).ConfigureAwait(false);
 
                 var m1 = SendMessage(client, user);
                 var m2 = SendMessage(client, user);
@@ -389,7 +389,7 @@
             {
                 await client.ConnectService.ConnectAsync();
 
-                var user = await GetUser(client);
+                var user = await GetUser(client).ConfigureAwait(false);
 
                 var cts = new CancellationTokenSource();
                 var task = SendMessage(client, user, cts.Token);
@@ -409,7 +409,7 @@
             {
                 await client.ConnectService.ConnectAsync();
 
-                var user = await GetUser(client);
+                var user = await GetUser(client).ConfigureAwait(false);
                 await SendMessage(client, user);
             }
         }
