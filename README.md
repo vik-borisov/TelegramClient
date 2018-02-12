@@ -1,5 +1,6 @@
 #TelegramClient
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d3458fb536684c8c82553caaf821888c)](https://app.codacy.com/app/OpenTl/TelegramClient?utm_source=github.com&utm_medium=referral&utm_content=vik-borisov/TelegramClient&utm_campaign=badger)
 [![Build status](https://ci.appveyor.com/api/projects/status/uia4ljj11m02omj3?svg=true)](https://ci.appveyor.com/project/vik_borisov/telegramclient)
 [![NuGet version](https://badge.fury.io/nu/telegramclientapi.svg)](https://badge.fury.io/nu/telegramclientapi)
 [![Telegram group](https://img.shields.io/badge/TELEGRAM-GROUP-green.svg)](https://t.me/joinchat/D1EEGBGwdrHcoNbzXALYPg)
