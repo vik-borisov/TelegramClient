@@ -316,8 +316,6 @@
                 await client.ConnectService.LogOut().ConfigureAwait(false);
 
                 await client.ConnectService.ConnectAsync().ConfigureAwait(false);
-
-                await GetUser(client).ConfigureAwait(false);
             }
         }
 

@@ -31,8 +31,12 @@
 
         public IClientSettings ClientSettings { get; set; }
 
+        public IAuthApiService AuthApiService { get; set; }
+
         public async Task<IFile> GetFile(IInputFileLocation location, int offset = 0, CancellationToken cancellationToken = default(CancellationToken))
         {
+            AuthApiService.EnsureUserAuthorized();
+
             int filePartSize;
             if (location is TInputDocumentFileLocation)
             {
@@ -90,6 +94,8 @@
 
         public async Task<IInputFile> UploadFile(string name, StreamReader reader, CancellationToken cancellationToken = default(CancellationToken))
         {
+            AuthApiService.EnsureUserAuthorized();
+
             const long TenMb = 10 * 1024 * 1024;
             var isBigFileUpload = reader.BaseStream.Length >= TenMb;
 

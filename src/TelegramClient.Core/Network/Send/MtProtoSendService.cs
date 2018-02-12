@@ -31,6 +31,7 @@
 
         public IResponseResultGetter ResponseResultGetter { get; set; }
         
+        
         public async Task<long> Send(IObject obj, CancellationToken cancellationToken)
         {
             Log.Debug($"Send object {obj}");

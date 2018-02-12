@@ -24,25 +24,11 @@
 
         public IUploadApiService UploadService { get; set; }
 
-        internal IWindsorContainer Container { get; set; }
+        private IWindsorContainer Container { get; set; }
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Container?.Dispose();
-            }
-        }
-
-        ~Client()
-        {
-            Dispose(false);
+            Container?.Dispose();
         }
     }
 }

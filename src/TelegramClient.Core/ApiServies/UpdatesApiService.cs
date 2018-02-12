@@ -13,15 +13,21 @@
     internal class UpdatesApiService : IUpdatesApiService,
                                        IUpdatesApiServiceRaiser
     {
+        public IAuthApiService AuthApiService { get; set; }
+
         public ISenderService SenderService { get; set; }
 
         public async Task<IState> GetCurrentState(CancellationToken cancellationToken = default(CancellationToken))
         {
+            AuthApiService.EnsureUserAuthorized();
+            
             return await SenderService.SendRequestAsync(new RequestGetState(), cancellationToken).ConfigureAwait(false);
         }
 
         public async Task<IDifference> GetUpdates(IState currentState, CancellationToken cancellationToken = default(CancellationToken))
         {
+            AuthApiService.EnsureUserAuthorized();
+
             var getDiffRequest = new RequestGetDifference
                                  {
                                      Pts = currentState.Pts,

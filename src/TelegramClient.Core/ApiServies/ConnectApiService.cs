@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using log4net;
@@ -24,6 +25,8 @@
         private static readonly ILog Log = LogManager.GetLogger(typeof(ConnectApiService));
 
         private TDcOption[] _dcOptions;
+
+        private Timer _timer; 
 
         public IClientSettings ClientSettings { get; set; }
 
@@ -54,6 +57,11 @@
             return ConnectAsync(true);
         }
 
+        public Task<IPong> PingAsync()
+        {
+            return SendService.SendRequestAsync(new RequestPing());
+        }
+
         public async Task ReconnectToDcAsync(int dcId)
         {
             if (_dcOptions == null || !_dcOptions.Any())
@@ -82,6 +90,7 @@
 
             ProtoRecieveService.StartReceiving();
 
+            
             //set-up layer
             var request = new RequestInvokeWithLayer
                           {
@@ -101,6 +110,8 @@
 
             var response = (TConfig)await SendService.SendRequestAsync(request).ConfigureAwait(false);
             _dcOptions = response.DcOptions.Items.Cast<TDcOption>().ToArray();
+            
+            _timer = new Timer(_ => PingAsync(), null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
         }
 
         private async Task<Step3Response> DoAuthentication()
@@ -137,6 +148,12 @@
             Log.Debug("Third step is done");
 
             return step3Response;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
+            ProtoRecieveService?.Dispose();
         }
     }
 }

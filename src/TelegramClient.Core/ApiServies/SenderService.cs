@@ -21,16 +21,14 @@
 
         public IMtProtoSender Sender { get; set; }
 
-        public IResponseResultGetter ResponseResultGetter { get; set; }
-
         public Lazy<IConnectApiService> ConnectApiService { get; set; }
 
         public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Log.Debug($"Send message of the constructor {methodToExecute}");
-
             while (true)
             {
+                Log.Debug($"Send message of the constructor {methodToExecute}");
+                
                 try
                 {
                     return (TResult)await await Sender.SendAndWaitResponse(methodToExecute, cancellationToken).ConfigureAwait(false);

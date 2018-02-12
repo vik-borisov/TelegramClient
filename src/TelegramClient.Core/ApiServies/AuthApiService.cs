@@ -25,8 +25,6 @@
     {
         public ISenderService SenderService { get; set; }
 
-        public IConnectApiService ConnectApiService { get; set; }
-
         public IClientSettings ClientSettings { get; set; }
 
         public ISessionStore SessionStore { get; set; }

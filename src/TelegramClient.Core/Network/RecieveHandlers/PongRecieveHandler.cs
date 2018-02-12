@@ -10,6 +10,7 @@
 
     using TelegramClient.Core.IoC;
     using TelegramClient.Core.Network.Confirm;
+    using TelegramClient.Core.Network.Recieve.Interfaces;
     using TelegramClient.Core.Network.RecieveHandlers.Interfaces;
 
     [SingleInstance(typeof(IRecieveHandler))]
@@ -19,6 +20,8 @@
 
         public Type[] HandleCodes { get; } = { typeof(TPong) };
 
+        public IResponseResultSetter ResponseResultSetter { get; set; }
+        
         public void HandleResponce(IObject obj)
         {
             var message = obj.Cast<TPong>();
@@ -28,6 +31,8 @@
                 var jMessages = JsonConvert.SerializeObject(message);
                 Log.Debug($"Handle pong for request = {jMessages}");
             }
+            
+            ResponseResultSetter.ReturnResult(message.MsgId, obj);
         }
     }
 }

@@ -93,7 +93,7 @@
             }
             else
             {
-                Log.Error($"Callback for request with Id {requestId}");
+                Log.Error($"Callback for request with Id {requestId} wasn't found");
             }
         }
     }
