@@ -18,8 +18,6 @@
 
         public void HandleResponce(IObject obj)
         {
-            var info = obj.Cast<TMsgDetailedInfo>();
-            
             Log.Debug("Handle a TMsgNewDetailedInfo");
         }
     }
