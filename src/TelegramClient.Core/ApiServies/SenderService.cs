@@ -21,8 +21,6 @@
 
         public IMtProtoSender Sender { get; set; }
 
-        public Lazy<IConnectApiService> ConnectApiService { get; set; }
-
         public async Task<TResult> SendRequestAsync<TResult>(IRequest<TResult> methodToExecute, CancellationToken cancellationToken = default(CancellationToken))
         {
             while (true)
@@ -35,14 +33,6 @@
                 }
                 catch (BadServerSaltException)
                 {
-                }
-                catch (AuthRestartException)
-                {
-                    await ConnectApiService.Value.ReAuthenticateAsync();
-                }
-                catch (DataCenterMigrationException ex)
-                {
-                    await ConnectApiService.Value.ReconnectToDcAsync(ex.Dc);
                 }
             }
         }
