@@ -1,4 +1,5 @@
-# TelegramClient DEPRECATED. Instead, use https://github.com/OpenTl/OpenTl.ClientApi 
+# TelegramClient DEPRECATED.
+# Instead, use https://github.com/OpenTl/OpenTl.ClientApi 
 
 [![Build status](https://ci.appveyor.com/api/projects/status/uia4ljj11m02omj3?svg=true)](https://ci.appveyor.com/project/vik_borisov/telegramclient)
 [![NuGet version](https://badge.fury.io/nu/telegramclientapi.svg)](https://badge.fury.io/nu/telegramclientapi)
